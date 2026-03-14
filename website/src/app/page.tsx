@@ -212,80 +212,6 @@ function PhoneMockup() {
   );
 }
 
-/* ========================  GARDEN PLANT CARD  ===================== */
-
-function GardenPlantCard({ plant }: { plant: typeof GARDEN_PLANTS[number] }) {
-  const statusColor = plant.status === "happy" ? "bg-green-plant" : plant.status === "thirsty" ? "bg-accent-orange" : "bg-accent-blue";
-  const statusEmoji = plant.status === "happy" ? "^^" : plant.status === "thirsty" ? ">.<" : "o.o";
-  const moistureColor = plant.moisture > 60 ? "bg-accent-blue" : plant.moisture > 30 ? "bg-accent-orange" : "bg-accent-red";
-
-  return (
-    <div className="bg-cream rounded-lg pixel-border p-3 sm:p-4 flex flex-col gap-2 relative overflow-hidden">
-      {/* Status dot */}
-      <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${statusColor} animate-pulse-glow`} />
-
-      {/* Mini plant avatar */}
-      <div className="flex items-end justify-center gap-1 h-10">
-        <div className="w-4 h-3 bg-green-plant rounded-sm rotate-[-15deg]" />
-        <div className="w-2 h-6 bg-green-dark" />
-        <div className="w-4 h-3 bg-green-plant rounded-sm rotate-[15deg]" />
-      </div>
-      <div className="mx-auto w-6 h-3 bg-brown rounded-sm -mt-1" />
-
-      {/* Face */}
-      <div className="flex justify-center -mt-5 mb-1">
-        <span className="pixel-font text-[6px] text-pixel-black">{statusEmoji}</span>
-      </div>
-
-      {/* Name */}
-      <p className="pixel-font text-[7px] text-center text-green-dark truncate">{plant.name}</p>
-      <p className="text-[9px] text-center text-pixel-gray -mt-1">{plant.type}</p>
-
-      {/* Bars */}
-      <div className="space-y-1">
-        <div>
-          <div className="flex justify-between mb-0.5">
-            <span className="pixel-font text-[5px] text-pixel-gray">MOISTURE</span>
-            <span className="pixel-font text-[5px] text-accent-blue">{plant.moisture}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
-            <div className={`h-full ${moistureColor} rounded-sm`} style={{ width: `${plant.moisture}%` }} />
-          </div>
-        </div>
-        <div>
-          <div className="flex justify-between mb-0.5">
-            <span className="pixel-font text-[5px] text-pixel-gray">LIGHT</span>
-            <span className="pixel-font text-[5px] text-accent-orange">{plant.light}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
-            <div className="h-full bg-accent-orange rounded-sm" style={{ width: `${plant.light}%` }} />
-          </div>
-        </div>
-        <div>
-          <div className="flex justify-between mb-0.5">
-            <span className="pixel-font text-[5px] text-pixel-gray">HP</span>
-            <span className="pixel-font text-[5px] text-green-plant">{plant.hp}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
-            <div className="h-full bg-green-plant rounded-sm" style={{ width: `${plant.hp}%` }} />
-          </div>
-        </div>
-      </div>
-
-      {/* Battery & temp */}
-      <div className="flex justify-between items-center mt-1">
-        <span className="text-[8px] text-pixel-gray">{plant.temp}°C</span>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-1.5 border border-pixel-gray/40 rounded-sm relative">
-            <div className={`absolute inset-0.5 rounded-sm ${plant.battery > 50 ? "bg-green-plant" : "bg-accent-orange"}`} style={{ width: `${plant.battery}%` }} />
-          </div>
-          <span className="text-[7px] text-pixel-gray">{plant.battery}%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ========================  iOS SCREEN MOCKUP  ===================== */
 
 function IOSScreenMockup({ screen, children }: { screen: string; children: React.ReactNode }) {
@@ -624,133 +550,33 @@ export default function Home() {
             Every plant in your home, monitored in one beautiful dashboard. See who&rsquo;s thriving and who needs a drink.
           </p>
 
-          {/* Desktop garden view */}
-          <div className="bg-white rounded-xl pixel-border p-4 sm:p-6 shadow-lg relative overflow-hidden mb-8">
-            {/* App toolbar */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-cream-dark">
-              <div className="flex items-center gap-3">
-                <span className="pixel-font text-[10px] sm:text-xs text-green-dark">My Garden</span>
-                <span className="text-[10px] text-pixel-gray">6 plants</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-2 py-1 rounded">All</span>
-                <span className="pixel-font text-[7px] text-cream bg-green-plant px-2 py-1 rounded">Grid</span>
-                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-2 py-1 rounded">List</span>
-              </div>
-            </div>
-
-            {/* Summary stats row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-5">
-              <div className="bg-green-plant/10 rounded-lg px-3 py-2 text-center">
-                <div className="pixel-font text-sm sm:text-base text-green-dark">4</div>
-                <div className="pixel-font text-[6px] text-green-dark/70">HAPPY</div>
-              </div>
-              <div className="bg-accent-orange/10 rounded-lg px-3 py-2 text-center">
-                <div className="pixel-font text-sm sm:text-base text-accent-orange">1</div>
-                <div className="pixel-font text-[6px] text-accent-orange/70">THIRSTY</div>
-              </div>
-              <div className="bg-accent-blue/10 rounded-lg px-3 py-2 text-center">
-                <div className="pixel-font text-sm sm:text-base text-accent-blue">1</div>
-                <div className="pixel-font text-[6px] text-accent-blue/70">NEEDS LIGHT</div>
-              </div>
-              <div className="bg-cream-dark rounded-lg px-3 py-2 text-center">
-                <div className="pixel-font text-sm sm:text-base text-pixel-gray">82%</div>
-                <div className="pixel-font text-[6px] text-pixel-gray/70">AVG HP</div>
-              </div>
-            </div>
-
-            {/* Plant cards grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {GARDEN_PLANTS.map((plant) => (
-                <GardenPlantCard key={plant.name} plant={plant} />
-              ))}
-            </div>
-
-            {/* Bottom action bar */}
-            <div className="flex items-center justify-between mt-5 pt-3 border-t-2 border-cream-dark">
-              <div className="flex gap-2">
-                <span className="pixel-font text-[7px] text-cream bg-green-plant px-3 py-1.5 rounded pixel-border">+ Add Plant</span>
-                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-3 py-1.5 rounded">Water All</span>
-              </div>
-              <span className="text-[9px] text-pixel-gray">Last synced: 2 min ago</span>
+          {/* Desktop screenshot */}
+          <div className="mb-10">
+            <div className="pixel-font text-[8px] text-center text-pixel-gray mb-3">DESKTOP VIEW</div>
+            <div className="rounded-xl overflow-hidden pixel-border shadow-lg">
+              <img
+                src="/garden-desktop.png"
+                alt="Plantgotchi Garden Dashboard - Desktop view showing 6 plants with live sensor data, HP bars, moisture levels, and detail panel"
+                className="w-full h-auto block"
+              />
             </div>
           </div>
 
-          {/* Mobile garden preview - side by side */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
-            {/* Mobile phone showing garden */}
-            <div className="w-56 sm:w-64">
-              <div className="border-4 border-pixel-black rounded-2xl bg-cream-dark p-3 relative overflow-hidden">
-                <div className="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg -mt-1 mb-2" />
-                {/* Status bar */}
-                <div className="flex justify-between items-center mb-2 px-1">
-                  <span className="pixel-font text-[6px] text-pixel-gray">9:41</span>
-                  <span className="pixel-font text-[6px] text-green-plant">My Garden</span>
-                  <div className="flex gap-0.5">
-                    <div className="w-2 h-1 bg-green-plant" />
-                    <div className="w-2 h-1.5 bg-green-plant" />
-                    <div className="w-2 h-2 bg-green-plant" />
-                  </div>
+          {/* Mobile + description side by side */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-14">
+            {/* Mobile screenshot in phone frame */}
+            <div className="w-56 sm:w-64 shrink-0">
+              <div className="pixel-font text-[8px] text-center text-pixel-gray mb-3">MOBILE VIEW</div>
+              <div className="border-4 border-pixel-black rounded-[24px] bg-pixel-black p-1.5 shadow-lg">
+                <div className="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg relative z-10" />
+                <div className="rounded-[18px] overflow-hidden -mt-1.5">
+                  <img
+                    src="/garden-mobile.png"
+                    alt="Plantgotchi Garden Dashboard - Mobile view with plant cards, HP bars, and moisture indicators"
+                    className="w-full h-auto block"
+                  />
                 </div>
-                {/* Mini summary */}
-                <div className="grid grid-cols-4 gap-1 mb-2">
-                  <div className="bg-green-plant/15 rounded px-1 py-0.5 text-center">
-                    <div className="pixel-font text-[7px] text-green-dark">4</div>
-                    <div className="pixel-font text-[4px] text-green-dark/60">HAPPY</div>
-                  </div>
-                  <div className="bg-accent-orange/15 rounded px-1 py-0.5 text-center">
-                    <div className="pixel-font text-[7px] text-accent-orange">1</div>
-                    <div className="pixel-font text-[4px] text-accent-orange/60">DRY</div>
-                  </div>
-                  <div className="bg-accent-blue/15 rounded px-1 py-0.5 text-center">
-                    <div className="pixel-font text-[7px] text-accent-blue">1</div>
-                    <div className="pixel-font text-[4px] text-accent-blue/60">LIGHT</div>
-                  </div>
-                  <div className="bg-cream rounded px-1 py-0.5 text-center">
-                    <div className="pixel-font text-[7px] text-pixel-gray">82%</div>
-                    <div className="pixel-font text-[4px] text-pixel-gray/60">HP</div>
-                  </div>
-                </div>
-                {/* Mini plant grid */}
-                <div className="grid grid-cols-2 gap-1.5">
-                  {GARDEN_PLANTS.slice(0, 4).map((p) => (
-                    <div key={p.name} className="bg-cream rounded pixel-border p-1.5">
-                      <div className="flex items-end justify-center gap-0.5 h-5 mb-1">
-                        <div className="w-2 h-1.5 bg-green-plant rounded-sm rotate-[-15deg]" />
-                        <div className="w-1 h-4 bg-green-dark" />
-                        <div className="w-2 h-1.5 bg-green-plant rounded-sm rotate-[15deg]" />
-                      </div>
-                      <div className="mx-auto w-3 h-1.5 bg-brown rounded-sm -mt-0.5" />
-                      <p className="pixel-font text-[5px] text-center text-green-dark mt-1 truncate">{p.name}</p>
-                      <div className="w-full h-1 bg-cream-dark rounded-sm mt-0.5">
-                        <div className="h-full bg-accent-blue rounded-sm" style={{ width: `${p.moisture}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {/* See all */}
-                <div className="text-center mt-2">
-                  <span className="pixel-font text-[5px] text-accent-blue">See all 6 plants →</span>
-                </div>
-                {/* Tab bar */}
-                <div className="flex justify-around mt-2 pt-2 border-t border-pixel-gray/20">
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="w-3 h-3 bg-green-plant rounded-sm" />
-                    <span className="pixel-font text-[4px] text-green-dark">Garden</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
-                    <span className="pixel-font text-[4px] text-pixel-gray">Camera</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
-                    <span className="pixel-font text-[4px] text-pixel-gray">Alerts</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
-                    <span className="pixel-font text-[4px] text-pixel-gray">Settings</span>
-                  </div>
-                </div>
+                <div className="mx-auto w-12 h-1 bg-pixel-gray/40 rounded-full mt-1.5" />
               </div>
             </div>
 
@@ -763,17 +589,25 @@ export default function Home() {
               </p>
               <div className="space-y-2">
                 {[
-                  "Live moisture, light & temperature",
-                  "HP score shows overall plant health",
-                  "Color-coded status at a glance",
-                  "Sort by room, health, or water needs",
+                  "Segmented HP &amp; moisture bars",
+                  "Mini 7-day trend charts per plant",
+                  "Live sensor indicators with animations",
+                  "Tap-to-expand detail panel with full stats",
+                  "Mobile bottom-sheet for plant details",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-green-plant shrink-0" />
-                    <span className="text-sm text-pixel-gray">{item}</span>
+                    <span className="text-sm text-pixel-gray" dangerouslySetInnerHTML={{ __html: item }} />
                   </div>
                 ))}
               </div>
+
+              <a
+                href="/garden"
+                className="inline-block mt-6 pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
+              >
+                Try the Live Demo
+              </a>
             </div>
           </div>
         </div>
