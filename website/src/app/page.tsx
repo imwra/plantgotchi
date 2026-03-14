@@ -212,13 +212,107 @@ function PhoneMockup() {
   );
 }
 
+/* ========================  GARDEN PLANT CARD  ===================== */
+
+function GardenPlantCard({ plant }: { plant: typeof GARDEN_PLANTS[number] }) {
+  const statusColor = plant.status === "happy" ? "bg-green-plant" : plant.status === "thirsty" ? "bg-accent-orange" : "bg-accent-blue";
+  const statusEmoji = plant.status === "happy" ? "^^" : plant.status === "thirsty" ? ">.<" : "o.o";
+  const moistureColor = plant.moisture > 60 ? "bg-accent-blue" : plant.moisture > 30 ? "bg-accent-orange" : "bg-accent-red";
+
+  return (
+    <div className="bg-cream rounded-lg pixel-border p-3 sm:p-4 flex flex-col gap-2 relative overflow-hidden">
+      {/* Status dot */}
+      <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${statusColor} animate-pulse-glow`} />
+
+      {/* Mini plant avatar */}
+      <div className="flex items-end justify-center gap-1 h-10">
+        <div className="w-4 h-3 bg-green-plant rounded-sm rotate-[-15deg]" />
+        <div className="w-2 h-6 bg-green-dark" />
+        <div className="w-4 h-3 bg-green-plant rounded-sm rotate-[15deg]" />
+      </div>
+      <div className="mx-auto w-6 h-3 bg-brown rounded-sm -mt-1" />
+
+      {/* Face */}
+      <div className="flex justify-center -mt-5 mb-1">
+        <span className="pixel-font text-[6px] text-pixel-black">{statusEmoji}</span>
+      </div>
+
+      {/* Name */}
+      <p className="pixel-font text-[7px] text-center text-green-dark truncate">{plant.name}</p>
+      <p className="text-[9px] text-center text-pixel-gray -mt-1">{plant.type}</p>
+
+      {/* Bars */}
+      <div className="space-y-1">
+        <div>
+          <div className="flex justify-between mb-0.5">
+            <span className="pixel-font text-[5px] text-pixel-gray">MOISTURE</span>
+            <span className="pixel-font text-[5px] text-accent-blue">{plant.moisture}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
+            <div className={`h-full ${moistureColor} rounded-sm`} style={{ width: `${plant.moisture}%` }} />
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between mb-0.5">
+            <span className="pixel-font text-[5px] text-pixel-gray">LIGHT</span>
+            <span className="pixel-font text-[5px] text-accent-orange">{plant.light}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
+            <div className="h-full bg-accent-orange rounded-sm" style={{ width: `${plant.light}%` }} />
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between mb-0.5">
+            <span className="pixel-font text-[5px] text-pixel-gray">HP</span>
+            <span className="pixel-font text-[5px] text-green-plant">{plant.hp}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-cream-dark rounded-sm">
+            <div className="h-full bg-green-plant rounded-sm" style={{ width: `${plant.hp}%` }} />
+          </div>
+        </div>
+      </div>
+
+      {/* Battery & temp */}
+      <div className="flex justify-between items-center mt-1">
+        <span className="text-[8px] text-pixel-gray">{plant.temp}°C</span>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-1.5 border border-pixel-gray/40 rounded-sm relative">
+            <div className={`absolute inset-0.5 rounded-sm ${plant.battery > 50 ? "bg-green-plant" : "bg-accent-orange"}`} style={{ width: `${plant.battery}%` }} />
+          </div>
+          <span className="text-[7px] text-pixel-gray">{plant.battery}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========================  iOS SCREEN MOCKUP  ===================== */
+
+function IOSScreenMockup({ screen, children }: { screen: string; children: React.ReactNode }) {
+  return (
+    <div className="w-full max-w-[200px] mx-auto">
+      <div className="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+        {/* Dynamic Island */}
+        <div className="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2" />
+        {/* Content */}
+        <div className="bg-cream rounded-lg overflow-hidden">
+          {children}
+        </div>
+        {/* Home indicator */}
+        <div className="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2" />
+      </div>
+      <p className="pixel-font text-[7px] text-center text-green-dark mt-2">{screen}</p>
+    </div>
+  );
+}
+
 /* ========================  NAV LINKS  ============================= */
 
 const NAV_LINKS = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Products", href: "#products" },
+  { label: "Garden", href: "#garden" },
   { label: "Pricing", href: "#pricing" },
-  { label: "App", href: "#app" },
 ] as const;
 
 /* ========================  DATA  ================================== */
@@ -287,6 +381,24 @@ const APP_FEATURES = [
   { title: "Push notifications", desc: "Never forget to water again" },
   { title: "Photo timeline", desc: "Automatic growth time-lapses" },
   { title: "Care history", desc: "Track every action and trend" },
+] as const;
+
+const GARDEN_PLANTS = [
+  { name: "Fern-ando", type: "Boston Fern", moisture: 72, light: 45, temp: 22, hp: 92, status: "happy", battery: 85 },
+  { name: "Aloe There", type: "Aloe Vera", moisture: 31, light: 78, temp: 24, hp: 68, status: "thirsty", battery: 62 },
+  { name: "Leaf Erikson", type: "Monstera", moisture: 58, light: 32, temp: 21, hp: 87, status: "happy", battery: 94 },
+  { name: "Cact-Jack", type: "Barrel Cactus", moisture: 15, light: 92, temp: 26, hp: 95, status: "happy", battery: 78 },
+  { name: "Herb Alpert", type: "Basil", moisture: 44, light: 55, temp: 23, hp: 73, status: "needs-light", battery: 41 },
+  { name: "Ivy League", type: "Pothos", moisture: 63, light: 28, temp: 20, hp: 81, status: "happy", battery: 99 },
+] as const;
+
+const IOS_SCREENS = [
+  { title: "Garden Overview", desc: "See all your plants at a glance with live status indicators" },
+  { title: "Plant Detail", desc: "Deep dive into sensor data, charts, and care history" },
+  { title: "Photo Timeline", desc: "Watch your plant grow with automatic time-lapse photos" },
+  { title: "Notifications", desc: "Smart alerts when your plants need attention" },
+  { title: "Sensor Pairing", desc: "Simple one-tap setup to connect new sensors" },
+  { title: "Settings", desc: "Customize thresholds, schedules, and notifications" },
 ] as const;
 
 /* ========================  PAGE  ================================== */
@@ -498,6 +610,390 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── DIGITAL GARDEN ───────── */}
+      <section id="garden" className="bg-cream-dark py-16 sm:py-24 relative scanlines">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+            Your Digital Garden
+          </h2>
+          <p className="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+            Every plant in your home, monitored in one beautiful dashboard. See who&rsquo;s thriving and who needs a drink.
+          </p>
+
+          {/* Desktop garden view */}
+          <div className="bg-white rounded-xl pixel-border p-4 sm:p-6 shadow-lg relative overflow-hidden mb-8">
+            {/* App toolbar */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-cream-dark">
+              <div className="flex items-center gap-3">
+                <span className="pixel-font text-[10px] sm:text-xs text-green-dark">My Garden</span>
+                <span className="text-[10px] text-pixel-gray">6 plants</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-2 py-1 rounded">All</span>
+                <span className="pixel-font text-[7px] text-cream bg-green-plant px-2 py-1 rounded">Grid</span>
+                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-2 py-1 rounded">List</span>
+              </div>
+            </div>
+
+            {/* Summary stats row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-5">
+              <div className="bg-green-plant/10 rounded-lg px-3 py-2 text-center">
+                <div className="pixel-font text-sm sm:text-base text-green-dark">4</div>
+                <div className="pixel-font text-[6px] text-green-dark/70">HAPPY</div>
+              </div>
+              <div className="bg-accent-orange/10 rounded-lg px-3 py-2 text-center">
+                <div className="pixel-font text-sm sm:text-base text-accent-orange">1</div>
+                <div className="pixel-font text-[6px] text-accent-orange/70">THIRSTY</div>
+              </div>
+              <div className="bg-accent-blue/10 rounded-lg px-3 py-2 text-center">
+                <div className="pixel-font text-sm sm:text-base text-accent-blue">1</div>
+                <div className="pixel-font text-[6px] text-accent-blue/70">NEEDS LIGHT</div>
+              </div>
+              <div className="bg-cream-dark rounded-lg px-3 py-2 text-center">
+                <div className="pixel-font text-sm sm:text-base text-pixel-gray">82%</div>
+                <div className="pixel-font text-[6px] text-pixel-gray/70">AVG HP</div>
+              </div>
+            </div>
+
+            {/* Plant cards grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {GARDEN_PLANTS.map((plant) => (
+                <GardenPlantCard key={plant.name} plant={plant} />
+              ))}
+            </div>
+
+            {/* Bottom action bar */}
+            <div className="flex items-center justify-between mt-5 pt-3 border-t-2 border-cream-dark">
+              <div className="flex gap-2">
+                <span className="pixel-font text-[7px] text-cream bg-green-plant px-3 py-1.5 rounded pixel-border">+ Add Plant</span>
+                <span className="pixel-font text-[7px] text-pixel-gray bg-cream-dark px-3 py-1.5 rounded">Water All</span>
+              </div>
+              <span className="text-[9px] text-pixel-gray">Last synced: 2 min ago</span>
+            </div>
+          </div>
+
+          {/* Mobile garden preview - side by side */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-12">
+            {/* Mobile phone showing garden */}
+            <div className="w-56 sm:w-64">
+              <div className="border-4 border-pixel-black rounded-2xl bg-cream-dark p-3 relative overflow-hidden">
+                <div className="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg -mt-1 mb-2" />
+                {/* Status bar */}
+                <div className="flex justify-between items-center mb-2 px-1">
+                  <span className="pixel-font text-[6px] text-pixel-gray">9:41</span>
+                  <span className="pixel-font text-[6px] text-green-plant">My Garden</span>
+                  <div className="flex gap-0.5">
+                    <div className="w-2 h-1 bg-green-plant" />
+                    <div className="w-2 h-1.5 bg-green-plant" />
+                    <div className="w-2 h-2 bg-green-plant" />
+                  </div>
+                </div>
+                {/* Mini summary */}
+                <div className="grid grid-cols-4 gap-1 mb-2">
+                  <div className="bg-green-plant/15 rounded px-1 py-0.5 text-center">
+                    <div className="pixel-font text-[7px] text-green-dark">4</div>
+                    <div className="pixel-font text-[4px] text-green-dark/60">HAPPY</div>
+                  </div>
+                  <div className="bg-accent-orange/15 rounded px-1 py-0.5 text-center">
+                    <div className="pixel-font text-[7px] text-accent-orange">1</div>
+                    <div className="pixel-font text-[4px] text-accent-orange/60">DRY</div>
+                  </div>
+                  <div className="bg-accent-blue/15 rounded px-1 py-0.5 text-center">
+                    <div className="pixel-font text-[7px] text-accent-blue">1</div>
+                    <div className="pixel-font text-[4px] text-accent-blue/60">LIGHT</div>
+                  </div>
+                  <div className="bg-cream rounded px-1 py-0.5 text-center">
+                    <div className="pixel-font text-[7px] text-pixel-gray">82%</div>
+                    <div className="pixel-font text-[4px] text-pixel-gray/60">HP</div>
+                  </div>
+                </div>
+                {/* Mini plant grid */}
+                <div className="grid grid-cols-2 gap-1.5">
+                  {GARDEN_PLANTS.slice(0, 4).map((p) => (
+                    <div key={p.name} className="bg-cream rounded pixel-border p-1.5">
+                      <div className="flex items-end justify-center gap-0.5 h-5 mb-1">
+                        <div className="w-2 h-1.5 bg-green-plant rounded-sm rotate-[-15deg]" />
+                        <div className="w-1 h-4 bg-green-dark" />
+                        <div className="w-2 h-1.5 bg-green-plant rounded-sm rotate-[15deg]" />
+                      </div>
+                      <div className="mx-auto w-3 h-1.5 bg-brown rounded-sm -mt-0.5" />
+                      <p className="pixel-font text-[5px] text-center text-green-dark mt-1 truncate">{p.name}</p>
+                      <div className="w-full h-1 bg-cream-dark rounded-sm mt-0.5">
+                        <div className="h-full bg-accent-blue rounded-sm" style={{ width: `${p.moisture}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* See all */}
+                <div className="text-center mt-2">
+                  <span className="pixel-font text-[5px] text-accent-blue">See all 6 plants →</span>
+                </div>
+                {/* Tab bar */}
+                <div className="flex justify-around mt-2 pt-2 border-t border-pixel-gray/20">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="w-3 h-3 bg-green-plant rounded-sm" />
+                    <span className="pixel-font text-[4px] text-green-dark">Garden</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
+                    <span className="pixel-font text-[4px] text-pixel-gray">Camera</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
+                    <span className="pixel-font text-[4px] text-pixel-gray">Alerts</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <div className="w-3 h-3 bg-pixel-gray/30 rounded-sm" />
+                    <span className="pixel-font text-[4px] text-pixel-gray">Settings</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="max-w-sm text-center sm:text-left">
+              <h3 className="pixel-font text-xs text-green-dark mb-3">All your plants, one view</h3>
+              <p className="text-sm text-pixel-gray mb-4">
+                The garden dashboard shows every plant in your home with live sensor data.
+                Tap any plant to see detailed charts, care history, and time-lapse photos.
+              </p>
+              <div className="space-y-2">
+                {[
+                  "Live moisture, light & temperature",
+                  "HP score shows overall plant health",
+                  "Color-coded status at a glance",
+                  "Sort by room, health, or water needs",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-green-plant shrink-0" />
+                    <span className="text-sm text-pixel-gray">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── iOS APP SCREENS ───────── */}
+      <section id="screens" className="py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+            Designed for iOS
+          </h2>
+          <p className="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+            A native app experience crafted for plant lovers. Every screen designed to make plant care feel like play.
+          </p>
+
+          {/* Screen showcase - 6 phones in a row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+
+            {/* 1: Garden Overview */}
+            <IOSScreenMockup screen="Garden">
+              <div className="p-2">
+                <div className="pixel-font text-[5px] text-green-dark mb-1">My Garden</div>
+                <div className="grid grid-cols-2 gap-1">
+                  {GARDEN_PLANTS.slice(0, 4).map((p) => (
+                    <div key={p.name} className="bg-cream-dark rounded p-1 text-center">
+                      <div className="flex items-end justify-center gap-0.5 h-4">
+                        <div className="w-1.5 h-1 bg-green-plant rounded-sm rotate-[-15deg]" />
+                        <div className="w-0.5 h-3 bg-green-dark" />
+                        <div className="w-1.5 h-1 bg-green-plant rounded-sm rotate-[15deg]" />
+                      </div>
+                      <div className="mx-auto w-2 h-1 bg-brown rounded-sm" />
+                      <p className="pixel-font text-[3px] text-green-dark mt-0.5 truncate">{p.name}</p>
+                      <div className="w-full h-0.5 bg-cream rounded-sm mt-0.5">
+                        <div className="h-full bg-accent-blue rounded-sm" style={{ width: `${p.moisture}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-1 text-center">
+                  <span className="pixel-font text-[3px] text-pixel-gray">+2 more plants</span>
+                </div>
+                {/* Bottom tabs */}
+                <div className="flex justify-around mt-2 pt-1 border-t border-pixel-gray/20">
+                  {["Garden", "Camera", "Alerts", "More"].map((t, i) => (
+                    <span key={t} className={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{t}</span>
+                  ))}
+                </div>
+              </div>
+            </IOSScreenMockup>
+
+            {/* 2: Plant Detail */}
+            <IOSScreenMockup screen="Plant Detail">
+              <div className="p-2">
+                <div className="pixel-font text-[4px] text-accent-blue mb-1">← Back</div>
+                <div className="flex items-end justify-center gap-1 h-8 mb-1">
+                  <div className="w-3 h-2 bg-green-plant rounded-sm rotate-[-15deg]" />
+                  <div className="w-1.5 h-6 bg-green-dark" />
+                  <div className="w-3 h-2 bg-green-plant rounded-sm rotate-[15deg]" />
+                </div>
+                <div className="mx-auto w-4 h-2 bg-brown rounded-sm -mt-0.5" />
+                <p className="pixel-font text-[5px] text-center text-green-dark mt-1">Fern-ando</p>
+                <p className="text-[4px] text-center text-pixel-gray">Boston Fern</p>
+                {/* Stats */}
+                <div className="space-y-1 mt-2">
+                  {[
+                    { label: "MOISTURE", value: "72%", color: "bg-accent-blue", pct: 72 },
+                    { label: "LIGHT", value: "45%", color: "bg-accent-orange", pct: 45 },
+                    { label: "TEMP", value: "22°C", color: "bg-accent-red", pct: 55 },
+                    { label: "HP", value: "92%", color: "bg-green-plant", pct: 92 },
+                  ].map((s) => (
+                    <div key={s.label}>
+                      <div className="flex justify-between">
+                        <span className="pixel-font text-[3px] text-pixel-gray">{s.label}</span>
+                        <span className="pixel-font text-[3px]">{s.value}</span>
+                      </div>
+                      <div className="w-full h-1 bg-cream-dark rounded-sm">
+                        <div className={`h-full ${s.color} rounded-sm`} style={{ width: `${s.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* Mini chart */}
+                <div className="bg-cream-dark rounded p-1 mt-2">
+                  <span className="pixel-font text-[3px] text-pixel-gray">7-DAY MOISTURE</span>
+                  <div className="flex items-end gap-px h-4 mt-0.5">
+                    {[60, 55, 70, 65, 45, 80, 72].map((v, i) => (
+                      <div key={i} className="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={{ height: `${v}%` }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </IOSScreenMockup>
+
+            {/* 3: Photo Timeline */}
+            <IOSScreenMockup screen="Photos">
+              <div className="p-2">
+                <div className="pixel-font text-[4px] text-accent-blue mb-1">← Back</div>
+                <div className="pixel-font text-[5px] text-green-dark mb-1">Photo Timeline</div>
+                {/* Photo grid */}
+                <div className="space-y-1">
+                  {["Today", "3 days ago", "1 week ago", "2 weeks ago"].map((date, i) => (
+                    <div key={date}>
+                      <span className="pixel-font text-[3px] text-pixel-gray">{date}</span>
+                      <div className={`w-full h-8 rounded mt-0.5 ${
+                        i === 0 ? "bg-green-plant/30" : i === 1 ? "bg-green-plant/25" : i === 2 ? "bg-green-plant/20" : "bg-green-plant/15"
+                      } flex items-center justify-center`}>
+                        <div className="flex items-end justify-center gap-0.5">
+                          <div className={`w-2 rounded-sm rotate-[-15deg] bg-green-plant`} style={{ height: `${6 + i * 1.5}px` }} />
+                          <div className={`w-1 bg-green-dark`} style={{ height: `${12 + i * 2}px` }} />
+                          <div className={`w-2 rounded-sm rotate-[15deg] bg-green-plant`} style={{ height: `${6 + i * 1.5}px` }} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-1">
+                  <span className="pixel-font text-[3px] text-accent-blue text-center block">▶ Play Time-lapse</span>
+                </div>
+              </div>
+            </IOSScreenMockup>
+
+            {/* 4: Notifications */}
+            <IOSScreenMockup screen="Notifications">
+              <div className="p-2">
+                <div className="pixel-font text-[5px] text-green-dark mb-2">Alerts</div>
+                <div className="space-y-1.5">
+                  {[
+                    { icon: "bg-accent-orange", title: "Aloe There is thirsty!", time: "2m ago", desc: "Moisture at 31%" },
+                    { icon: "bg-accent-blue", title: "Herb needs more light", time: "1h ago", desc: "Light level low" },
+                    { icon: "bg-green-plant", title: "Fern-ando is thriving!", time: "3h ago", desc: "HP reached 92%" },
+                    { icon: "bg-accent-red", title: "Low battery: Herb", time: "5h ago", desc: "Sensor at 41%" },
+                    { icon: "bg-accent-blue", title: "New photo captured", time: "1d ago", desc: "PlantCam auto-shot" },
+                  ].map((n, i) => (
+                    <div key={i} className="flex gap-1.5 items-start bg-cream-dark rounded p-1">
+                      <div className={`w-1.5 h-1.5 rounded-full ${n.icon} shrink-0 mt-0.5`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between">
+                          <span className="pixel-font text-[3px] text-pixel-black truncate">{n.title}</span>
+                          <span className="pixel-font text-[2.5px] text-pixel-gray shrink-0 ml-1">{n.time}</span>
+                        </div>
+                        <span className="text-[3px] text-pixel-gray">{n.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </IOSScreenMockup>
+
+            {/* 5: Sensor Pairing */}
+            <IOSScreenMockup screen="Pair Sensor">
+              <div className="p-2">
+                <div className="pixel-font text-[5px] text-green-dark mb-2 text-center">Add Sensor</div>
+                {/* Scanning animation */}
+                <div className="flex justify-center mb-2">
+                  <div className="w-12 h-12 rounded-full border-2 border-green-plant/30 flex items-center justify-center relative">
+                    <div className="w-8 h-8 rounded-full border-2 border-green-plant/50 flex items-center justify-center">
+                      <div className="w-4 h-4 rounded-full bg-green-plant/20 flex items-center justify-center">
+                        <div className="w-2 h-2 bg-green-plant rounded-full animate-pulse-glow" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="pixel-font text-[4px] text-center text-pixel-gray mb-2">Scanning for sensors...</p>
+                {/* Found sensors */}
+                <div className="space-y-1">
+                  {["Plantgotchi-A3F2", "Plantgotchi-B7E1"].map((s, i) => (
+                    <div key={s} className="flex items-center gap-1.5 bg-cream-dark rounded p-1.5">
+                      <div className={`w-2 h-2 rounded-full ${i === 0 ? "bg-green-plant animate-pulse-glow" : "bg-pixel-gray/30"}`} />
+                      <span className="pixel-font text-[3.5px] text-pixel-black flex-1">{s}</span>
+                      <span className="pixel-font text-[3px] text-cream bg-green-plant px-1.5 py-0.5 rounded">Pair</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[3px] text-pixel-gray text-center mt-2">Place sensor in pairing mode (hold button 3s)</p>
+              </div>
+            </IOSScreenMockup>
+
+            {/* 6: Settings */}
+            <IOSScreenMockup screen="Settings">
+              <div className="p-2">
+                <div className="pixel-font text-[5px] text-green-dark mb-2">Settings</div>
+                <div className="space-y-1">
+                  {[
+                    { section: "NOTIFICATIONS", items: ["Water reminders", "Low battery alerts", "Daily summary"] },
+                    { section: "SENSORS", items: ["Sync interval: 15 min", "LED brightness", "Sleep schedule"] },
+                    { section: "ACCOUNT", items: ["Profile", "Export data"] },
+                  ].map((group) => (
+                    <div key={group.section}>
+                      <span className="pixel-font text-[3px] text-pixel-gray">{group.section}</span>
+                      <div className="bg-cream-dark rounded mt-0.5">
+                        {group.items.map((item, i) => (
+                          <div key={item} className={`flex items-center justify-between px-1.5 py-1 ${i < group.items.length - 1 ? "border-b border-cream" : ""}`}>
+                            <span className="text-[3.5px] text-pixel-black">{item}</span>
+                            <div className="w-4 h-2 bg-green-plant rounded-full relative">
+                              <div className="absolute right-0.5 top-0.5 w-1 h-1 bg-white rounded-full" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </IOSScreenMockup>
+          </div>
+
+          {/* Coming to App Store badge */}
+          <div className="flex flex-col items-center mt-12 gap-3">
+            <div className="bg-pixel-black text-cream rounded-xl px-6 py-3 flex items-center gap-3">
+              <div className="flex flex-col items-center">
+                <svg className="w-6 h-6 text-cream" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                </svg>
+              </div>
+              <div>
+                <span className="pixel-font text-[6px] text-cream/60 block">Coming 2026</span>
+                <span className="pixel-font text-[9px] text-cream">Download on the App Store</span>
+              </div>
+            </div>
+            <p className="text-xs text-pixel-gray">Native iOS app. Built with SwiftUI.</p>
           </div>
         </div>
       </section>

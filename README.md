@@ -6,7 +6,7 @@ Smart plant sensors with a Tamagotchi-inspired app experience. Stick it in soil,
 
 ### Landing Page (`/`)
 
-The marketing homepage featuring product lineup, pricing bundles, setup configurations, and an app preview section.
+The marketing homepage featuring product lineup, pricing bundles, setup configurations, a digital garden dashboard preview, and an iOS app screens showcase.
 
 | Desktop | Mobile |
 |---------|--------|
