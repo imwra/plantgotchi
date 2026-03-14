@@ -42,15 +42,214 @@ function PixelPlantHero() {
   );
 }
 
-function PixelSensor({ color = "bg-green-plant", label }: { color?: string; label: string }) {
+/* =====================  ISOMETRIC DEVICE SVGS  ==================== */
+
+function IsoSensor({ variant = "solo" }: { variant?: "ble" | "solo" }) {
+  const isBle = variant === "ble";
+  const bodyFront = isBle ? "#81C784" : "#4CAF50";
+  const bodySide = isBle ? "#66BB6A" : "#388E3C";
+  const bodyTop = isBle ? "#A5D6A7" : "#66BB6A";
   return (
-    <div className="flex flex-col items-center gap-1" aria-label={label}>
-      {/* Probe */}
-      <div className="w-1.5 h-8 bg-pixel-gray" />
-      {/* Body */}
-      <div className={`w-8 h-10 ${color} pixel-border relative`}>
-        <div className="absolute top-1 left-1 w-2 h-2 bg-green-light rounded-full animate-pulse-glow" />
-        <div className="absolute bottom-1 left-1 right-1 h-1 bg-pixel-black opacity-20" />
+    <svg viewBox="0 0 140 200" width="140" height="200" className="block mx-auto drop-shadow-lg">
+      {/* Probe – long spike going down */}
+      <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+      <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+      {/* Probe tip */}
+      <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+
+      {/* Body – isometric box: top face */}
+      <polygon points="70,18 120,42 70,66 20,42" fill={bodyTop} />
+      {/* Body – front-right face */}
+      <polygon points="70,66 120,42 120,90 70,114" fill={bodyFront} />
+      {/* Body – front-left face */}
+      <polygon points="70,66 20,42 20,90 70,114" fill={bodySide} />
+
+      {/* Top bevel / rim */}
+      <polygon points="70,18 120,42 70,66 20,42" fill="white" fillOpacity="0.15" />
+
+      {/* LED indicator on top face */}
+      <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+      <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+      </ellipse>
+
+      {/* Front-right face details */}
+      {/* Status screen recess */}
+      <polygon points="78,56 112,43 112,60 78,73" fill="#1B5E20" fillOpacity="0.5" />
+      <polygon points="80,58 110,46 110,58 80,70" fill="#1B5E20" />
+      {/* Screen content – mini bar chart */}
+      <rect x="84" y="60" width="3" height="6" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+      <rect x="90" y="57" width="3" height="9" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+      <rect x="96" y="55" width="3" height="7" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+
+      {/* Left face details */}
+      {/* USB-C port (solo only) */}
+      {!isBle && (
+        <g>
+          <rect x="36" y="94" width="14" height="5" rx="2" fill="#424242" transform="skewY(26)" />
+          <rect x="38" y="95" width="10" height="3" rx="1" fill="#616161" transform="skewY(26)" />
+        </g>
+      )}
+      {/* Battery icon (BLE only) */}
+      {isBle && (
+        <g transform="translate(32,72) skewY(26)">
+          <rect x="0" y="0" width="16" height="8" rx="1.5" fill="none" stroke="#2E7D32" strokeWidth="1.5" />
+          <rect x="16" y="2" width="2" height="4" rx="0.5" fill="#2E7D32" />
+          <rect x="2" y="2" width="10" height="4" rx="0.5" fill="#69F0AE" opacity="0.7" />
+        </g>
+      )}
+
+      {/* Plantgotchi logo mark on front-right */}
+      <g transform="translate(92, 78)">
+        <circle cx="0" cy="0" r="3.5" fill="#E8F5E9" opacity="0.6" />
+        <path d="M-1.5,1 Q0,-3 1.5,1" fill="none" stroke="#2E7D32" strokeWidth="1" />
+      </g>
+
+      {/* Dimension labels */}
+      <text x="70" y="12" textAnchor="middle" fontSize="7" fontFamily="'Press Start 2P', monospace" fill="#795548" opacity="0.5">
+        {isBle ? "22×15mm" : "28×18mm"}
+      </text>
+    </svg>
+  );
+}
+
+function IsoCamera() {
+  return (
+    <svg viewBox="0 0 160 180" width="160" height="180" className="block mx-auto drop-shadow-lg">
+      {/* Body – isometric box: top face */}
+      <polygon points="80,10 140,40 80,70 20,40" fill="#424242" />
+      {/* Body – front-right face */}
+      <polygon points="80,70 140,40 140,110 80,140" fill="#2c2c2c" />
+      {/* Body – front-left face */}
+      <polygon points="80,70 20,40 20,110 80,140" fill="#1a1a1a" />
+
+      {/* Top highlight */}
+      <polygon points="80,10 140,40 80,70 20,40" fill="white" fillOpacity="0.08" />
+
+      {/* Camera lens on front-right face */}
+      <ellipse cx="108" cy="78" rx="16" ry="18" fill="#1a1a1a" />
+      <ellipse cx="108" cy="78" rx="13" ry="15" fill="#0D47A1" />
+      <ellipse cx="108" cy="78" rx="10" ry="11.5" fill="#1565C0" />
+      <ellipse cx="108" cy="78" rx="6" ry="7" fill="#42A5F5">
+        <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+      </ellipse>
+      {/* Lens flare */}
+      <ellipse cx="104" cy="73" rx="3" ry="2" fill="white" opacity="0.35" />
+
+      {/* Recording indicator LED on top */}
+      <ellipse cx="56" cy="35" rx="4" ry="2.5" fill="#c62828" />
+      <ellipse cx="56" cy="35" rx="2.5" ry="1.5" fill="#EF5350">
+        <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" />
+      </ellipse>
+      <text x="56" y="30" textAnchor="middle" fontSize="5" fontFamily="'Press Start 2P', monospace" fill="#EF5350" opacity="0.7">REC</text>
+
+      {/* Left face – IR sensor window */}
+      <polygon points="34,62 50,70 50,82 34,74" fill="#37474F" />
+      <polygon points="36,64 48,71 48,80 36,73" fill="#263238" />
+
+      {/* Mounting clip on left face */}
+      <polygon points="20,95 28,99 28,115 20,111" fill="#616161" />
+      <polygon points="28,99 36,95 36,111 28,115" fill="#757575" />
+
+      {/* Logo on front-right */}
+      <g transform="translate(108, 108)">
+        <circle cx="0" cy="0" r="4" fill="#424242" stroke="#616161" strokeWidth="0.5" />
+        <path d="M-2,1.5 Q0,-3 2,1.5" fill="none" stroke="#81C784" strokeWidth="1" />
+      </g>
+
+      {/* 5MP label */}
+      <text x="108" y="128" textAnchor="middle" fontSize="6" fontFamily="'Press Start 2P', monospace" fill="#9E9E9E" opacity="0.6">5MP</text>
+
+      {/* Dimension */}
+      <text x="80" y="6" textAnchor="middle" fontSize="7" fontFamily="'Press Start 2P', monospace" fill="#795548" opacity="0.5">38×32mm</text>
+
+      {/* Probe / stake on bottom */}
+      <polygon points="74,140 86,140 82,175 78,175" fill="#757575" />
+      <polygon points="74,140 78,175 76,174 72,140" fill="#616161" />
+    </svg>
+  );
+}
+
+function IsoCamHubPro() {
+  return (
+    <svg viewBox="0 0 200 190" width="200" height="190" className="block mx-auto drop-shadow-lg">
+      {/* Base platform – isometric */}
+      <polygon points="100,170 170,140 100,155 30,140" fill="#2E7D32" />
+      <polygon points="100,155 170,140 170,145 100,170" fill="#1B5E20" />
+      <polygon points="100,155 30,140 30,145 100,170" fill="#245828" />
+
+      {/* Main body – top face */}
+      <polygon points="100,12 168,46 100,80 32,46" fill="#388E3C" />
+      {/* Main body – front-right face */}
+      <polygon points="100,80 168,46 168,130 100,150" fill="#2E7D32" />
+      {/* Main body – front-left face */}
+      <polygon points="100,80 32,46 32,130 100,150" fill="#1B5E20" />
+
+      {/* Top highlight */}
+      <polygon points="100,12 168,46 100,80 32,46" fill="white" fillOpacity="0.1" />
+
+      {/* Screen on front-right face – large display */}
+      <polygon points="108,56 158,36 158,85 108,105" fill="#0a0a0a" />
+      <polygon points="110,58 156,39 156,83 110,103" fill="#0D1117" />
+      {/* Screen content – dashboard UI */}
+      {/* Top bar */}
+      <polygon points="112,60 154,42 154,46 112,64" fill="#1B5E20" />
+      {/* Plant icons row */}
+      <rect x="114" y="66" width="5" height="5" fill="#69F0AE" opacity="0.7" transform="skewY(-26)" />
+      <rect x="122" y="63" width="5" height="5" fill="#81C784" opacity="0.7" transform="skewY(-26)" />
+      <rect x="130" y="60" width="5" height="5" fill="#FFB74D" opacity="0.7" transform="skewY(-26)" />
+      <rect x="138" y="57" width="5" height="5" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+      {/* Chart lines */}
+      <line x1="114" y1="83" x2="150" y2="69" stroke="#69F0AE" strokeWidth="1" opacity="0.5" />
+      <line x1="114" y1="87" x2="150" y2="73" stroke="#42A5F5" strokeWidth="1" opacity="0.4" />
+      {/* Status text */}
+      <rect x="114" y="92" width="20" height="2" fill="#69F0AE" opacity="0.4" transform="skewY(-26)" />
+
+      {/* Camera lens on front-right face */}
+      <ellipse cx="134" cy="118" rx="10" ry="11" fill="#1a1a1a" />
+      <ellipse cx="134" cy="118" rx="7.5" ry="8.5" fill="#0D47A1" />
+      <ellipse cx="134" cy="118" rx="5" ry="5.5" fill="#42A5F5" opacity="0.8" />
+      <ellipse cx="132" cy="115" rx="2" ry="1.5" fill="white" opacity="0.3" />
+
+      {/* Left face – ventilation grille */}
+      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <line key={i} x1="38" y1={62 + i * 8} x2="56" y2={70 + i * 8} stroke="#245828" strokeWidth="2.5" opacity="0.5" />
+      ))}
+
+      {/* WiFi antenna on top */}
+      <rect x="50" y="18" width="4" height="22" rx="2" fill="#616161" transform="skewY(26) skewX(-10)" />
+      <circle cx="56" cy="16" r="3" fill="#757575" />
+      {/* WiFi waves */}
+      <path d="M42,12 Q56,2 70,12" fill="none" stroke="#69F0AE" strokeWidth="1" opacity="0.5">
+        <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" />
+      </path>
+      <path d="M46,16 Q56,8 66,16" fill="none" stroke="#69F0AE" strokeWidth="1" opacity="0.7">
+        <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" begin="0.3s" repeatCount="indefinite" />
+      </path>
+
+      {/* LED strip on top face */}
+      {[0, 1, 2].map((i) => (
+        <ellipse key={i} cx={88 + i * 12} cy={30 + i * 6} rx="3" ry="1.8" fill="#69F0AE" opacity={0.6 + i * 0.15}>
+          <animate attributeName="opacity" values={`${0.6 + i * 0.15};0.2;${0.6 + i * 0.15}`} dur="2.5s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
+        </ellipse>
+      ))}
+
+      {/* Label */}
+      <text x="100" y="8" textAnchor="middle" fontSize="7" fontFamily="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62×45mm</text>
+
+      {/* Rpi label on left face */}
+      <text x="48" y="125" fontSize="5" fontFamily="'Press Start 2P', monospace" fill="#A5D6A7" opacity="0.4" transform="skewY(26)">RPi</text>
+    </svg>
+  );
+}
+
+/* Legacy wrappers used in Setup Configurations section */
+function PixelSensor({ color = "bg-green-plant", label }: { color?: string; label: string }) {
+  const isBle = color === "bg-green-light";
+  return (
+    <div className="flex flex-col items-center" aria-label={label}>
+      <div className="w-20 h-24">
+        <IsoSensor variant={isBle ? "ble" : "solo"} />
       </div>
     </div>
   );
@@ -58,12 +257,9 @@ function PixelSensor({ color = "bg-green-plant", label }: { color?: string; labe
 
 function PixelCamera() {
   return (
-    <div className="flex flex-col items-center gap-1" aria-label="PlantCam sensor">
-      <div className="w-12 h-14 bg-pixel-black pixel-border relative">
-        {/* lens */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full border-2 border-pixel-gray bg-accent-blue opacity-80" />
-        {/* indicator */}
-        <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-2 h-2 bg-accent-red rounded-full animate-pulse-glow" />
+    <div className="flex flex-col items-center" aria-label="PlantCam sensor">
+      <div className="w-20 h-24">
+        <IsoCamera />
       </div>
     </div>
   );
@@ -71,20 +267,10 @@ function PixelCamera() {
 
 function PixelHub() {
   return (
-    <div className="flex flex-col items-center gap-1" aria-label="CamHub Pro">
-      <div className="w-16 h-12 bg-green-dark pixel-border relative">
-        {/* screen */}
-        <div className="absolute top-1.5 left-1.5 right-1.5 h-5 bg-pixel-black rounded-sm">
-          <div className="absolute inset-0.5 bg-green-plant opacity-30" />
-          <div className="absolute top-1 left-1 w-1 h-1 bg-green-light" />
-          <div className="absolute top-1 left-3 w-3 h-0.5 bg-green-light" />
-          <div className="absolute top-2.5 left-1 w-5 h-0.5 bg-green-light opacity-60" />
-        </div>
-        {/* lens */}
-        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-pixel-gray bg-accent-blue opacity-70" />
+    <div className="flex flex-col items-center" aria-label="CamHub Pro">
+      <div className="w-24 h-24">
+        <IsoCamHubPro />
       </div>
-      {/* base */}
-      <div className="w-10 h-1.5 bg-green-dark" />
     </div>
   );
 }
@@ -439,14 +625,14 @@ export default function Home() {
             {PRODUCTS.map((p, i) => (
               <div
                 key={p.name}
-                className="bg-cream-dark rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden scanlines"
+                className="bg-cream-dark rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
               >
-                {/* device art */}
-                <div className="h-20 flex items-end justify-center">
-                  {i === 0 && <PixelSensor color="bg-green-light" label={p.name} />}
-                  {i === 1 && <PixelSensor color="bg-green-plant" label={p.name} />}
-                  {i === 2 && <PixelCamera />}
-                  {i === 3 && <PixelHub />}
+                {/* Isometric device art */}
+                <div className="flex items-center justify-center" style={{ height: i === 3 ? 160 : 140 }}>
+                  {i === 0 && <IsoSensor variant="ble" />}
+                  {i === 1 && <IsoSensor variant="solo" />}
+                  {i === 2 && <IsoCamera />}
+                  {i === 3 && <IsoCamHubPro />}
                 </div>
 
                 <h3 className="pixel-font text-[10px] text-pixel-black">{p.name}</h3>
