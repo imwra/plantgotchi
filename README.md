@@ -8,13 +8,17 @@ Smart plant sensors with a Tamagotchi-inspired app experience. Stick it in soil,
 
 The marketing homepage featuring product lineup, pricing bundles, setup configurations, and an app preview section.
 
-![Landing Page](screenshots/home-page.png)
+| Desktop | Mobile |
+|---------|--------|
+| ![Landing Page](screenshots/home-page.png) | ![Landing Page Mobile](screenshots/home-page-mobile.png) |
 
 ### Admin Dashboard (`/admin`)
 
 Internal product launch tracker with 11 development phases, task management, cost estimation, and milestone tracking.
 
-![Admin Dashboard](screenshots/admin-page.png)
+| Desktop | Mobile |
+|---------|--------|
+| ![Admin Dashboard](screenshots/admin-page.png) | ![Admin Dashboard Mobile](screenshots/admin-page-mobile.png) |
 
 ## Tech Stack
 
