@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Base theme for Plantgotchi.
+        Compose handles theming at runtime; this is only needed for
+        the splash/launch screen before Compose initializes.
+    -->
+    <style name="Theme.Plantgotchi" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/cream</item>
+        <item name="android:statusBarColor">@color/cream</item>
+        <item name="android:navigationBarColor">@color/cream</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
