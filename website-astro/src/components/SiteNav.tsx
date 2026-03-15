@@ -1,22 +1,22 @@
 import { useState } from "react";
 
-const base = import.meta.env.BASE_URL || "/";
-
 const NAV_LINKS = [
-  { label: "Home", href: base },
-  { label: "Garden", href: `${base}garden` },
-  { label: "Admin", href: `${base}admin` },
-  { label: "Products", href: `${base}#products` },
-  { label: "Pricing", href: `${base}#pricing` },
+  { label: "Home", href: "/" },
+  { label: "Garden", href: "/garden" },
+  { label: "Admin", href: "/admin" },
 ];
 
-export default function SiteNav() {
+interface SiteNavProps {
+  userName?: string;
+}
+
+export default function SiteNav({ userName }: SiteNavProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <nav className="sticky top-0 z-50 bg-cream/90 backdrop-blur-sm border-b-2 border-pixel-black">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <a href={base} className="pixel-font text-green-dark text-xs sm:text-sm tracking-tight">
+        <a href="/" className="pixel-font text-green-dark text-xs sm:text-sm tracking-tight">
           Plantgotchi
         </a>
 
@@ -34,12 +34,27 @@ export default function SiteNav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href={`${base}#pricing`}
-            className="pixel-font text-[8px] sm:text-[10px] bg-green-plant text-cream px-3 py-2 pixel-border hover:bg-green-dark transition-colors"
-          >
-            Pre-order
-          </a>
+          {userName ? (
+            <>
+              <span className="hidden sm:inline text-xs text-pixel-gray">{userName}</span>
+              <button
+                onClick={async () => {
+                  await fetch("/api/auth/sign-out", { method: "POST" });
+                  window.location.href = "/login";
+                }}
+                className="pixel-font text-[8px] sm:text-[10px] bg-pixel-gray text-cream px-3 py-2 pixel-border hover:bg-pixel-black transition-colors"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <a
+              href="/login"
+              className="pixel-font text-[8px] sm:text-[10px] bg-green-plant text-cream px-3 py-2 pixel-border hover:bg-green-dark transition-colors"
+            >
+              Login
+            </a>
+          )}
 
           {/* Mobile hamburger */}
           <button
@@ -80,6 +95,24 @@ export default function SiteNav() {
                 {l.label}
               </a>
             ))}
+            {userName ? (
+              <div className="px-3 py-2.5 flex items-center justify-between">
+                <span className="text-xs text-pixel-gray">{userName}</span>
+                <button
+                  onClick={async () => {
+                    await fetch("/api/auth/sign-out", { method: "POST" });
+                    window.location.href = "/login";
+                  }}
+                  className="pixel-font text-[8px] text-accent-red"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <a href="/login" className="pixel-font text-[9px] text-green-dark px-3 py-2.5">
+                Login
+              </a>
+            )}
           </div>
         </div>
       )}
