@@ -17,6 +17,9 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "POSTHOG_API_KEY", "\"${project.findProperty("POSTHOG_API_KEY") ?: ""}\"")
+        buildConfigField("String", "POSTHOG_HOST", "\"${project.findProperty("POSTHOG_HOST") ?: "https://us.i.posthog.com"}\"")
     }
 
     buildTypes {
@@ -41,6 +44,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -94,6 +98,9 @@ dependencies {
 
     // Core KTX
     implementation("androidx.core:core-ktx:1.15.0")
+
+    // PostHog analytics
+    implementation("com.posthog:posthog-android:3.+")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
