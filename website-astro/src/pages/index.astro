@@ -1,9 +1,1079 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import SiteNav from '../components/SiteNav';
-import LandingPage from '../components/LandingPage';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteNav from "../components/SiteNav";
+
+const PRODUCTS = [
+  {
+    name: "BLE Child Sensor",
+    price: "$9 - $12",
+    nickname: "The tiny one",
+    specs: ["BLE only", "CR2032 battery", "2-year battery life"],
+    color: "bg-green-light",
+  },
+  {
+    name: "Solo Sensor",
+    price: "$15 - $19",
+    nickname: "The independent one",
+    specs: ["WiFi + BLE", "USB-C rechargeable", "OLED screen option"],
+    color: "bg-green-plant",
+  },
+  {
+    name: "PlantCam",
+    price: "$25 - $29",
+    nickname: "The photographer",
+    specs: ["5MP camera", "Auto time-lapse", "4-6 month battery"],
+    color: "bg-accent-blue",
+  },
+  {
+    name: "PlantCam Pro",
+    price: "$69 - $79",
+    nickname: "The brain",
+    specs: ["AI plant disease detection", "Hub for all sensors", "Raspberry Pi powered"],
+    color: "bg-accent-purple",
+  },
+];
+
+const SETUPS = [
+  {
+    title: "Hub + Children",
+    desc: "Best for plant collectors (5+ plants)",
+    detail: "CamHub Pro + BLE sensors",
+    icon: "hub",
+  },
+  {
+    title: "Standalone",
+    desc: "Perfect for 1-3 plants",
+    detail: "WiFi sensors work alone",
+    icon: "solo",
+  },
+  {
+    title: "Parent + Children",
+    desc: "No hub needed",
+    detail: "Parent sensor relays data for children",
+    icon: "parent",
+  },
+];
+
+const BUNDLES = [
+  { name: "Starter Kit", price: "$35", contents: "1 Solo Sensor + 1 PlantCam" },
+  { name: "Home Garden Kit", price: "$99", contents: "5 BLE Sensors + 1 CamHub Pro" },
+  { name: "Plant Parent Kit", price: "$45", contents: "5 BLE Sensors + 1 Solo (parent)" },
+  { name: "Sensor 5-Pack", price: "$29", contents: "5 BLE Child Sensors" },
+];
+
+const APP_FEATURES = [
+  { title: "Real-time monitoring", desc: "Live moisture, light, and temperature data" },
+  { title: "Push notifications", desc: "Never forget to water again" },
+  { title: "Photo timeline", desc: "Automatic growth time-lapses" },
+  { title: "Care history", desc: "Track every action and trend" },
+];
+
+const GARDEN_PLANTS = [
+  { name: "Fern-ando", type: "Boston Fern", moisture: 72, light: 45, temp: 22, hp: 92, status: "happy", battery: 85 },
+  { name: "Aloe There", type: "Aloe Vera", moisture: 31, light: 78, temp: 24, hp: 68, status: "thirsty", battery: 62 },
+  { name: "Leaf Erikson", type: "Monstera", moisture: 58, light: 32, temp: 21, hp: 87, status: "happy", battery: 94 },
+  { name: "Cact-Jack", type: "Barrel Cactus", moisture: 15, light: 92, temp: 26, hp: 95, status: "happy", battery: 78 },
+  { name: "Herb Alpert", type: "Basil", moisture: 44, light: 55, temp: 23, hp: 73, status: "needs-light", battery: 41 },
+  { name: "Ivy League", type: "Pothos", moisture: 63, light: 28, temp: 20, hp: 81, status: "happy", battery: 99 },
+];
+
+const MOISTURE_CHART = [60, 55, 70, 65, 45, 80, 67];
+const DETAIL_CHART = [60, 55, 70, 65, 45, 80, 72];
+
+const PHOTO_DATES = ["Today", "3 days ago", "1 week ago", "2 weeks ago"];
+
+const NOTIFICATIONS = [
+  { icon: "bg-accent-orange", title: "Aloe There is thirsty!", time: "2m ago", desc: "Moisture at 31%" },
+  { icon: "bg-accent-blue", title: "Herb needs more light", time: "1h ago", desc: "Light level low" },
+  { icon: "bg-green-plant", title: "Fern-ando is thriving!", time: "3h ago", desc: "HP reached 92%" },
+  { icon: "bg-accent-red", title: "Low battery: Herb", time: "5h ago", desc: "Sensor at 41%" },
+  { icon: "bg-accent-blue", title: "New photo captured", time: "1d ago", desc: "PlantCam auto-shot" },
+];
+
+const FOUND_SENSORS = ["Plantgotchi-A3F2", "Plantgotchi-B7E1"];
+
+const SETTINGS_GROUPS = [
+  { section: "NOTIFICATIONS", items: ["Water reminders", "Low battery alerts", "Daily summary"] },
+  { section: "SENSORS", items: ["Sync interval: 15 min", "LED brightness", "Sleep schedule"] },
+  { section: "ACCOUNT", items: ["Profile", "Export data"] },
+];
+
+const DETAIL_STATS = [
+  { label: "MOISTURE", value: "72%", color: "bg-accent-blue", pct: 72 },
+  { label: "LIGHT", value: "45%", color: "bg-accent-orange", pct: 45 },
+  { label: "TEMP", value: "22\u00B0C", color: "bg-accent-red", pct: 55 },
+  { label: "HP", value: "92%", color: "bg-green-plant", pct: 92 },
+];
+
+const GARDEN_FEATURES = [
+  "Segmented HP &amp; moisture bars",
+  "Mini 7-day trend charts per plant",
+  "Live sensor indicators with animations",
+  "Tap-to-expand detail panel with full stats",
+  "Mobile bottom-sheet for plant details",
+];
+
+const VENT_LINES = [0, 1, 2, 3, 4, 5, 6];
+const LED_DOTS = [0, 1, 2];
 ---
-<BaseLayout title="Plantgotchi - Smart Plant Monitoring with Retro Soul">
-  <SiteNav client:load />
-  <LandingPage />
+
+<BaseLayout>
+  <div class="min-h-screen bg-cream text-pixel-black">
+    <!-- STICKY NAV -->
+    <SiteNav client:load />
+
+    <!-- HERO -->
+    <section class="relative overflow-hidden">
+      <div class="max-w-5xl mx-auto px-4 pt-16 pb-20 sm:pt-24 sm:pb-28 flex flex-col items-center text-center gap-8">
+        <!-- Pixel plant -->
+        <div class="relative h-40 w-40 flex items-end justify-center">
+          <div class="animate-bounce-plant relative" aria-hidden="true">
+            <!-- Pot -->
+            <div class="mx-auto w-20 h-10 bg-brown relative">
+              <div class="absolute -top-1 -left-1 w-22 h-3 bg-brown-light" style="width: calc(100% + 8px); left: -4px;"></div>
+              <div class="absolute bottom-0 left-1 right-1 h-1 bg-brown-light opacity-40"></div>
+            </div>
+            <!-- Soil -->
+            <div class="mx-auto w-20 h-2 bg-brown-light opacity-60 -mt-px"></div>
+            <!-- Stem -->
+            <div class="mx-auto w-2 h-14 bg-green-dark -mt-2 relative z-10"></div>
+            <!-- Leaves -->
+            <div class="absolute left-1/2 -translate-x-1/2 bottom-[56px]">
+              <!-- center leaf -->
+              <div class="w-10 h-10 bg-green-plant rounded-sm pixel-border mx-auto -mb-2 relative">
+                <div class="absolute inset-1 bg-green-light opacity-40 rounded-sm"></div>
+              </div>
+              <!-- left leaf -->
+              <div class="absolute -left-8 top-4 w-8 h-6 bg-green-plant rounded-sm rotate-[-20deg]">
+                <div class="absolute inset-1 bg-green-light opacity-30 rounded-sm"></div>
+              </div>
+              <!-- right leaf -->
+              <div class="absolute -right-8 top-4 w-8 h-6 bg-green-plant rounded-sm rotate-[20deg]">
+                <div class="absolute inset-1 bg-green-light opacity-30 rounded-sm"></div>
+              </div>
+            </div>
+            <!-- Face -->
+            <div class="absolute left-1/2 -translate-x-1/2 bottom-[68px] flex gap-2">
+              <div class="w-2 h-2 bg-pixel-black rounded-full"></div>
+              <div class="w-2 h-2 bg-pixel-black rounded-full"></div>
+            </div>
+            <div class="absolute left-1/2 -translate-x-1/2 bottom-[62px] w-3 h-1.5 border-b-2 border-pixel-black rounded-b-full"></div>
+          </div>
+        </div>
+
+        <h1 class="pixel-font text-lg sm:text-2xl md:text-3xl leading-relaxed text-green-dark max-w-3xl">
+          Stick it in soil. Connect&nbsp;to&nbsp;WiFi.<br />
+          Watch your plants thrive.
+        </h1>
+
+        <p class="text-pixel-gray text-base sm:text-lg max-w-xl">
+          Smart plant sensors with a Tamagotchi-inspired app experience
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href="#pricing"
+            class="pixel-font text-xs bg-green-plant text-cream px-8 py-4 pixel-border hover:bg-green-dark transition-colors"
+          >
+            Pre-order Now
+          </a>
+          <a
+            href="#how-it-works"
+            class="pixel-font text-xs border-2 border-pixel-black text-pixel-black px-8 py-4 hover:bg-cream-dark transition-colors"
+          >
+            See How It Works
+          </a>
+        </div>
+      </div>
+
+      <!-- decorative dots -->
+      <div class="absolute top-8 left-8 w-2 h-2 bg-accent-orange rounded-full animate-pulse-glow"></div>
+      <div class="absolute top-20 right-12 w-2 h-2 bg-accent-blue rounded-full animate-pulse-glow"></div>
+      <div class="absolute bottom-12 left-16 w-1.5 h-1.5 bg-accent-purple rounded-full animate-pulse-glow"></div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-14">
+          How It Works
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
+          <!-- Step 1 -->
+          <div class="flex flex-col items-center text-center gap-4">
+            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+              <div class="w-16 h-16 flex items-center justify-center relative">
+                <div class="absolute bottom-0 left-0 right-0 h-6 bg-brown rounded-b-lg"></div>
+                <div class="w-2 h-10 bg-green-plant relative z-10 animate-bounce-plant"></div>
+                <div class="absolute top-1 left-1/2 -translate-x-1/2 text-lg">
+                  <span class="pixel-font text-accent-orange text-[10px]">!</span>
+                </div>
+              </div>
+            </div>
+            <span class="pixel-font text-[10px] text-accent-orange">STEP 1</span>
+            <h3 class="pixel-font text-xs text-pixel-black">Stick It In</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">Insert the sensor into your plant's soil.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex flex-col items-center text-center gap-4">
+            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+              <div class="w-16 h-16 flex items-center justify-center relative">
+                <div class="flex flex-col items-center gap-1">
+                  <div class="w-10 h-1.5 bg-accent-blue rounded-full opacity-40"></div>
+                  <div class="w-7 h-1.5 bg-accent-blue rounded-full opacity-60"></div>
+                  <div class="w-4 h-1.5 bg-accent-blue rounded-full opacity-80"></div>
+                  <div class="w-2 h-2 bg-accent-blue rounded-full animate-pulse-glow"></div>
+                </div>
+              </div>
+            </div>
+            <span class="pixel-font text-[10px] text-accent-orange">STEP 2</span>
+            <h3 class="pixel-font text-xs text-pixel-black">Connect</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">Connect to WiFi via the Plantgotchi app.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex flex-col items-center text-center gap-4">
+            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+              <div class="w-16 h-16 flex items-center justify-center relative">
+                <div class="w-12 h-12 bg-green-plant pixel-border flex flex-col items-center justify-center gap-1">
+                  <div class="flex gap-2">
+                    <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                    <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                  </div>
+                  <div class="w-4 h-1.5 border-b-2 border-pixel-black rounded-b-full"></div>
+                </div>
+                <div class="absolute -top-1 -right-1 text-accent-orange pixel-font text-[8px] animate-pulse-glow">*</div>
+                <div class="absolute -bottom-1 -left-1 text-accent-orange pixel-font text-[8px] animate-pulse-glow">*</div>
+              </div>
+            </div>
+            <span class="pixel-font text-[10px] text-accent-orange">STEP 3</span>
+            <h3 class="pixel-font text-xs text-pixel-black">Watch It Thrive</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">Monitor your plants with Tamagotchi-style animations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT LINEUP -->
+    <section id="products" class="py-16 sm:py-24">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          Product Lineup
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+          From a tiny soil sensor to a full AI-powered plant hub&nbsp;&mdash; pick what fits your jungle.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {PRODUCTS.map((p, i) => (
+            <div
+              class="bg-cream-dark rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
+            >
+              <div class="flex items-center justify-center" style={`height: ${i === 3 ? 160 : 140}px`}>
+                {i === 0 && (
+                  <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                    <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                    <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                    <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                    <polygon points="70,18 120,42 70,66 20,42" fill="#A5D6A7" />
+                    <polygon points="70,66 120,42 120,90 70,114" fill="#81C784" />
+                    <polygon points="70,66 20,42 20,90 70,114" fill="#66BB6A" />
+                    <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                    <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                    <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                    </ellipse>
+                    <polygon points="78,56 112,43 112,60 78,73" fill="#1B5E20" fill-opacity="0.5" />
+                    <polygon points="80,58 110,46 110,58 80,70" fill="#1B5E20" />
+                    <rect x="84" y="60" width="3" height="6" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+                    <rect x="90" y="57" width="3" height="9" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+                    <rect x="96" y="55" width="3" height="7" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+                    <g transform="translate(32,72) skewY(26)">
+                      <rect x="0" y="0" width="16" height="8" rx="1.5" fill="none" stroke="#2E7D32" stroke-width="1.5" />
+                      <rect x="16" y="2" width="2" height="4" rx="0.5" fill="#2E7D32" />
+                      <rect x="2" y="2" width="10" height="4" rx="0.5" fill="#69F0AE" opacity="0.7" />
+                    </g>
+                    <g transform="translate(92, 78)">
+                      <circle cx="0" cy="0" r="3.5" fill="#E8F5E9" opacity="0.6" />
+                      <path d="M-1.5,1 Q0,-3 1.5,1" fill="none" stroke="#2E7D32" stroke-width="1" />
+                    </g>
+                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                  </svg>
+                )}
+                {i === 1 && (
+                  <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                    <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                    <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                    <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                    <polygon points="70,18 120,42 70,66 20,42" fill="#66BB6A" />
+                    <polygon points="70,66 120,42 120,90 70,114" fill="#4CAF50" />
+                    <polygon points="70,66 20,42 20,90 70,114" fill="#388E3C" />
+                    <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                    <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                    <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                    </ellipse>
+                    <polygon points="78,56 112,43 112,60 78,73" fill="#1B5E20" fill-opacity="0.5" />
+                    <polygon points="80,58 110,46 110,58 80,70" fill="#1B5E20" />
+                    <rect x="84" y="60" width="3" height="6" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+                    <rect x="90" y="57" width="3" height="9" fill="#69F0AE" opacity="0.8" transform="skewY(-26)" />
+                    <rect x="96" y="55" width="3" height="7" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+                    <g>
+                      <rect x="36" y="94" width="14" height="5" rx="2" fill="#424242" transform="skewY(26)" />
+                      <rect x="38" y="95" width="10" height="3" rx="1" fill="#616161" transform="skewY(26)" />
+                    </g>
+                    <g transform="translate(92, 78)">
+                      <circle cx="0" cy="0" r="3.5" fill="#E8F5E9" opacity="0.6" />
+                      <path d="M-1.5,1 Q0,-3 1.5,1" fill="none" stroke="#2E7D32" stroke-width="1" />
+                    </g>
+                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                  </svg>
+                )}
+                {i === 2 && (
+                  <svg viewBox="0 0 160 180" width="160" height="180" class="block mx-auto drop-shadow-lg">
+                    <polygon points="80,10 140,40 80,70 20,40" fill="#424242" />
+                    <polygon points="80,70 140,40 140,110 80,140" fill="#2c2c2c" />
+                    <polygon points="80,70 20,40 20,110 80,140" fill="#1a1a1a" />
+                    <polygon points="80,10 140,40 80,70 20,40" fill="white" fill-opacity="0.08" />
+                    <ellipse cx="108" cy="78" rx="16" ry="18" fill="#1a1a1a" />
+                    <ellipse cx="108" cy="78" rx="13" ry="15" fill="#0D47A1" />
+                    <ellipse cx="108" cy="78" rx="10" ry="11.5" fill="#1565C0" />
+                    <ellipse cx="108" cy="78" rx="6" ry="7" fill="#42A5F5">
+                      <animate attributeName="opacity" values="0.8;1;0.8" dur="3s" repeatCount="indefinite" />
+                    </ellipse>
+                    <ellipse cx="104" cy="73" rx="3" ry="2" fill="white" opacity="0.35" />
+                    <ellipse cx="56" cy="35" rx="4" ry="2.5" fill="#c62828" />
+                    <ellipse cx="56" cy="35" rx="2.5" ry="1.5" fill="#EF5350">
+                      <animate attributeName="opacity" values="1;0.2;1" dur="1.5s" repeatCount="indefinite" />
+                    </ellipse>
+                    <text x="56" y="30" text-anchor="middle" font-size="5" font-family="'Press Start 2P', monospace" fill="#EF5350" opacity="0.7">REC</text>
+                    <polygon points="34,62 50,70 50,82 34,74" fill="#37474F" />
+                    <polygon points="36,64 48,71 48,80 36,73" fill="#263238" />
+                    <polygon points="20,95 28,99 28,115 20,111" fill="#616161" />
+                    <polygon points="28,99 36,95 36,111 28,115" fill="#757575" />
+                    <g transform="translate(108, 108)">
+                      <circle cx="0" cy="0" r="4" fill="#424242" stroke="#616161" stroke-width="0.5" />
+                      <path d="M-2,1.5 Q0,-3 2,1.5" fill="none" stroke="#81C784" stroke-width="1" />
+                    </g>
+                    <text x="108" y="128" text-anchor="middle" font-size="6" font-family="'Press Start 2P', monospace" fill="#9E9E9E" opacity="0.6">5MP</text>
+                    <text x="80" y="6" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">38×32mm</text>
+                    <polygon points="74,140 86,140 82,175 78,175" fill="#757575" />
+                    <polygon points="74,140 78,175 76,174 72,140" fill="#616161" />
+                  </svg>
+                )}
+                {i === 3 && (
+                  <svg viewBox="0 0 200 190" width="200" height="190" class="block mx-auto drop-shadow-lg">
+                    <polygon points="100,170 170,140 100,155 30,140" fill="#2E7D32" />
+                    <polygon points="100,155 170,140 170,145 100,170" fill="#1B5E20" />
+                    <polygon points="100,155 30,140 30,145 100,170" fill="#245828" />
+                    <polygon points="100,12 168,46 100,80 32,46" fill="#388E3C" />
+                    <polygon points="100,80 168,46 168,130 100,150" fill="#2E7D32" />
+                    <polygon points="100,80 32,46 32,130 100,150" fill="#1B5E20" />
+                    <polygon points="100,12 168,46 100,80 32,46" fill="white" fill-opacity="0.1" />
+                    <polygon points="108,56 158,36 158,85 108,105" fill="#0a0a0a" />
+                    <polygon points="110,58 156,39 156,83 110,103" fill="#0D1117" />
+                    <polygon points="112,60 154,42 154,46 112,64" fill="#1B5E20" />
+                    <rect x="114" y="66" width="5" height="5" fill="#69F0AE" opacity="0.7" transform="skewY(-26)" />
+                    <rect x="122" y="63" width="5" height="5" fill="#81C784" opacity="0.7" transform="skewY(-26)" />
+                    <rect x="130" y="60" width="5" height="5" fill="#FFB74D" opacity="0.7" transform="skewY(-26)" />
+                    <rect x="138" y="57" width="5" height="5" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+                    <line x1="114" y1="83" x2="150" y2="69" stroke="#69F0AE" stroke-width="1" opacity="0.5" />
+                    <line x1="114" y1="87" x2="150" y2="73" stroke="#42A5F5" stroke-width="1" opacity="0.4" />
+                    <rect x="114" y="92" width="20" height="2" fill="#69F0AE" opacity="0.4" transform="skewY(-26)" />
+                    <ellipse cx="134" cy="118" rx="10" ry="11" fill="#1a1a1a" />
+                    <ellipse cx="134" cy="118" rx="7.5" ry="8.5" fill="#0D47A1" />
+                    <ellipse cx="134" cy="118" rx="5" ry="5.5" fill="#42A5F5" opacity="0.8" />
+                    <ellipse cx="132" cy="115" rx="2" ry="1.5" fill="white" opacity="0.3" />
+                    {VENT_LINES.map((vi) => (
+                      <line x1="38" y1={62 + vi * 8} x2="56" y2={70 + vi * 8} stroke="#245828" stroke-width="2.5" opacity="0.5" />
+                    ))}
+                    <rect x="50" y="18" width="4" height="22" rx="2" fill="#616161" transform="skewY(26) skewX(-10)" />
+                    <circle cx="56" cy="16" r="3" fill="#757575" />
+                    <path d="M42,12 Q56,2 70,12" fill="none" stroke="#69F0AE" stroke-width="1" opacity="0.5">
+                      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" repeatCount="indefinite" />
+                    </path>
+                    <path d="M46,16 Q56,8 66,16" fill="none" stroke="#69F0AE" stroke-width="1" opacity="0.7">
+                      <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" begin="0.3s" repeatCount="indefinite" />
+                    </path>
+                    {LED_DOTS.map((li) => (
+                      <ellipse cx={88 + li * 12} cy={30 + li * 6} rx="3" ry="1.8" fill="#69F0AE" opacity={0.6 + li * 0.15}>
+                        <animate attributeName="opacity" values={`${0.6 + li * 0.15};0.2;${0.6 + li * 0.15}`} dur="2.5s" begin={`${li * 0.4}s`} repeatCount="indefinite" />
+                      </ellipse>
+                    ))}
+                    <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62×45mm</text>
+                    <text x="48" y="125" font-size="5" font-family="'Press Start 2P', monospace" fill="#A5D6A7" opacity="0.4" transform="skewY(26)">RPi</text>
+                  </svg>
+                )}
+              </div>
+
+              <h3 class="pixel-font text-[10px] text-pixel-black">{p.name}</h3>
+              <span class="italic text-pixel-gray text-sm">&ldquo;{p.nickname}&rdquo;</span>
+              <span class="pixel-font text-xs text-green-dark">{p.price}</span>
+
+              <ul class="text-sm text-pixel-gray space-y-1 mt-auto">
+                {p.specs.map((s) => (
+                  <li class="flex items-center gap-1.5 justify-center">
+                    <span class="w-1.5 h-1.5 bg-green-plant inline-block"></span>
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- ECOSYSTEM / SETUPS -->
+    <section class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          Setup Configurations
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+          Mix and match to fit your space.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {SETUPS.map((s) => (
+            <div class="bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4">
+              <div class="h-20 flex items-end justify-center gap-2">
+                {s.icon === "hub" && (
+                  <Fragment>
+                    <div class="flex flex-col items-center" aria-label="CamHub Pro">
+                      <div class="w-24 h-24">
+                        <svg viewBox="0 0 200 190" width="200" height="190" class="block mx-auto drop-shadow-lg">
+                          <polygon points="100,170 170,140 100,155 30,140" fill="#2E7D32" />
+                          <polygon points="100,155 170,140 170,145 100,170" fill="#1B5E20" />
+                          <polygon points="100,155 30,140 30,145 100,170" fill="#245828" />
+                          <polygon points="100,12 168,46 100,80 32,46" fill="#388E3C" />
+                          <polygon points="100,80 168,46 168,130 100,150" fill="#2E7D32" />
+                          <polygon points="100,80 32,46 32,130 100,150" fill="#1B5E20" />
+                          <polygon points="100,12 168,46 100,80 32,46" fill="white" fill-opacity="0.1" />
+                          <polygon points="108,56 158,36 158,85 108,105" fill="#0a0a0a" />
+                          <polygon points="110,58 156,39 156,83 110,103" fill="#0D1117" />
+                          <polygon points="112,60 154,42 154,46 112,64" fill="#1B5E20" />
+                          <rect x="114" y="66" width="5" height="5" fill="#69F0AE" opacity="0.7" transform="skewY(-26)" />
+                          <rect x="122" y="63" width="5" height="5" fill="#81C784" opacity="0.7" transform="skewY(-26)" />
+                          <rect x="130" y="60" width="5" height="5" fill="#FFB74D" opacity="0.7" transform="skewY(-26)" />
+                          <rect x="138" y="57" width="5" height="5" fill="#69F0AE" opacity="0.6" transform="skewY(-26)" />
+                          <line x1="114" y1="83" x2="150" y2="69" stroke="#69F0AE" stroke-width="1" opacity="0.5" />
+                          <line x1="114" y1="87" x2="150" y2="73" stroke="#42A5F5" stroke-width="1" opacity="0.4" />
+                          <rect x="114" y="92" width="20" height="2" fill="#69F0AE" opacity="0.4" transform="skewY(-26)" />
+                          <ellipse cx="134" cy="118" rx="10" ry="11" fill="#1a1a1a" />
+                          <ellipse cx="134" cy="118" rx="7.5" ry="8.5" fill="#0D47A1" />
+                          <ellipse cx="134" cy="118" rx="5" ry="5.5" fill="#42A5F5" opacity="0.8" />
+                          <ellipse cx="132" cy="115" rx="2" ry="1.5" fill="white" opacity="0.3" />
+                          <rect x="50" y="18" width="4" height="22" rx="2" fill="#616161" transform="skewY(26) skewX(-10)" />
+                          <circle cx="56" cy="16" r="3" fill="#757575" />
+                          <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62×45mm</text>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <div class="flex flex-col items-center" aria-label="child sensor">
+                        <div class="w-20 h-24">
+                          <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                            <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                            <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                            <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                            <polygon points="70,18 120,42 70,66 20,42" fill="#A5D6A7" />
+                            <polygon points="70,66 120,42 120,90 70,114" fill="#81C784" />
+                            <polygon points="70,66 20,42 20,90 70,114" fill="#66BB6A" />
+                            <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                            <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                            <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                            </ellipse>
+                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Fragment>
+                )}
+                {s.icon === "solo" && (
+                  <div class="flex flex-col items-center" aria-label="solo sensor">
+                    <div class="w-20 h-24">
+                      <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                        <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                        <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                        <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                        <polygon points="70,18 120,42 70,66 20,42" fill="#66BB6A" />
+                        <polygon points="70,66 120,42 120,90 70,114" fill="#4CAF50" />
+                        <polygon points="70,66 20,42 20,90 70,114" fill="#388E3C" />
+                        <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                        <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                        <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                          <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                        </ellipse>
+                        <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                      </svg>
+                    </div>
+                  </div>
+                )}
+                {s.icon === "parent" && (
+                  <Fragment>
+                    <div class="flex flex-col items-center" aria-label="parent sensor">
+                      <div class="w-20 h-24">
+                        <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                          <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                          <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                          <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                          <polygon points="70,18 120,42 70,66 20,42" fill="#66BB6A" />
+                          <polygon points="70,66 120,42 120,90 70,114" fill="#4CAF50" />
+                          <polygon points="70,66 20,42 20,90 70,114" fill="#388E3C" />
+                          <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                          <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                          <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                          </ellipse>
+                          <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                        </svg>
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <div class="flex flex-col items-center" aria-label="child sensor">
+                        <div class="w-20 h-24">
+                          <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
+                            <polygon points="64,105 76,105 73,195 67,195" fill="#9E9E9E" />
+                            <polygon points="64,105 67,195 65,193 62,105" fill="#757575" />
+                            <polygon points="67,195 73,195 70,200 67,200" fill="#616161" />
+                            <polygon points="70,18 120,42 70,66 20,42" fill="#A5D6A7" />
+                            <polygon points="70,66 120,42 120,90 70,114" fill="#81C784" />
+                            <polygon points="70,66 20,42 20,90 70,114" fill="#66BB6A" />
+                            <polygon points="70,18 120,42 70,66 20,42" fill="white" fill-opacity="0.15" />
+                            <ellipse cx="70" cy="36" rx="6" ry="3.5" fill="#C8E6C9" />
+                            <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
+                              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                            </ellipse>
+                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Fragment>
+                )}
+              </div>
+
+              <h3 class="pixel-font text-[10px] text-pixel-black">{s.title}</h3>
+              <p class="text-sm text-pixel-gray">{s.desc}</p>
+              <span class="pixel-font text-[8px] text-green-dark bg-cream-dark px-3 py-1 rounded-full">
+                {s.detail}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- APP PREVIEW -->
+    <section id="app" class="py-16 sm:py-24">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          The App
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+          Your plants, reimagined as pixel pals.
+        </p>
+
+        <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
+          <!-- PhoneMockup -->
+          <div class="mx-auto w-56 sm:w-64 relative">
+            <div class="border-4 border-pixel-black rounded-2xl bg-cream-dark p-3 relative overflow-hidden scanlines">
+              <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg -mt-1 mb-3"></div>
+              <div class="flex justify-between items-center mb-3 px-1">
+                <span class="pixel-font text-[6px] text-pixel-gray">9:41</span>
+                <span class="pixel-font text-[6px] text-green-plant">Plantgotchi</span>
+                <div class="flex gap-0.5">
+                  <div class="w-2 h-1 bg-green-plant"></div>
+                  <div class="w-2 h-1.5 bg-green-plant"></div>
+                  <div class="w-2 h-2 bg-green-plant"></div>
+                </div>
+              </div>
+              <div class="bg-cream rounded-lg p-3 mb-2 pixel-border">
+                <div class="flex items-end justify-center gap-2 mb-2">
+                  <div class="w-6 h-4 bg-green-plant rounded-sm rotate-[-15deg]"></div>
+                  <div class="w-3 h-8 bg-green-dark"></div>
+                  <div class="w-6 h-4 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                </div>
+                <div class="mx-auto w-8 h-5 bg-brown rounded-sm"></div>
+                <div class="flex justify-center gap-1.5 -mt-6 mb-3">
+                  <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                  <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                </div>
+                <p class="pixel-font text-[7px] text-center text-green-dark mt-1">Fern-ando</p>
+              </div>
+              <div class="mb-2">
+                <div class="flex justify-between items-center mb-0.5">
+                  <span class="pixel-font text-[6px] text-pixel-gray">HP</span>
+                  <span class="pixel-font text-[6px] text-green-plant">92%</span>
+                </div>
+                <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
+                  <div class="h-full bg-green-plant rounded-sm" style="width: 92%;"></div>
+                </div>
+              </div>
+              <div class="mb-2">
+                <div class="flex justify-between items-center mb-0.5">
+                  <span class="pixel-font text-[6px] text-pixel-gray">MOISTURE</span>
+                  <span class="pixel-font text-[6px] text-accent-blue">67%</span>
+                </div>
+                <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
+                  <div class="h-full bg-accent-blue rounded-sm" style="width: 67%;"></div>
+                </div>
+              </div>
+              <div class="bg-cream rounded-lg p-2 mb-2 pixel-border">
+                <span class="pixel-font text-[5px] text-pixel-gray block mb-1">7-DAY MOISTURE</span>
+                <div class="flex items-end gap-0.5 h-6">
+                  {MOISTURE_CHART.map((v) => (
+                    <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
+                  ))}
+                </div>
+              </div>
+              <div class="flex gap-1.5">
+                <div class="flex-1 bg-accent-blue text-cream text-center py-1 rounded-sm pixel-font text-[5px]">WATER</div>
+                <div class="flex-1 bg-accent-orange text-cream text-center py-1 rounded-sm pixel-font text-[5px]">PHOTO</div>
+                <div class="flex-1 bg-green-plant text-cream text-center py-1 rounded-sm pixel-font text-[5px]">HISTORY</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {APP_FEATURES.map((f) => (
+              <div class="bg-cream-dark rounded-lg pixel-border p-5">
+                <h3 class="pixel-font text-[9px] text-pixel-black mb-2">{f.title}</h3>
+                <p class="text-sm text-pixel-gray">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIGITAL GARDEN -->
+    <section id="garden" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          Your Digital Garden
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+          Every plant in your home, monitored in one beautiful dashboard. See who&rsquo;s thriving and who needs a drink.
+        </p>
+
+        <div class="mb-10">
+          <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">DESKTOP VIEW</div>
+          <div class="rounded-xl overflow-hidden pixel-border shadow-lg">
+            <img
+              src="/garden-desktop.png"
+              alt="Plantgotchi Garden Dashboard - Desktop view showing 6 plants with live sensor data, HP bars, moisture levels, and detail panel"
+              class="w-full h-auto block"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-14">
+          <div class="w-56 sm:w-64 shrink-0">
+            <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">MOBILE VIEW</div>
+            <div class="border-4 border-pixel-black rounded-[24px] bg-pixel-black p-1.5 shadow-lg">
+              <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg relative z-10"></div>
+              <div class="rounded-[18px] overflow-hidden -mt-1.5">
+                <img
+                  src="/garden-mobile.png"
+                  alt="Plantgotchi Garden Dashboard - Mobile view with plant cards, HP bars, and moisture indicators"
+                  class="w-full h-auto block"
+                />
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-gray/40 rounded-full mt-1.5"></div>
+            </div>
+          </div>
+
+          <div class="max-w-sm text-center sm:text-left">
+            <h3 class="pixel-font text-xs text-green-dark mb-3">All your plants, one view</h3>
+            <p class="text-sm text-pixel-gray mb-4">
+              The garden dashboard shows every plant in your home with live sensor data.
+              Tap any plant to see detailed charts, care history, and time-lapse photos.
+            </p>
+            <div class="space-y-2">
+              {GARDEN_FEATURES.map((item) => (
+                <div class="flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 bg-green-plant shrink-0"></span>
+                  <span class="text-sm text-pixel-gray" set:html={item} />
+                </div>
+              ))}
+            </div>
+
+            <a
+              href="/garden"
+              class="inline-block mt-6 pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
+            >
+              Try the Live Demo
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- iOS APP SCREENS -->
+    <section id="screens" class="py-16 sm:py-24">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          Designed for iOS
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+          A native app experience crafted for plant lovers. Every screen designed to make plant care feel like play.
+        </p>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+
+          <!-- 1: Garden Overview -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[5px] text-green-dark mb-1">My Garden</div>
+                  <div class="grid grid-cols-2 gap-1">
+                    {GARDEN_PLANTS.slice(0, 4).map((p) => (
+                      <div class="bg-cream-dark rounded p-1 text-center">
+                        <div class="flex items-end justify-center gap-0.5 h-4">
+                          <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[-15deg]"></div>
+                          <div class="w-0.5 h-3 bg-green-dark"></div>
+                          <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                        </div>
+                        <div class="mx-auto w-2 h-1 bg-brown rounded-sm"></div>
+                        <p class="pixel-font text-[3px] text-green-dark mt-0.5 truncate">{p.name}</p>
+                        <div class="w-full h-0.5 bg-cream rounded-sm mt-0.5">
+                          <div class="h-full bg-accent-blue rounded-sm" style={`width: ${p.moisture}%;`}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div class="mt-1 text-center">
+                    <span class="pixel-font text-[3px] text-pixel-gray">+2 more plants</span>
+                  </div>
+                  <div class="flex justify-around mt-2 pt-1 border-t border-pixel-gray/20">
+                    {["Garden", "Camera", "Alerts", "More"].map((t, i) => (
+                      <span class={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Garden</p>
+          </div>
+
+          <!-- 2: Plant Detail -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; Back</div>
+                  <div class="flex items-end justify-center gap-1 h-8 mb-1">
+                    <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[-15deg]"></div>
+                    <div class="w-1.5 h-6 bg-green-dark"></div>
+                    <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                  </div>
+                  <div class="mx-auto w-4 h-2 bg-brown rounded-sm -mt-0.5"></div>
+                  <p class="pixel-font text-[5px] text-center text-green-dark mt-1">Fern-ando</p>
+                  <p class="text-[4px] text-center text-pixel-gray">Boston Fern</p>
+                  <div class="space-y-1 mt-2">
+                    {DETAIL_STATS.map((st) => (
+                      <div>
+                        <div class="flex justify-between">
+                          <span class="pixel-font text-[3px] text-pixel-gray">{st.label}</span>
+                          <span class="pixel-font text-[3px]">{st.value}</span>
+                        </div>
+                        <div class="w-full h-1 bg-cream-dark rounded-sm">
+                          <div class={`h-full ${st.color} rounded-sm`} style={`width: ${st.pct}%;`}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div class="bg-cream-dark rounded p-1 mt-2">
+                    <span class="pixel-font text-[3px] text-pixel-gray">7-DAY MOISTURE</span>
+                    <div class="flex items-end gap-px h-4 mt-0.5">
+                      {DETAIL_CHART.map((v) => (
+                        <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Plant Detail</p>
+          </div>
+
+          <!-- 3: Photo Timeline -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; Back</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-1">Photo Timeline</div>
+                  <div class="space-y-1">
+                    {PHOTO_DATES.map((date, i) => (
+                      <div>
+                        <span class="pixel-font text-[3px] text-pixel-gray">{date}</span>
+                        <div class={`w-full h-8 rounded mt-0.5 ${
+                          i === 0 ? "bg-green-plant/30" : i === 1 ? "bg-green-plant/25" : i === 2 ? "bg-green-plant/20" : "bg-green-plant/15"
+                        } flex items-center justify-center`}>
+                          <div class="flex items-end justify-center gap-0.5">
+                            <div class="w-2 rounded-sm rotate-[-15deg] bg-green-plant" style={`height: ${6 + i * 1.5}px;`}></div>
+                            <div class="w-1 bg-green-dark" style={`height: ${12 + i * 2}px;`}></div>
+                            <div class="w-2 rounded-sm rotate-[15deg] bg-green-plant" style={`height: ${6 + i * 1.5}px;`}></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div class="mt-1">
+                    <span class="pixel-font text-[3px] text-accent-blue text-center block">&#9654; Play Time-lapse</span>
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Photos</p>
+          </div>
+
+          <!-- 4: Notifications -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[5px] text-green-dark mb-2">Alerts</div>
+                  <div class="space-y-1.5">
+                    {NOTIFICATIONS.map((n) => (
+                      <div class="flex gap-1.5 items-start bg-cream-dark rounded p-1">
+                        <div class={`w-1.5 h-1.5 rounded-full ${n.icon} shrink-0 mt-0.5`}></div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex justify-between">
+                            <span class="pixel-font text-[3px] text-pixel-black truncate">{n.title}</span>
+                            <span class="pixel-font text-[2.5px] text-pixel-gray shrink-0 ml-1">{n.time}</span>
+                          </div>
+                          <span class="text-[3px] text-pixel-gray">{n.desc}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Notifications</p>
+          </div>
+
+          <!-- 5: Sensor Pairing -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[5px] text-green-dark mb-2 text-center">Add Sensor</div>
+                  <div class="flex justify-center mb-2">
+                    <div class="w-12 h-12 rounded-full border-2 border-green-plant/30 flex items-center justify-center relative">
+                      <div class="w-8 h-8 rounded-full border-2 border-green-plant/50 flex items-center justify-center">
+                        <div class="w-4 h-4 rounded-full bg-green-plant/20 flex items-center justify-center">
+                          <div class="w-2 h-2 bg-green-plant rounded-full animate-pulse-glow"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="pixel-font text-[4px] text-center text-pixel-gray mb-2">Scanning for sensors...</p>
+                  <div class="space-y-1">
+                    {FOUND_SENSORS.map((sensor, i) => (
+                      <div class="flex items-center gap-1.5 bg-cream-dark rounded p-1.5">
+                        <div class={`w-2 h-2 rounded-full ${i === 0 ? "bg-green-plant animate-pulse-glow" : "bg-pixel-gray/30"}`}></div>
+                        <span class="pixel-font text-[3.5px] text-pixel-black flex-1">{sensor}</span>
+                        <span class="pixel-font text-[3px] text-cream bg-green-plant px-1.5 py-0.5 rounded">Pair</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p class="text-[3px] text-pixel-gray text-center mt-2">Place sensor in pairing mode (hold button 3s)</p>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Pair Sensor</p>
+          </div>
+
+          <!-- 6: Settings -->
+          <div class="w-full max-w-[200px] mx-auto">
+            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
+              <div class="bg-cream rounded-lg overflow-hidden">
+                <div class="p-2">
+                  <div class="pixel-font text-[5px] text-green-dark mb-2">Settings</div>
+                  <div class="space-y-1">
+                    {SETTINGS_GROUPS.map((group) => (
+                      <div>
+                        <span class="pixel-font text-[3px] text-pixel-gray">{group.section}</span>
+                        <div class="bg-cream-dark rounded mt-0.5">
+                          {group.items.map((item, i) => (
+                            <div class={`flex items-center justify-between px-1.5 py-1 ${i < group.items.length - 1 ? "border-b border-cream" : ""}`}>
+                              <span class="text-[3.5px] text-pixel-black">{item}</span>
+                              <div class="w-4 h-2 bg-green-plant rounded-full relative">
+                                <div class="absolute right-0.5 top-0.5 w-1 h-1 bg-white rounded-full"></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+            </div>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Settings</p>
+          </div>
+        </div>
+
+        <!-- Coming to App Store badge -->
+        <div class="flex flex-col items-center mt-12 gap-3">
+          <div class="bg-pixel-black text-cream rounded-xl px-6 py-3 flex items-center gap-3">
+            <div class="flex flex-col items-center">
+              <svg class="w-6 h-6 text-cream" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+              </svg>
+            </div>
+            <div>
+              <span class="pixel-font text-[6px] text-cream/60 block">Coming 2026</span>
+              <span class="pixel-font text-[9px] text-cream">Download on the App Store</span>
+            </div>
+          </div>
+          <p class="text-xs text-pixel-gray">Native iOS app. Built with SwiftUI.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING / BUNDLES -->
+    <section id="pricing" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+          Bundles &amp; Pricing
+        </h2>
+        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+          Save more when you bundle.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {BUNDLES.map((b, i) => (
+            <div
+              class={`bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-3 ${
+                i === 1 ? "ring-2 ring-green-plant" : ""
+              }`}
+            >
+              {i === 1 && (
+                <span class="pixel-font text-[7px] bg-green-plant text-cream px-2 py-0.5 -mt-3 mb-1">
+                  BEST VALUE
+                </span>
+              )}
+              <h3 class="pixel-font text-[10px] text-pixel-black">{b.name}</h3>
+              <span class="pixel-font text-xl text-green-dark">{b.price}</span>
+              <p class="text-sm text-pixel-gray">{b.contents}</p>
+              <a
+                href="#"
+                class="mt-auto pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
+              >
+                Pre-order
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- OPEN SOURCE -->
+    <section class="py-12 sm:py-16">
+      <div class="max-w-3xl mx-auto px-4 text-center">
+        <div class="bg-cream-dark rounded-lg pixel-border p-8 relative overflow-hidden scanlines">
+          <h2 class="pixel-font text-[10px] sm:text-xs text-green-dark mb-4">
+            Built on Open-Source Hardware
+          </h2>
+          <p class="text-sm text-pixel-gray mb-4 max-w-md mx-auto">
+            Forked from{" "}
+            <a
+              href="https://github.com/rbaron/b-parasite"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-accent-blue underline hover:text-accent-blue/80"
+            >
+              b-parasite
+            </a>{" "}
+            by rbaron. Schematics, firmware, and enclosures are all open.
+          </p>
+          <div class="inline-flex items-center gap-2 bg-cream px-4 py-2 rounded-full pixel-border">
+            <span class="pixel-font text-[7px] text-pixel-gray">LICENSE</span>
+            <span class="pixel-font text-[8px] text-green-dark">CC BY-SA 4.0</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-pixel-black text-cream py-12">
+      <div class="max-w-5xl mx-auto px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+          <div>
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">Stay in the loop</h3>
+            <p class="text-sm text-cream/60 mb-4">
+              Get updates on launch dates, new sensors, and plant care tips.
+            </p>
+            <form class="flex gap-2">
+              <input
+                type="email"
+                placeholder="you@email.com"
+                aria-label="Email address"
+                class="flex-1 bg-pixel-gray/30 text-cream text-sm px-3 py-2 rounded-sm border border-pixel-gray/40 placeholder:text-cream/30 focus:outline-none focus:border-green-plant"
+              />
+              <button
+                type="submit"
+                class="pixel-font text-[8px] bg-green-plant text-cream px-4 py-2 hover:bg-green-dark transition-colors"
+              >
+                Join
+              </button>
+            </form>
+          </div>
+
+          <div class="sm:text-center">
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">Links</h3>
+            <ul class="space-y-2 text-sm text-cream/60">
+              <li><a href="#how-it-works" class="hover:text-cream transition-colors">How It Works</a></li>
+              <li><a href="#products" class="hover:text-cream transition-colors">Products</a></li>
+              <li><a href="#pricing" class="hover:text-cream transition-colors">Pricing</a></li>
+              <li><a href="#app" class="hover:text-cream transition-colors">App</a></li>
+            </ul>
+          </div>
+
+          <div class="sm:text-right">
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">Follow us</h3>
+            <div class="flex sm:justify-end gap-4">
+              {["GitHub", "Twitter", "Discord"].map((s) => (
+                <a
+                  href="#"
+                  class="text-sm text-cream/60 hover:text-cream transition-colors"
+                >
+                  {s}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-pixel-gray/30 mt-10 pt-6 text-center">
+          <p class="pixel-font text-[8px] text-cream/40">
+            Made with love for plants &bull; Plantgotchi &copy; 2026
+          </p>
+        </div>
+      </div>
+    </footer>
+  </div>
 </BaseLayout>
