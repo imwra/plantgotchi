@@ -88,6 +88,7 @@ if (session) {
   </div>
 
   <script>
+    import posthog from 'posthog-js';
     const form = document.getElementById("signup-form") as HTMLFormElement;
     const errorMsg = document.getElementById("error-msg") as HTMLDivElement;
     const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
@@ -117,6 +118,14 @@ if (session) {
           submitBtn.disabled = false;
           submitBtn.textContent = "CREATE ACCOUNT";
           return;
+        }
+
+        const session = await res.json().catch(() => null);
+        if (session?.user?.id) {
+          posthog.identify(session.user.id, {
+            email: session.user.email,
+            name: session.user.name,
+          });
         }
 
         window.location.href = "/garden";
