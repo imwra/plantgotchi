@@ -1,19 +1,19 @@
-import { createClient, type Client } from '@libsql/client/web';
+import { createClient, type Client } from "@libsql/client";
 
-let _client: Client | null = null;
+let db: Client | null = null;
 
 export function getDb(): Client {
-  if (_client) return _client;
+  if (db) return db;
 
-  const url = import.meta.env.PUBLIC_TURSO_URL;
-  const authToken = import.meta.env.PUBLIC_TURSO_AUTH_TOKEN;
+  const url = import.meta.env.TURSO_URL;
+  const authToken = import.meta.env.TURSO_AUTH_TOKEN;
 
   if (!url) {
-    // Fallback: use in-memory SQLite for development/demo
-    _client = createClient({ url: ':memory:' });
-    return _client;
+    console.warn("TURSO_URL not set, using in-memory SQLite");
+    db = createClient({ url: ":memory:" });
+  } else {
+    db = createClient({ url, authToken });
   }
 
-  _client = createClient({ url, authToken });
-  return _client;
+  return db;
 }
