@@ -1,7 +1,16 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import GardenDashboard from '../components/GardenDashboard';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import GardenDashboard from "../components/GardenDashboard";
+import { getSession } from "../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) {
+  return Astro.redirect("/login");
+}
+
+const userName = session.user.name || session.user.email;
 ---
+
 <BaseLayout title="Garden - Plantgotchi">
-  <GardenDashboard client:load />
+  <GardenDashboard client:load userName={userName} />
 </BaseLayout>
