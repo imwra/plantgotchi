@@ -1,4 +1,5 @@
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface ReadingFormProps {
   plantId: string;
@@ -52,6 +53,7 @@ export default function ReadingForm({ plantId, onSubmitted }: ReadingFormProps) 
       setTemperature("");
       setLight("");
       onSubmitted();
+      posthog.capture("reading_submitted", { plant_id: plantId });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
     } finally {

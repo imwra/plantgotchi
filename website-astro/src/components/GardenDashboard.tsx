@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import posthog from "posthog-js";
 import SiteNav from "./SiteNav";
 import { toPlantView, type PlantView } from "../lib/plant-view";
 import type { Plant, SensorReading, CareLog, Recommendation } from "../lib/db/queries";
@@ -369,6 +370,7 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
         toPlantView(item.plant, item.latestReading, item.recentCareLogs)
       );
       setPlants(views);
+      posthog.capture("garden_viewed", { plant_count: views.length });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error loading plants");
     } finally {

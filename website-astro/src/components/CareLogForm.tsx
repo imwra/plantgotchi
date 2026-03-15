@@ -1,4 +1,5 @@
 import { useState } from "react";
+import posthog from "posthog-js";
 
 const CARE_ACTIONS = [
   { action: "water", icon: "💧", label: "Water" },
@@ -36,6 +37,7 @@ export default function CareLogForm({ plantId, onLogged }: CareLogFormProps) {
       }
       setNotes("");
       onLogged();
+      posthog.capture("care_logged", { plant_id: plantId, action });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error");
     } finally {

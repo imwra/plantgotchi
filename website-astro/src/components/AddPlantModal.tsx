@@ -1,4 +1,5 @@
 import { useState } from "react";
+import posthog from "posthog-js";
 
 const PLANT_EMOJIS = ["🌿", "🌱", "🪴", "🌵", "🌻", "🌺", "🌸", "🍀", "🌾", "🎋", "🎍", "🌴"];
 
@@ -48,6 +49,7 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
       }
 
       onCreated();
+      posthog.capture("plant_added", { species: species.trim() });
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");

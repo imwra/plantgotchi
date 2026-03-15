@@ -1,4 +1,5 @@
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface Recommendation {
   id: string;
@@ -28,15 +29,16 @@ export default function RecommendationsList({ recommendations, onDismissed }: Re
   const active = recommendations.filter((r) => !r.acted_on);
   if (active.length === 0) return null;
 
-  const dismiss = async (id: string) => {
-    setDismissing(id);
+  const dismiss = async (rec: Recommendation) => {
+    setDismissing(rec.id);
     try {
       await fetch("/api/recommendations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: rec.id }),
       });
       onDismissed();
+      posthog.capture("recommendation_viewed", { plant_id: rec.plant_id, source: rec.source });
     } finally {
       setDismissing(null);
     }
@@ -68,7 +70,7 @@ export default function RecommendationsList({ recommendations, onDismissed }: Re
               {rec.message}
             </div>
             <button
-              onClick={() => dismiss(rec.id)}
+              onClick={() => dismiss(rec)}
               disabled={dismissing === rec.id}
               style={{
                 padding: "0.2rem 0.4rem",
