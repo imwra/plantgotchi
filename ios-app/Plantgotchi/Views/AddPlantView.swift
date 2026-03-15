@@ -1,4 +1,5 @@
 import SwiftUI
+import PostHog
 
 /// Form for creating a new plant with name, species, emoji, light preference,
 /// and moisture/temperature thresholds.
@@ -251,6 +252,10 @@ struct AddPlantView: View {
 
         do {
             try AppDatabase.shared.savePlant(plant)
+            PostHogSDK.shared.capture("plant_added", properties: [
+                "plant_id": plant.id,
+                "species": plant.species ?? "",
+            ])
             onSave?()
             dismiss()
         } catch {

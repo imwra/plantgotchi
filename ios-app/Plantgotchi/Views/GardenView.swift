@@ -1,5 +1,6 @@
 import SwiftUI
 import GRDB
+import PostHog
 
 /// Main dashboard showing a grid of the user's plants.
 /// Pull-to-refresh reloads from the local database.
@@ -129,6 +130,9 @@ struct GardenView: View {
                 let logs = try db.getCareLogs(plantId: plant.id, limit: 5)
                 return toPlantView(plant: plant, latestReading: reading, recentCareLogs: logs)
             }
+            PostHogSDK.shared.capture("garden_viewed", properties: [
+                "plant_count": plantViews.count,
+            ])
         } catch {
             print("[GardenView] Failed to load plants: \(error)")
         }

@@ -1,4 +1,5 @@
 import SwiftUI
+import PostHog
 
 /// Detailed view for a single plant showing sensor readings, care log,
 /// recommendations, and quick-action buttons.
@@ -269,6 +270,10 @@ struct PlantDetailView: View {
                     recentCareLogs: careLogs
                 )
             }
+            PostHogSDK.shared.capture("recommendation_viewed", properties: [
+                "plant_id": plantId,
+                "recommendation_count": recommendations.count,
+            ])
         } catch {
             print("[PlantDetailView] Failed to load: \(error)")
         }
@@ -282,6 +287,10 @@ struct PlantDetailView: View {
         )
         do {
             try AppDatabase.shared.addCareLog(log)
+            PostHogSDK.shared.capture("care_logged", properties: [
+                "plant_id": plantId,
+                "action": action,
+            ])
             Task { await loadData() }
         } catch {
             print("[PlantDetailView] Failed to log care: \(error)")
