@@ -141,6 +141,26 @@ export async function getRecommendations(plantId: string, limit: number = 10): P
   return result.rows as unknown as Recommendation[];
 }
 
+export async function getPlantForUser(
+  id: string,
+  userId: string
+): Promise<Plant | null> {
+  const plant = await getPlant(id);
+  if (!plant || plant.user_id !== userId) return null;
+  return plant;
+}
+
+export async function getRecommendationById(
+  id: string
+): Promise<Recommendation | null> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: "SELECT * FROM recommendations WHERE id = ?",
+    args: [id],
+  });
+  return (result.rows[0] as unknown as Recommendation) ?? null;
+}
+
 export async function markRecommendationActedOn(id: string): Promise<void> {
   const db = getDb();
   await db.execute({
