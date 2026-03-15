@@ -8,9 +8,12 @@
     "preview": "astro preview"
   },
   "dependencies": {
+    "@astrojs/node": "^10.0.1",
     "@astrojs/react": "^5.0.0",
+    "@libsql/client": "^0.17.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.0.4",
+    "better-auth": "^1.5.5",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tailwindcss": "^4.2.1"

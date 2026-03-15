@@ -1,10 +1,11 @@
 import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
+import node from "@astrojs/node";
 
 export default defineConfig({
-  site: "https://imwra.github.io",
-  base: "/plantgotchi",
+  output: "server",
+  adapter: node({ mode: "standalone" }),
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
