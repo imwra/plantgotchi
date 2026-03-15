@@ -1,0 +1,58 @@
+---
+import HelpLayout from "../../layouts/HelpLayout.astro";
+---
+
+<HelpLayout title="Sensor Not Connecting" category="Troubleshooting" description="Fix Bluetooth pairing issues, range problems, and interference.">
+  <p>
+    Can't find your sensor during BLE scan? Here are the most common causes and fixes.
+  </p>
+
+  <h2>Check the Basics</h2>
+  <ol>
+    <li><strong>Is the sensor powered on?</strong> Check for a blinking blue LED (BLE advertising mode). If no LED, the battery may be dead — see <a href="/help/sensor-battery">Battery & Charging</a>.</li>
+    <li><strong>Is Bluetooth enabled on your phone?</strong> Go to your phone's settings and make sure Bluetooth is on.</li>
+    <li><strong>Did you grant Bluetooth permissions?</strong> On Android, both Bluetooth and Location permissions are required for BLE scanning. On iOS, Bluetooth permission is needed.</li>
+  </ol>
+
+  <h2>Range Issues</h2>
+  <p>
+    BLE has a typical range of 10–30 meters (30–100 feet) in open air, but walls, furniture,
+    and other objects reduce this significantly. For best results:
+  </p>
+  <ul>
+    <li>Stay within 5 meters (15 feet) of the sensor during initial pairing.</li>
+    <li>Avoid placing sensors behind thick walls or metal shelves.</li>
+    <li>If range is a problem, consider a Solo sensor (WiFi backup) or PlantCam Pro (hub mode).</li>
+  </ul>
+
+  <h2>Interference</h2>
+  <p>
+    BLE operates on the 2.4 GHz band, shared with WiFi, microwaves, and other Bluetooth devices.
+    If you have many BLE devices in close proximity, they may interfere:
+  </p>
+  <ul>
+    <li>Move the sensor away from WiFi routers and microwaves.</li>
+    <li>If you have many BLE devices, spread them out physically.</li>
+    <li>Try scanning from a different location in the room.</li>
+  </ul>
+
+  <h2>Sensor Not Appearing in Scan</h2>
+  <p>
+    The app scans specifically for devices advertising the Plantgotchi GATT service UUID
+    (<code>0000FE00-...</code>). If your sensor doesn't appear:
+  </p>
+  <ol>
+    <li>Power cycle the sensor (remove and reinsert battery, or press the reset button).</li>
+    <li>Close and reopen the Plantgotchi app.</li>
+    <li>On Android, try toggling Bluetooth off and on in system settings.</li>
+    <li>Make sure no other app or device is currently connected to the sensor — BLE supports only one active connection at a time.</li>
+  </ol>
+
+  <h2>Already Paired to Another Phone</h2>
+  <p>
+    A Plantgotchi sensor can only be actively connected to one device at a time. If another
+    phone is connected, the sensor won't appear in your scan. Disconnect the other phone first,
+    then scan again. Note: multiple phones <em>can</em> receive BLE advertisements simultaneously,
+    but only one can hold an active GATT connection.
+  </p>
+</HelpLayout>
