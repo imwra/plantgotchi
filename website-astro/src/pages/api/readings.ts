@@ -7,7 +7,7 @@ import {
   addRecommendation,
 } from "../../lib/db/queries";
 import { evaluatePlant } from "../../lib/agents/rules";
-import { randomUUID } from "node:crypto";
+
 
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request);
@@ -50,7 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
   const plant = await getPlantForUser(plant_id, session.user.id);
   if (!plant) return new Response("Not found", { status: 404 });
 
-  const sensorId = `manual-${randomUUID()}`;
+  const sensorId = `manual-${crypto.randomUUID()}`;
   const now = new Date().toISOString();
 
   const readingData = {

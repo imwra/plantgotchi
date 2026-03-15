@@ -6,7 +6,7 @@ import {
   getCareLogs,
   createPlant,
 } from "../../../lib/db/queries";
-import { randomUUID } from "node:crypto";
+
 
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request);
@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const plant = {
-    id: randomUUID(),
+    id: crypto.randomUUID(),
     user_id: session.user.id,
     name,
     species: species || null,

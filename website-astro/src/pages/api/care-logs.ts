@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../lib/auth";
 import { getPlantForUser, addCareLog, getCareLogs } from "../../lib/db/queries";
-import { randomUUID } from "node:crypto";
+
 
 const VALID_ACTIONS = [
   "water",
@@ -62,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!plant) return new Response("Not found", { status: 404 });
 
   const careLog = {
-    id: randomUUID(),
+    id: crypto.randomUUID(),
     plant_id,
     user_id: session.user.id,
     action,
