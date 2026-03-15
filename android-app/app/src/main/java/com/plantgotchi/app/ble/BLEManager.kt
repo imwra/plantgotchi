@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import com.plantgotchi.app.model.SensorReading
+import com.posthog.PostHog
 import com.welie.blessed.BluetoothCentralManager
 import com.welie.blessed.BluetoothCentralManagerCallback
 import com.welie.blessed.BluetoothPeripheral
@@ -95,9 +96,15 @@ class BLEManager(context: Context) {
                     peripheral.setNotify(it, true)
                 }
             }
+            PostHog.capture("sensor_connected", properties = mapOf(
+                "sensor_id" to peripheral.address,
+            ))
         }
 
         override fun onDisconnected(peripheral: BluetoothPeripheral, status: GattStatus) {
+            PostHog.capture("sensor_disconnected", properties = mapOf(
+                "sensor_id" to peripheral.address,
+            ))
             _state.value = BleState.DISCONNECTED
             _connectedPeripheral.value = null
             _latestReading.value = null
@@ -132,6 +139,10 @@ class BLEManager(context: Context) {
                     current.copy(battery = SensorParser.parseBattery(value))
                 else -> current
             }
+            PostHog.capture("reading_received", properties = mapOf(
+                "sensor_id" to peripheral.address,
+                "source" to "ble",
+            ))
         }
     }
 

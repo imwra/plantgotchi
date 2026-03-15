@@ -51,6 +51,7 @@ import com.plantgotchi.app.ble.BleState
 import com.plantgotchi.app.ble.DiscoveredSensor
 import com.plantgotchi.app.ui.theme.Blue
 import com.plantgotchi.app.ui.theme.Green
+import com.posthog.PostHog
 
 /**
  * BLE scanning screen — discovers Plantgotchi sensors and allows pairing.
@@ -167,6 +168,7 @@ fun ScanScreen(
                         onClick = {
                             if (permissionsGranted || bleManager.isBluetoothEnabled()) {
                                 bleManager.startScan()
+                                PostHog.capture("sensor_scan_started")
                             } else {
                                 permissionLauncher.launch(blePermissions)
                             }
@@ -223,6 +225,9 @@ fun ScanScreen(
                             onConnect = {
                                 bleManager.connectToSensor(sensor.address)
                                 onSensorPaired(sensor.address)
+                                PostHog.capture("sensor_paired", properties = mapOf(
+                                    "sensor_id" to sensor.address,
+                                ))
                             },
                         )
                     }

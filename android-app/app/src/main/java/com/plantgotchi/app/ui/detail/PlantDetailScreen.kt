@@ -44,6 +44,7 @@ import com.plantgotchi.app.ui.theme.Blue
 import com.plantgotchi.app.ui.theme.Green
 import com.plantgotchi.app.ui.theme.Red
 import com.plantgotchi.app.ui.theme.Yellow
+import com.posthog.PostHog
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -209,6 +210,10 @@ fun PlantDetailScreen(
                                         notes = "Watered via app",
                                     )
                                 )
+                                PostHog.capture("care_logged", properties = mapOf(
+                                    "plant_id" to plantId,
+                                    "action" to "water",
+                                ))
                             }
                         },
                         modifier = Modifier.weight(1f),
@@ -228,6 +233,10 @@ fun PlantDetailScreen(
                                         notes = "Fertilized via app",
                                     )
                                 )
+                                PostHog.capture("care_logged", properties = mapOf(
+                                    "plant_id" to plantId,
+                                    "action" to "fertilize",
+                                ))
                             }
                         },
                         modifier = Modifier.weight(1f),

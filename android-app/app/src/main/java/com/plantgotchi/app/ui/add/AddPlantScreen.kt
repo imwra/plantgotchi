@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
+import com.posthog.PostHog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.ui.theme.Green
 import kotlinx.coroutines.launch
@@ -277,6 +278,10 @@ fun AddPlantScreen(
                             )
                         )
                         onPlantAdded(plantId)
+                        PostHog.capture("plant_added", properties = mapOf(
+                            "plant_id" to plantId,
+                            "species" to species.trim().ifBlank { null },
+                        ))
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

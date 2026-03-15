@@ -38,9 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
+import com.posthog.PostHog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.SensorReading
 import com.plantgotchi.app.ui.theme.Green
+import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -64,6 +66,15 @@ fun GardenScreen(
 
     var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    // Track garden view when plants change
+    LaunchedEffect(plants) {
+        if (plants.isNotEmpty()) {
+            PostHog.capture("garden_viewed", properties = mapOf(
+                "plant_count" to plants.size,
+            ))
+        }
+    }
 
     Scaffold(
         topBar = {

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.plantgotchi.app.ui.theme.Green
 import com.plantgotchi.app.ui.theme.Red
+import com.posthog.PostHog
 
 /**
  * Settings screen — Turso cloud URL + auth token configuration,
@@ -141,6 +142,7 @@ fun SettingsScreen(
                         onClick = {
                             // In a real app, store in DataStore / encrypted SharedPreferences
                             isSaved = true
+                            PostHog.capture("settings_changed")
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = Green),
