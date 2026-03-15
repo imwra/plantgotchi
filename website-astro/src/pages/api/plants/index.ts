@@ -6,6 +6,7 @@ import {
   getCareLogs,
   createPlant,
 } from "../../../lib/db/queries";
+import { captureServerEvent } from "../../../lib/posthog";
 
 
 export const GET: APIRoute = async ({ request }) => {
@@ -58,6 +59,11 @@ export const POST: APIRoute = async ({ request }) => {
   };
 
   await createPlant(plant);
+
+  captureServerEvent(session.user.id, "plant_added", {
+    plant_id: plant.id,
+    species: plant.species,
+  });
 
   return new Response(JSON.stringify(plant), {
     status: 201,

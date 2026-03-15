@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../lib/auth";
 import { getPlantForUser, addCareLog, getCareLogs } from "../../lib/db/queries";
+import { captureServerEvent } from "../../lib/posthog";
 
 
 const VALID_ACTIONS = [
@@ -70,6 +71,11 @@ export const POST: APIRoute = async ({ request }) => {
   };
 
   await addCareLog(careLog);
+
+  captureServerEvent(session.user.id, "care_logged", {
+    plant_id: careLog.plant_id,
+    action: careLog.action,
+  });
 
   return new Response(JSON.stringify({ ...careLog, created_at: new Date().toISOString() }), {
     status: 201,

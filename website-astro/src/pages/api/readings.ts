@@ -7,6 +7,7 @@ import {
   addRecommendation,
 } from "../../lib/db/queries";
 import { evaluatePlant } from "../../lib/agents/rules";
+import { captureServerEvent } from "../../lib/posthog";
 
 
 export const GET: APIRoute = async ({ request }) => {
@@ -76,6 +77,14 @@ export const POST: APIRoute = async ({ request }) => {
   // Persist each recommendation
   for (const rec of recommendations) {
     await addRecommendation(rec);
+  }
+
+  for (const rec of recommendations) {
+    captureServerEvent(session.user.id, "recommendation_generated", {
+      plant_id: rec.plant_id,
+      source: rec.source,
+      severity: rec.severity,
+    });
   }
 
   return new Response(
