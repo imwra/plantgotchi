@@ -1,4 +1,5 @@
 import SwiftUI
+import PostHog
 
 /// App settings: Turso sync configuration, Claude API key,
 /// sensor management, and sign-out.
@@ -271,6 +272,7 @@ struct SettingsView: View {
             BackgroundAgent.shared.scheduleNextRefresh()
         }
 
+        PostHogSDK.shared.capture("settings_changed")
         showSaveConfirmation = true
     }
 
