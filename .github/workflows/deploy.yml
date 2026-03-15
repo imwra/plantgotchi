@@ -22,22 +22,22 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
-          cache-dependency-path: website/package-lock.json
+          cache-dependency-path: website-astro/package-lock.json
 
       - name: Install dependencies
         run: npm ci
-        working-directory: website
+        working-directory: website-astro
 
-      - name: Build
+      - name: Build Astro site
         run: npm run build
-        working-directory: website
+        working-directory: website-astro
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/out
+          path: website-astro/dist
 
   deploy:
     needs: build

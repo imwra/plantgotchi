@@ -2,14 +2,30 @@
 
 ## Overview
 
-Offline-first IoT plant monitoring system. Local data on every device, sync when connected. Template pattern for future apps.
+Offline-first IoT plant monitoring system. **Single data layer (Turso/libSQL)** with per-plant AI agents. Local SQLite on every device, sync through cloud when connected.
 
 ```
-ESP32 Sensors ──BLE──► Phone Apps ──sync──► Cloud ◄──sync── Web App
-                         │                                    │
-                    Local SQLite                        SQLite WASM
-                    + Automerge                         + Automerge
+ESP32 Sensors ──BLE──► Phone App ──Turso sync──► Cloud ◄──sync── Web App
+                         │                                        │
+                    Local SQLite                            SQLite WASM
+                    + Plant Agent                           + Plant Agent
 ```
+
+---
+
+## Key Decision: Turso Only (No Automerge)
+
+We use **one data system** (Turso/libSQL) instead of two. Automerge adds peer-to-peer sync between devices without internet, but that's a nice-to-have — not a must-have for v1. Turso handles offline reads/writes via embedded replicas and syncs through cloud.
+
+| Concern | Turso Only | Turso + Automerge |
+|---------|-----------|-------------------|
+| Offline reads/writes | Yes | Yes |
+| Cloud sync | Yes (built-in) | Yes |
+| P2P sync (no internet) | **No** | Yes |
+| Conflict resolution | Manual (we write logic) | Automatic (CRDTs) |
+| Complexity | **One system** | Two systems, two mental models |
+
+**If P2P is needed later**, Automerge can be layered on top for collaborative data only.
 
 ---
 
@@ -17,89 +33,182 @@ ESP32 Sensors ──BLE──► Phone Apps ──sync──► Cloud ◄──s
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| **Web framework** | Astro 6 | Island architecture: marketing pages = zero JS, dashboards = React islands. Static by default. |
-| **Web UI islands** | React | Existing components migrate as-is inside `client:load` / `client:only="react"` directives |
-| **Structured data** | Turso (libSQL) | Local SQLite embedded replicas that sync to cloud. SQL queries, time-series, indexes. |
-| **Collaborative data** | Automerge | CRDT for care logs, plant settings, household sharing. Peer-to-peer, no conflicts. |
-| **iOS app** | Swift (native) | CoreBluetooth for BLE, GRDB for local SQLite, automerge-swift for CRDTs |
-| **Android app** | Kotlin (native) | BLESSED/Nordic BLE lib, Room for local SQLite, automerge-java for CRDTs |
-| **Sensors** | ESP32 (BLE GATT) | Dumb peripherals — read/notify sensor values. Phone is the smart node. |
-| **Sensor hub** | Raspberry Pi (PlantCam Pro) | BLE central connecting to child sensors, relays to cloud over WiFi/Ethernet |
-| **Deployment** | GitHub Pages (Astro static) | Free, official `withastro/action` GitHub Action |
-| **PWA / offline web** | @vite-pwa/astro | Service workers, offline caching, install prompt |
+| **Web framework** | Astro | Island architecture: marketing pages = zero JS, dashboards = React islands |
+| **Web UI islands** | React | Existing components migrate as-is inside `client:load` directives |
+| **Data layer** | Turso (libSQL) | Local SQLite embedded replicas, cloud sync, SQL for time-series |
+| **Per-plant agents** | Rule engine (offline) + Claude API (online) | Smart care recommendations |
+| **iOS app** | Swift (native) | CoreBluetooth for BLE, GRDB for local SQLite |
+| **Android app** | Kotlin (native) | BLESSED/Nordic BLE, Room for local SQLite |
+| **Sensors** | ESP32 (BLE GATT) | Dumb peripherals — phone is the smart node |
+| **Sensor hub** | Raspberry Pi (PlantCam Pro) | BLE central, relays to cloud over WiFi |
+| **Deployment** | GitHub Pages | Free, static output |
+| **PWA / offline web** | Vite PWA plugin | Service workers, offline caching |
 
 ---
 
-## Data Architecture: What Goes Where
+## Data Architecture: All in Turso
 
-### Turso (structured, queryable data)
-- Sensor readings (moisture, temp, light, battery) — time-series with `(sensor_id, timestamp)` key
-- Plant catalog / species reference data
-- Historical analytics and trends
-- User accounts
+### Schema
 
-### Automerge (collaborative, conflict-free data)
-- Plant care logs (watering, fertilizing, repotting) — List CRDT, concurrent entries preserved
-- Plant settings (name, photo, thresholds) — Map CRDT, per-field LWW
-- Real-time dashboard state
-- Household sharing between family members
+```sql
+-- Plants owned by a user
+CREATE TABLE plants (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  species TEXT,
+  emoji TEXT DEFAULT '🌱',
+  photo_url TEXT,
+  moisture_min INTEGER DEFAULT 30,  -- threshold for "thirsty" alert
+  moisture_max INTEGER DEFAULT 80,
+  temp_min REAL DEFAULT 15.0,
+  temp_max REAL DEFAULT 30.0,
+  light_preference TEXT DEFAULT 'medium', -- low/medium/high
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
 
-### Why both?
-- Turso = database (SQL, indexes, aggregations for sensor data)
-- Automerge = collaboration (automatic conflict resolution, peer-to-peer sync)
-- Using only Turso: lose peer-to-peer sync, need manual conflict handling
-- Using only Automerge: no SQL queries on time-series data, painful for analytics
+-- Time-series sensor data
+CREATE TABLE sensor_readings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  plant_id TEXT NOT NULL REFERENCES plants(id),
+  sensor_id TEXT NOT NULL,         -- ESP32 device ID
+  moisture INTEGER,                -- 0-100 percentage
+  temperature REAL,                -- Celsius
+  light INTEGER,                   -- lux
+  battery INTEGER,                 -- 0-100 percentage
+  timestamp TEXT DEFAULT (datetime('now')),
+  UNIQUE(sensor_id, timestamp)     -- dedup from multiple phones
+);
+
+-- Care log (watering, fertilizing, repotting)
+CREATE TABLE care_logs (
+  id TEXT PRIMARY KEY,
+  plant_id TEXT NOT NULL REFERENCES plants(id),
+  user_id TEXT NOT NULL,
+  action TEXT NOT NULL,             -- water, fertilize, repot, prune, note
+  notes TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- AI agent recommendations
+CREATE TABLE recommendations (
+  id TEXT PRIMARY KEY,
+  plant_id TEXT NOT NULL REFERENCES plants(id),
+  source TEXT NOT NULL,             -- 'rules' or 'claude'
+  message TEXT NOT NULL,
+  severity TEXT DEFAULT 'info',     -- info, warning, urgent
+  acted_on INTEGER DEFAULT 0,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Indexes for fast queries
+CREATE INDEX idx_readings_plant_time ON sensor_readings(plant_id, timestamp DESC);
+CREATE INDEX idx_readings_sensor_time ON sensor_readings(sensor_id, timestamp DESC);
+CREATE INDEX idx_care_plant_time ON care_logs(plant_id, created_at DESC);
+CREATE INDEX idx_recs_plant ON recommendations(plant_id, created_at DESC);
+```
+
+### Conflict Resolution (Turso Embedded Replicas)
+
+| Scenario | Strategy |
+|----------|----------|
+| Two phones record same sensor reading | `UNIQUE(sensor_id, timestamp)` — INSERT OR IGNORE deduplicates |
+| Two people add care log entries | Both get unique IDs — no conflict, both preserved |
+| Two people edit plant name | Last-push-wins (Turso default) — acceptable for v1 |
+| Phone offline for a week | Rebase strategy replays local writes on top of remote |
 
 ---
 
-## Data Flow
+## Per-Plant Agent System
 
-### 1. Sensor → Phone → Cloud
-```
-ESP32 reads sensors every 30-60s
-  → BLE GATT notify
-  → Phone receives bytes, parses
-  → INSERT into local libSQL (GRDB on iOS / Room on Android)
-  → db.sync() when online → Turso Cloud
+Each plant gets an "agent" — not infrastructure, just application logic reading/writing the same Turso DB.
+
+### Offline Agent (Rule Engine)
+Runs on every new sensor reading, no network needed:
+
+```typescript
+function evaluatePlant(plant: Plant, reading: SensorReading): Recommendation[] {
+  const recs: Recommendation[] = [];
+
+  // Moisture alerts
+  if (reading.moisture !== null && reading.moisture < plant.moisture_min) {
+    recs.push({
+      source: 'rules',
+      message: `${plant.name} needs water! Moisture at ${reading.moisture}%`,
+      severity: reading.moisture < 20 ? 'urgent' : 'warning',
+    });
+  }
+  if (reading.moisture !== null && reading.moisture > plant.moisture_max) {
+    recs.push({
+      source: 'rules',
+      message: `${plant.name} is overwatered — moisture at ${reading.moisture}%`,
+      severity: 'warning',
+    });
+  }
+
+  // Temperature alerts
+  if (reading.temperature !== null) {
+    if (reading.temperature < plant.temp_min) {
+      recs.push({ source: 'rules', message: `Too cold for ${plant.name}! ${reading.temperature}°C`, severity: 'warning' });
+    }
+    if (reading.temperature > plant.temp_max) {
+      recs.push({ source: 'rules', message: `Too hot for ${plant.name}! ${reading.temperature}°C`, severity: 'warning' });
+    }
+  }
+
+  // Battery alert
+  if (reading.battery !== null && reading.battery < 15) {
+    recs.push({ source: 'rules', message: `Sensor battery low (${reading.battery}%)`, severity: 'warning' });
+  }
+
+  return recs;
+}
 ```
 
-### 2. User action (watering, renaming)
-```
-User taps "Water" in app
-  → Write to local Automerge document
-  → Automerge syncs peer-to-peer (BLE/local WiFi) to other household phones
-  → Automerge syncs via WebSocket to sync server → web app
+### Online Agent (Claude API)
+Runs periodically when connected, for richer analysis:
+
+```typescript
+async function getClaudeRecommendation(plant: Plant, history: SensorReading[], careLogs: CareLog[]) {
+  const response = await anthropic.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 256,
+    messages: [{
+      role: 'user',
+      content: `You are a plant care advisor. Analyze this data and give one short recommendation.
+Plant: ${plant.name} (${plant.species})
+Last 7 days moisture: ${history.map(r => r.moisture).join(', ')}
+Last 7 days temp: ${history.map(r => r.temperature).join(', ')}
+Recent care: ${careLogs.map(l => `${l.action} ${l.created_at}`).join(', ')}
+Respond in one sentence.`
+    }]
+  });
+
+  return {
+    source: 'claude',
+    message: response.content[0].text,
+    severity: 'info',
+  };
+}
 ```
 
-### 3. Web app
+### Data Flow
+
 ```
-Astro page loads React island
-  → @libsql/client-wasm connects to Turso (local WASM SQLite + cloud sync)
-  → @automerge/automerge-repo connects via WebSocket for collaborative data
-  → Both work offline via service worker + OPFS persistence
+New sensor reading arrives (BLE or manual)
+  │
+  ├── INSERT INTO sensor_readings
+  │
+  ├── Offline Agent (immediate, local)
+  │   ├── Check thresholds
+  │   └── INSERT INTO recommendations (if needed)
+  │
+  └── Online Agent (periodic, when connected)
+      ├── Query last 7 days of readings + care logs
+      ├── Call Claude API
+      └── INSERT INTO recommendations
 ```
-
-### 4. PlantCam Pro (Raspberry Pi hub)
-```
-RPi runs BLE central (Python bleak)
-  → Connects to each ESP32 child sensor via GATT
-  → Reads/subscribes to sensor characteristics
-  → Forwards data to Turso Cloud over WiFi/Ethernet
-  → Star topology (simple, reliable for <20 sensors)
-```
-
----
-
-## Conflict Resolution
-
-| Data Type | Strategy | Detail |
-|-----------|----------|--------|
-| Sensor readings | Deduplicate | Composite key `(sensor_id, timestamp)` — duplicates from multiple phones are dropped |
-| Care log entries | Append-only | Both entries are real events — List CRDT preserves both in order |
-| Plant name/settings | LWW per-field | Automerge Map CRDT — last writer wins deterministically |
-| Plant deletion | Delete wins | If one person deletes while another edits offline, deletion takes precedence |
-
-Full CRDTs (Automerge) are overkill for sensor data but perfect for user-generated content. Turso handles the sensor side with simple dedup.
 
 ---
 
@@ -119,36 +228,25 @@ Service: Device Information (0x180A, standard)
 └── Hardware Revision
 ```
 
-- Integer values with exponents (no floats over BLE)
-- BLE2902 descriptor on every notifiable characteristic
-- 30-60s notification interval for plant monitoring
 - ESP32 is a dumb peripheral — phone is the smart node
+- Integer values with exponents (no floats over BLE)
+- 30-60s notification interval
 
 ---
 
 ## Mobile App Architecture
 
 ### iOS (Swift)
-- **BLE**: Raw CoreBluetooth (use case is simple enough)
-  - Background: State Preservation + connected-mode notifications
-  - Declare `NSBluetoothAlwaysUsageDescription`, enable BLE background mode
-- **Local DB**: GRDB.swift v7 — mature, SwiftUI-integrated, type-safe
-- **CRDTs**: automerge-swift + automerge-repo-swift (stable, networking included)
-- **Sync**: BGAppRefreshTask for periodic Turso sync, BLE delegate triggers for immediate
+- **BLE**: CoreBluetooth (State Preservation for background)
+- **Local DB**: GRDB.swift v7 (mature, SwiftUI-integrated)
+- **Sync**: libsql-swift embedded replica → Turso Cloud
+- **Agent**: Rule engine runs on BLE delegate callback; Claude API on BGAppRefreshTask
 
 ### Android (Kotlin)
 - **BLE**: BLESSED Coroutines or Nordic Kotlin BLE Library
-  - Background: ForegroundService with `connectedDevice` type + CompanionDeviceService
-  - Negotiate MTU to 185+ bytes after connection
-- **Local DB**: Room (Google-maintained, Jetpack-integrated)
-- **CRDTs**: automerge-java (JNI to Rust core) — works but no Kotlin-specific repo adapter
-- **Sync**: WorkManager with PeriodicWorkRequest (min 15 min) + network constraint
-
-### Why native over cross-platform?
-- BLE is the core interaction — reliability is critical
-- Background data collection uses platform-specific APIs (State Preservation on iOS, CompanionDeviceService on Android)
-- The UI is simple (dashboards, charts) — the hard part is BLE/background/sync
-- Consider Kotlin Multiplatform (KMP) for shared business logic if code sharing is desired
+- **Local DB**: Room (Jetpack-integrated)
+- **Sync**: libsql-android embedded replica → Turso Cloud
+- **Agent**: Rule engine in BLE callback; Claude API via WorkManager periodic task
 
 ---
 
@@ -158,96 +256,47 @@ Service: Device Information (0x180A, standard)
 | Current (Next.js) | Astro | JS shipped |
 |---|---|---|
 | `src/app/page.tsx` (landing) | `src/pages/index.astro` | **Zero** — pure static HTML |
-| `src/app/garden/page.tsx` | `src/pages/garden.astro` wrapping React with `client:load` | React island only |
-| `src/app/admin/page.tsx` | `src/pages/admin.astro` wrapping React with `client:load` | React island only |
+| `src/app/garden/page.tsx` | `src/pages/garden.astro` → React island | React only |
+| `src/app/admin/page.tsx` | `src/pages/admin.astro` → React island | React only |
 | `src/app/components/SiteNav.tsx` | `src/components/SiteNav.tsx` with `client:load` | Small island |
 
 ### Key differences
 - Landing page ships zero JS (massive perf win)
 - Interactive dashboards work unchanged as React islands
-- Cross-island state: use `nanostores` (Astro-recommended) instead of React Context
-- `<Link>` → `<a>`, `<Image>` → `<img>` or Astro `<Image>`
-- Static output is Astro's default (not a secondary mode like Next.js)
-
-### Deployment
-```yaml
-# .github/workflows/deploy.yml
-- uses: withastro/action@v5  # official Astro GitHub Pages action
-```
-
-### PWA / Offline
-- `@vite-pwa/astro` for service workers + offline caching
-- `injectManifest` strategy for custom offline logic (sensor data queue)
-- Precache all page routes (`/`, `/garden`, `/admin`)
-
----
-
-## SDK Readiness Assessment
-
-| Platform | Turso | Automerge | Risk |
-|----------|-------|-----------|------|
-| **iOS (Swift)** | libsql-swift v0.3.2 | automerge-swift + repo (stable) | Low |
-| **Android (Kotlin)** | Technical preview | Java bindings, no repo adapter | Medium |
-| **Web (JS/TS)** | @libsql/client (stable) | @automerge/automerge-repo (stable) | Low |
-| **ESP32** | N/A (dumb peripheral) | N/A (phone is smart node) | None |
-| **Raspberry Pi** | Python SDK or HTTP API | Not needed (forwards to cloud) | Low |
-
-**Biggest risk**: Android — both Turso and Automerge have immature Android support. Plan for extra dev time there.
+- `<Link>` → `<a>`, `<Image>` → `<img>`
+- Static output is Astro's default
 
 ---
 
 ## Implementation Phases
 
-### Phase 1: Web foundation (Astro + static)
-- [ ] Initialize Astro 6 project with React integration
+### Phase 1: Web foundation (Astro + static) ← CURRENT
+- [ ] Initialize Astro project with React integration
 - [ ] Migrate landing page to `.astro` (zero JS)
-- [ ] Migrate garden dashboard as React island (`client:load`)
+- [ ] Migrate garden dashboard as React island
 - [ ] Migrate admin as React island
-- [ ] Deploy to GitHub Pages with `withastro/action`
-- [ ] Add PWA support via `@vite-pwa/astro`
+- [ ] Add Turso data layer (schema + client)
+- [ ] Add per-plant agent system (rules + Claude API)
+- [ ] Add PWA support
+- [ ] Deploy to GitHub Pages
+- [ ] Update CI/CD workflow
 
-### Phase 2: Data layer (Turso + Automerge)
-- [ ] Set up Turso Cloud database with schema (plants, sensor_readings, users)
-- [ ] Add `@libsql/client-wasm` to garden dashboard for local-first sensor data
-- [ ] Add `@automerge/automerge-repo` for care logs and plant settings
-- [ ] Set up Automerge sync server (simple WebSocket relay)
-- [ ] Implement offline queue + sync-on-reconnect
+### Phase 2: ESP32 firmware
+- [ ] BLE GATT service with sensor characteristics
+- [ ] Deep sleep between readings
+- [ ] WiFi provisioning via BLE
 
-### Phase 3: ESP32 firmware
-- [ ] Design BLE GATT service with sensor characteristics
-- [ ] Implement ESP32 firmware (Arduino or ESP-IDF)
-- [ ] BLE advertising + notification on sensor read intervals
-- [ ] WiFi provisioning via BLE (Espressif WiFiProv)
-- [ ] Deep sleep between readings for battery life
+### Phase 3: iOS app
+- [ ] CoreBluetooth BLE + GRDB + libsql-swift
+- [ ] SwiftUI dashboard
+- [ ] Background data collection
 
-### Phase 4: iOS app
-- [ ] CoreBluetooth BLE manager for sensor discovery + data collection
-- [ ] GRDB local database with sensor readings schema
-- [ ] automerge-swift for care logs + plant settings
-- [ ] Background BLE data collection (State Preservation)
-- [ ] Turso sync via libsql-swift embedded replica
-- [ ] SwiftUI dashboard UI
-
-### Phase 5: Android app
-- [ ] BLESSED/Nordic BLE library for sensor communication
-- [ ] Room database for sensor readings
-- [ ] automerge-java integration for collaborative data
+### Phase 4: Android app
+- [ ] BLESSED BLE + Room + libsql-android
+- [ ] Jetpack Compose dashboard
 - [ ] ForegroundService for background BLE
-- [ ] Turso sync via libsql-android embedded replica
-- [ ] Jetpack Compose dashboard UI
 
-### Phase 6: PlantCam Pro (Raspberry Pi hub)
-- [ ] Python BLE central (bleak) connecting to child ESP32 sensors
-- [ ] Camera module integration for time-lapse
-- [ ] Forward sensor data to Turso Cloud
-- [ ] Optional: AI plant disease detection (on-device or cloud)
-
----
-
-## Astro 6 Notes
-- Released March 10, 2026
-- Requires Node 22+
-- Cloudflare acquired Astro team (Jan 2026) — remains MIT licensed
-- Live Content Collections can pull from Turso at runtime
-- Built-in Fonts API for self-hosting (good for offline/PWA)
-- Experimental Rust compiler for faster builds
+### Phase 5: PlantCam Pro (Raspberry Pi)
+- [ ] Python BLE central (bleak) for child sensors
+- [ ] Camera + AI plant disease detection
+- [ ] Forward to Turso Cloud

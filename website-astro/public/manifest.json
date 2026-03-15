@@ -1,0 +1,22 @@
+{
+  "name": "Plantgotchi",
+  "short_name": "Plantgotchi",
+  "description": "Smart plant monitoring with retro soul",
+  "start_url": "/plantgotchi/",
+  "scope": "/plantgotchi/",
+  "display": "standalone",
+  "background_color": "#FFF8E7",
+  "theme_color": "#2E7D32",
+  "icons": [
+    {
+      "src": "/plantgotchi/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/plantgotchi/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
