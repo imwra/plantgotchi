@@ -2,20 +2,24 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import AdminPanel from "../components/admin/AdminPanel";
 import { getSession } from "../lib/auth";
+import { getLocaleFromPath, useTranslations } from "../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
 
 const session = await getSession(Astro.request);
 if (!session) {
-  return Astro.redirect("/login");
+  return Astro.redirect(locale === "en" ? "/en/login" : "/login");
 }
 
 // Only allow admin users
 if ((session.user as any).role !== "admin") {
-  return Astro.redirect("/garden");
+  return Astro.redirect(locale === "en" ? "/en/garden" : "/garden");
 }
 
 const userName = session.user.name || session.user.email;
 ---
 
-<BaseLayout title="Admin - Plantgotchi">
+<BaseLayout title={t("admin.title")}>
   <AdminPanel client:load userName={userName} />
 </BaseLayout>

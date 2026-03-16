@@ -1,72 +1,15 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SiteNav from "../components/SiteNav";
+import { getLocaleFromPath, useTranslations, loadContent } from "../i18n";
 
-const PRODUCTS = [
-  {
-    name: "BLE Child Sensor",
-    price: "$9 - $12",
-    nickname: "The tiny one",
-    specs: ["BLE only", "CR2032 battery", "2-year battery life"],
-    color: "bg-green-light",
-  },
-  {
-    name: "Solo Sensor",
-    price: "$15 - $19",
-    nickname: "The independent one",
-    specs: ["WiFi + BLE", "USB-C rechargeable", "OLED screen option"],
-    color: "bg-green-plant",
-  },
-  {
-    name: "PlantCam",
-    price: "$25 - $29",
-    nickname: "The photographer",
-    specs: ["5MP camera", "Auto time-lapse", "4-6 month battery"],
-    color: "bg-accent-blue",
-  },
-  {
-    name: "PlantCam Pro",
-    price: "$69 - $79",
-    nickname: "The brain",
-    specs: ["AI plant disease detection", "Hub for all sensors", "Raspberry Pi powered"],
-    color: "bg-accent-purple",
-  },
-];
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+const content = await loadContent(locale, "landing") as any;
+const prefix = locale === "en" ? "/en" : "";
 
-const SETUPS = [
-  {
-    title: "Hub + Children",
-    desc: "Best for plant collectors (5+ plants)",
-    detail: "CamHub Pro + BLE sensors",
-    icon: "hub",
-  },
-  {
-    title: "Standalone",
-    desc: "Perfect for 1-3 plants",
-    detail: "WiFi sensors work alone",
-    icon: "solo",
-  },
-  {
-    title: "Parent + Children",
-    desc: "No hub needed",
-    detail: "Parent sensor relays data for children",
-    icon: "parent",
-  },
-];
-
-const BUNDLES = [
-  { name: "Starter Kit", price: "$35", contents: "1 Solo Sensor + 1 PlantCam" },
-  { name: "Home Garden Kit", price: "$99", contents: "5 BLE Sensors + 1 CamHub Pro" },
-  { name: "Plant Parent Kit", price: "$45", contents: "5 BLE Sensors + 1 Solo (parent)" },
-  { name: "Sensor 5-Pack", price: "$29", contents: "5 BLE Child Sensors" },
-];
-
-const APP_FEATURES = [
-  { title: "Real-time monitoring", desc: "Live moisture, light, and temperature data" },
-  { title: "Push notifications", desc: "Never forget to water again" },
-  { title: "Photo timeline", desc: "Automatic growth time-lapses" },
-  { title: "Care history", desc: "Track every action and trend" },
-];
+const PRODUCT_COLORS = ["bg-green-light", "bg-green-plant", "bg-accent-blue", "bg-accent-purple"];
+const SETUP_ICONS = ["hub", "solo", "parent"];
 
 const GARDEN_PLANTS = [
   { name: "Fern-ando", type: "Boston Fern", moisture: 72, light: 45, temp: 22, hp: 92, status: "happy", battery: 85 },
@@ -80,23 +23,7 @@ const GARDEN_PLANTS = [
 const MOISTURE_CHART = [60, 55, 70, 65, 45, 80, 67];
 const DETAIL_CHART = [60, 55, 70, 65, 45, 80, 72];
 
-const PHOTO_DATES = ["Today", "3 days ago", "1 week ago", "2 weeks ago"];
-
-const NOTIFICATIONS = [
-  { icon: "bg-accent-orange", title: "Aloe There is thirsty!", time: "2m ago", desc: "Moisture at 31%" },
-  { icon: "bg-accent-blue", title: "Herb needs more light", time: "1h ago", desc: "Light level low" },
-  { icon: "bg-green-plant", title: "Fern-ando is thriving!", time: "3h ago", desc: "HP reached 92%" },
-  { icon: "bg-accent-red", title: "Low battery: Herb", time: "5h ago", desc: "Sensor at 41%" },
-  { icon: "bg-accent-blue", title: "New photo captured", time: "1d ago", desc: "PlantCam auto-shot" },
-];
-
 const FOUND_SENSORS = ["Plantgotchi-A3F2", "Plantgotchi-B7E1"];
-
-const SETTINGS_GROUPS = [
-  { section: "NOTIFICATIONS", items: ["Water reminders", "Low battery alerts", "Daily summary"] },
-  { section: "SENSORS", items: ["Sync interval: 15 min", "LED brightness", "Sleep schedule"] },
-  { section: "ACCOUNT", items: ["Profile", "Export data"] },
-];
 
 const DETAIL_STATS = [
   { label: "MOISTURE", value: "72%", color: "bg-accent-blue", pct: 72 },
@@ -105,22 +32,33 @@ const DETAIL_STATS = [
   { label: "HP", value: "92%", color: "bg-green-plant", pct: 92 },
 ];
 
-const GARDEN_FEATURES = [
-  "Segmented HP &amp; moisture bars",
-  "Mini 7-day trend charts per plant",
-  "Live sensor indicators with animations",
-  "Tap-to-expand detail panel with full stats",
-  "Mobile bottom-sheet for plant details",
-];
-
 const VENT_LINES = [0, 1, 2, 3, 4, 5, 6];
 const LED_DOTS = [0, 1, 2];
+
+const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plant", "bg-accent-red", "bg-accent-blue"];
 ---
 
-<BaseLayout>
+<BaseLayout title={content.meta.title} description={content.meta.description}>
   <div class="min-h-screen bg-cream text-pixel-black">
     <!-- STICKY NAV -->
-    <SiteNav client:load />
+    <SiteNav
+      client:load
+      locale={locale}
+      currentPath={Astro.url.pathname}
+      labels={{
+        home: t("nav.home"),
+        garden: t("nav.garden"),
+        help: t("nav.help"),
+        admin: t("nav.admin"),
+        login: t("nav.login"),
+        logout: t("nav.logout"),
+        toggleMenu: t("nav.toggleMenu"),
+        langPtbr: t("lang.pt-br"),
+        langEn: t("lang.en"),
+        langCurrentPtbr: t("lang.current.pt-br"),
+        langCurrentEn: t("lang.current.en"),
+      }}
+    />
 
     <!-- HERO -->
     <section class="relative overflow-hidden">
@@ -162,12 +100,12 @@ const LED_DOTS = [0, 1, 2];
         </div>
 
         <h1 class="pixel-font text-lg sm:text-2xl md:text-3xl leading-relaxed text-green-dark max-w-3xl">
-          Stick it in soil. Connect&nbsp;to&nbsp;WiFi.<br />
-          Watch your plants thrive.
+          {content.hero.heading[0]} {content.hero.heading[1]}<br />
+          {content.hero.heading[2]} {content.hero.heading[3]}
         </h1>
 
         <p class="text-pixel-gray text-base sm:text-lg max-w-xl">
-          Smart plant sensors with a Tamagotchi-inspired app experience
+          {content.hero.tagline}
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4">
@@ -175,13 +113,13 @@ const LED_DOTS = [0, 1, 2];
             href="#pricing"
             class="pixel-font text-xs bg-green-plant text-cream px-8 py-4 pixel-border hover:bg-green-dark transition-colors"
           >
-            Pre-order Now
+            {content.hero.cta}
           </a>
           <a
             href="#how-it-works"
             class="pixel-font text-xs border-2 border-pixel-black text-pixel-black px-8 py-4 hover:bg-cream-dark transition-colors"
           >
-            See How It Works
+            {content.hero.ctaSecondary}
           </a>
         </div>
       </div>
@@ -196,7 +134,7 @@ const LED_DOTS = [0, 1, 2];
     <section id="how-it-works" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-14">
-          How It Works
+          {content.howItWorks.title}
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
@@ -211,9 +149,9 @@ const LED_DOTS = [0, 1, 2];
                 </div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">STEP 1</span>
-            <h3 class="pixel-font text-xs text-pixel-black">Stick It In</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">Insert the sensor into your plant's soil.</p>
+            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[0].label}</span>
+            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[0].title}</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[0].desc}</p>
           </div>
 
           <!-- Step 2 -->
@@ -228,9 +166,9 @@ const LED_DOTS = [0, 1, 2];
                 </div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">STEP 2</span>
-            <h3 class="pixel-font text-xs text-pixel-black">Connect</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">Connect to WiFi via the Plantgotchi app.</p>
+            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[1].label}</span>
+            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[1].title}</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[1].desc}</p>
           </div>
 
           <!-- Step 3 -->
@@ -248,9 +186,9 @@ const LED_DOTS = [0, 1, 2];
                 <div class="absolute -bottom-1 -left-1 text-accent-orange pixel-font text-[8px] animate-pulse-glow">*</div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">STEP 3</span>
-            <h3 class="pixel-font text-xs text-pixel-black">Watch It Thrive</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">Monitor your plants with Tamagotchi-style animations.</p>
+            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[2].label}</span>
+            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[2].title}</h3>
+            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[2].desc}</p>
           </div>
         </div>
       </div>
@@ -260,14 +198,14 @@ const LED_DOTS = [0, 1, 2];
     <section id="products" class="py-16 sm:py-24">
       <div class="max-w-6xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          Product Lineup
+          {content.sections.productLineup}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
           From a tiny soil sensor to a full AI-powered plant hub&nbsp;&mdash; pick what fits your jungle.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PRODUCTS.map((p, i) => (
+          {content.products.map((p: any, i: number) => (
             <div
               class="bg-cream-dark rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
             >
@@ -299,7 +237,7 @@ const LED_DOTS = [0, 1, 2];
                       <circle cx="0" cy="0" r="3.5" fill="#E8F5E9" opacity="0.6" />
                       <path d="M-1.5,1 Q0,-3 1.5,1" fill="none" stroke="#2E7D32" stroke-width="1" />
                     </g>
-                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22x15mm</text>
                   </svg>
                 )}
                 {i === 1 && (
@@ -328,7 +266,7 @@ const LED_DOTS = [0, 1, 2];
                       <circle cx="0" cy="0" r="3.5" fill="#E8F5E9" opacity="0.6" />
                       <path d="M-1.5,1 Q0,-3 1.5,1" fill="none" stroke="#2E7D32" stroke-width="1" />
                     </g>
-                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                    <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28x18mm</text>
                   </svg>
                 )}
                 {i === 2 && (
@@ -358,7 +296,7 @@ const LED_DOTS = [0, 1, 2];
                       <path d="M-2,1.5 Q0,-3 2,1.5" fill="none" stroke="#81C784" stroke-width="1" />
                     </g>
                     <text x="108" y="128" text-anchor="middle" font-size="6" font-family="'Press Start 2P', monospace" fill="#9E9E9E" opacity="0.6">5MP</text>
-                    <text x="80" y="6" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">38×32mm</text>
+                    <text x="80" y="6" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">38x32mm</text>
                     <polygon points="74,140 86,140 82,175 78,175" fill="#757575" />
                     <polygon points="74,140 78,175 76,174 72,140" fill="#616161" />
                   </svg>
@@ -402,7 +340,7 @@ const LED_DOTS = [0, 1, 2];
                         <animate attributeName="opacity" values={`${0.6 + li * 0.15};0.2;${0.6 + li * 0.15}`} dur="2.5s" begin={`${li * 0.4}s`} repeatCount="indefinite" />
                       </ellipse>
                     ))}
-                    <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62×45mm</text>
+                    <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62x45mm</text>
                     <text x="48" y="125" font-size="5" font-family="'Press Start 2P', monospace" fill="#A5D6A7" opacity="0.4" transform="skewY(26)">RPi</text>
                   </svg>
                 )}
@@ -413,7 +351,7 @@ const LED_DOTS = [0, 1, 2];
               <span class="pixel-font text-xs text-green-dark">{p.price}</span>
 
               <ul class="text-sm text-pixel-gray space-y-1 mt-auto">
-                {p.specs.map((s) => (
+                {p.specs.map((s: string) => (
                   <li class="flex items-center gap-1.5 justify-center">
                     <span class="w-1.5 h-1.5 bg-green-plant inline-block"></span>
                     {s}
@@ -430,17 +368,19 @@ const LED_DOTS = [0, 1, 2];
     <section class="bg-cream-dark py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          Setup Configurations
+          {content.sections.setupConfigurations}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
           Mix and match to fit your space.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {SETUPS.map((s) => (
+          {content.setups.map((s: any, idx: number) => {
+            const icon = SETUP_ICONS[idx];
+            return (
             <div class="bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4">
               <div class="h-20 flex items-end justify-center gap-2">
-                {s.icon === "hub" && (
+                {icon === "hub" && (
                   <Fragment>
                     <div class="flex flex-col items-center" aria-label="CamHub Pro">
                       <div class="w-24 h-24">
@@ -468,7 +408,7 @@ const LED_DOTS = [0, 1, 2];
                           <ellipse cx="132" cy="115" rx="2" ry="1.5" fill="white" opacity="0.3" />
                           <rect x="50" y="18" width="4" height="22" rx="2" fill="#616161" transform="skewY(26) skewX(-10)" />
                           <circle cx="56" cy="16" r="3" fill="#757575" />
-                          <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62×45mm</text>
+                          <text x="100" y="8" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">62x45mm</text>
                         </svg>
                       </div>
                     </div>
@@ -487,14 +427,14 @@ const LED_DOTS = [0, 1, 2];
                             <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
                               <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
                             </ellipse>
-                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22x15mm</text>
                           </svg>
                         </div>
                       </div>
                     </div>
                   </Fragment>
                 )}
-                {s.icon === "solo" && (
+                {icon === "solo" && (
                   <div class="flex flex-col items-center" aria-label="solo sensor">
                     <div class="w-20 h-24">
                       <svg viewBox="0 0 140 200" width="140" height="200" class="block mx-auto drop-shadow-lg">
@@ -509,12 +449,12 @@ const LED_DOTS = [0, 1, 2];
                         <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
                           <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
                         </ellipse>
-                        <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                        <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28x18mm</text>
                       </svg>
                     </div>
                   </div>
                 )}
-                {s.icon === "parent" && (
+                {icon === "parent" && (
                   <Fragment>
                     <div class="flex flex-col items-center" aria-label="parent sensor">
                       <div class="w-20 h-24">
@@ -530,7 +470,7 @@ const LED_DOTS = [0, 1, 2];
                           <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
                             <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
                           </ellipse>
-                          <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28×18mm</text>
+                          <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">28x18mm</text>
                         </svg>
                       </div>
                     </div>
@@ -549,7 +489,7 @@ const LED_DOTS = [0, 1, 2];
                             <ellipse cx="70" cy="36" rx="4" ry="2.5" fill="#69F0AE">
                               <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
                             </ellipse>
-                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22×15mm</text>
+                            <text x="70" y="12" text-anchor="middle" font-size="7" font-family="'Press Start 2P', monospace" fill="#795548" opacity="0.5">22x15mm</text>
                           </svg>
                         </div>
                       </div>
@@ -564,7 +504,7 @@ const LED_DOTS = [0, 1, 2];
                 {s.detail}
               </span>
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </section>
@@ -573,7 +513,7 @@ const LED_DOTS = [0, 1, 2];
     <section id="app" class="py-16 sm:py-24">
       <div class="max-w-5xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          The App
+          {content.sections.appExperience}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
           Your plants, reimagined as pixel pals.
@@ -641,7 +581,7 @@ const LED_DOTS = [0, 1, 2];
           </div>
 
           <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {APP_FEATURES.map((f) => (
+            {content.appFeatures.map((f: any) => (
               <div class="bg-cream-dark rounded-lg pixel-border p-5">
                 <h3 class="pixel-font text-[9px] text-pixel-black mb-2">{f.title}</h3>
                 <p class="text-sm text-pixel-gray">{f.desc}</p>
@@ -696,16 +636,16 @@ const LED_DOTS = [0, 1, 2];
               Tap any plant to see detailed charts, care history, and time-lapse photos.
             </p>
             <div class="space-y-2">
-              {GARDEN_FEATURES.map((item) => (
+              {content.gardenFeatures.map((item: string) => (
                 <div class="flex items-center gap-2">
                   <span class="w-1.5 h-1.5 bg-green-plant shrink-0"></span>
-                  <span class="text-sm text-pixel-gray" set:html={item} />
+                  <span class="text-sm text-pixel-gray">{item}</span>
                 </div>
               ))}
             </div>
 
             <a
-              href="/garden"
+              href={`${prefix}/garden`}
               class="inline-block mt-6 pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
             >
               Try the Live Demo
@@ -754,8 +694,8 @@ const LED_DOTS = [0, 1, 2];
                     <span class="pixel-font text-[3px] text-pixel-gray">+2 more plants</span>
                   </div>
                   <div class="flex justify-around mt-2 pt-1 border-t border-pixel-gray/20">
-                    {["Garden", "Camera", "Alerts", "More"].map((t, i) => (
-                      <span class={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{t}</span>
+                    {["Garden", "Camera", "Alerts", "More"].map((label, i) => (
+                      <span class={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{label}</span>
                     ))}
                   </div>
                 </div>
@@ -817,7 +757,7 @@ const LED_DOTS = [0, 1, 2];
                   <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; Back</div>
                   <div class="pixel-font text-[5px] text-green-dark mb-1">Photo Timeline</div>
                   <div class="space-y-1">
-                    {PHOTO_DATES.map((date, i) => (
+                    {content.photoLabels.map((date: string, i: number) => (
                       <div>
                         <span class="pixel-font text-[3px] text-pixel-gray">{date}</span>
                         <div class={`w-full h-8 rounded mt-0.5 ${
@@ -850,9 +790,9 @@ const LED_DOTS = [0, 1, 2];
                 <div class="p-2">
                   <div class="pixel-font text-[5px] text-green-dark mb-2">Alerts</div>
                   <div class="space-y-1.5">
-                    {NOTIFICATIONS.map((n) => (
+                    {content.notifications.map((n: any, ni: number) => (
                       <div class="flex gap-1.5 items-start bg-cream-dark rounded p-1">
-                        <div class={`w-1.5 h-1.5 rounded-full ${n.icon} shrink-0 mt-0.5`}></div>
+                        <div class={`w-1.5 h-1.5 rounded-full ${NOTIFICATION_ICONS[ni]} shrink-0 mt-0.5`}></div>
                         <div class="flex-1 min-w-0">
                           <div class="flex justify-between">
                             <span class="pixel-font text-[3px] text-pixel-black truncate">{n.title}</span>
@@ -912,11 +852,11 @@ const LED_DOTS = [0, 1, 2];
                 <div class="p-2">
                   <div class="pixel-font text-[5px] text-green-dark mb-2">Settings</div>
                   <div class="space-y-1">
-                    {SETTINGS_GROUPS.map((group) => (
+                    {content.settingsGroups.map((group: any) => (
                       <div>
                         <span class="pixel-font text-[3px] text-pixel-gray">{group.section}</span>
                         <div class="bg-cream-dark rounded mt-0.5">
-                          {group.items.map((item, i) => (
+                          {group.items.map((item: string, i: number) => (
                             <div class={`flex items-center justify-between px-1.5 py-1 ${i < group.items.length - 1 ? "border-b border-cream" : ""}`}>
                               <span class="text-[3.5px] text-pixel-black">{item}</span>
                               <div class="w-4 h-2 bg-green-plant rounded-full relative">
@@ -958,14 +898,14 @@ const LED_DOTS = [0, 1, 2];
     <section id="pricing" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          Bundles &amp; Pricing
+          {content.sections.preOrderBundles}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
           Save more when you bundle.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {BUNDLES.map((b, i) => (
+          {content.bundles.map((b: any, i: number) => (
             <div
               class={`bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-3 ${
                 i === 1 ? "ring-2 ring-green-plant" : ""
@@ -996,7 +936,7 @@ const LED_DOTS = [0, 1, 2];
       <div class="max-w-3xl mx-auto px-4 text-center">
         <div class="bg-cream-dark rounded-lg pixel-border p-8 relative overflow-hidden scanlines">
           <h2 class="pixel-font text-[10px] sm:text-xs text-green-dark mb-4">
-            Built on Open-Source Hardware
+            {content.openSource.title}
           </h2>
           <p class="text-sm text-pixel-gray mb-4 max-w-md mx-auto">
             Forked from{" "}
@@ -1070,7 +1010,7 @@ const LED_DOTS = [0, 1, 2];
 
         <div class="border-t border-pixel-gray/30 mt-10 pt-6 text-center">
           <p class="pixel-font text-[8px] text-cream/40">
-            Made with love for plants &bull; Plantgotchi &copy; 2026
+            {content.footer.tagline} &bull; Plantgotchi &copy; 2026
           </p>
         </div>
       </div>
