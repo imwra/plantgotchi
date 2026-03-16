@@ -31,20 +31,25 @@ jobs:
           PUBLIC_POSTHOG_KEY: ${{ secrets.PUBLIC_POSTHOG_KEY }}
           PUBLIC_POSTHOG_HOST: ${{ secrets.PUBLIC_POSTHOG_HOST }}
 
-      - name: Prepare Pages-compatible output
+      - name: Fix Astro wrangler.json for Pages compatibility
         working-directory: website-astro
         run: |
-          mkdir -p dist-pages/_worker.js
-          cp -r dist/client/* dist-pages/
-          cp -r dist/server/chunks dist-pages/_worker.js/
-          cp dist/server/entry.mjs dist-pages/_worker.js/index.js
-          cp dist/server/virtual_astro_middleware.mjs dist-pages/_worker.js/
-          rm -rf dist/server/wrangler.json .wrangler/deploy
+          python3 -c "
+          import json
+          with open('dist/server/wrangler.json', 'r') as f:
+              d = json.load(f)
+          for key in ['assets', 'main', 'rules', 'no_bundle', 'images']:
+              d.pop(key, None)
+          d['kv_namespaces'] = []
+          with open('dist/server/wrangler.json', 'w') as f:
+              json.dump(d, f)
+          "
+          rm -rf .wrangler/deploy
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist-pages --project-name=plantgotchi --commit-dirty=true
+          command: pages deploy --project-name=plantgotchi --commit-dirty=true
           workingDirectory: website-astro
