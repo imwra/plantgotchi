@@ -225,7 +225,11 @@ const FILTER_OPTIONS: Array<{ value: TaskStatus | "all"; label: string }> = [
 // Component
 // ---------------------------------------------------------------------------
 
-export default function AdminDashboard() {
+interface AdminDashboardProps {
+  embedded?: boolean;
+}
+
+export default function AdminDashboard({ embedded = false }: AdminDashboardProps) {
   const [phases, setPhases] = useState<Phase[]>(INITIAL_PHASES);
   const [filter, setFilter] = useState<TaskStatus | "all">("all");
   const [search, setSearch] = useState("");
@@ -402,36 +406,15 @@ export default function AdminDashboard() {
 
   if (!loaded) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
+      <div className={embedded ? "" : "min-h-screen bg-cream flex items-center justify-center"}>
         <p className="pixel-font text-green-dark text-sm">Loading...</p>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-cream text-pixel-black">
-      <SiteNav />
-      {/* ---- Header ---- */}
-      <header className="bg-green-dark text-cream z-30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="pixel-font text-base sm:text-lg tracking-wide">
-              PLANTGOTCHI
-            </h1>
-            <p className="text-cream-dark text-xs mt-1 opacity-80">
-              Internal Product Launch Tracker
-            </p>
-          </div>
-          <div className="flex items-center gap-3 text-xs">
-            <span className="bg-green-plant/30 px-3 py-1 rounded-full font-semibold">
-              {stats.pct}% complete
-            </span>
-            <span className="opacity-70">{stats.done}/{stats.total} tasks</span>
-          </div>
-        </div>
-      </header>
+  const mainContent = (
+    <>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* ---- Summary Bar ---- */}
         <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
@@ -842,6 +825,38 @@ export default function AdminDashboard() {
           </span>{" "}
           Internal Dashboard &middot; Data saved locally in your browser
         </footer>
+    </>
+  );
+
+  if (embedded) {
+    return <div className="space-y-6">{mainContent}</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-cream text-pixel-black">
+      <SiteNav />
+      {/* ---- Header ---- */}
+      <header className="bg-green-dark text-cream z-30 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="pixel-font text-base sm:text-lg tracking-wide">
+              PLANTGOTCHI
+            </h1>
+            <p className="text-cream-dark text-xs mt-1 opacity-80">
+              Internal Product Launch Tracker
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="bg-green-plant/30 px-3 py-1 rounded-full font-semibold">
+              {stats.pct}% complete
+            </span>
+            <span className="opacity-70">{stats.done}/{stats.total} tasks</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {mainContent}
       </main>
     </div>
   );
