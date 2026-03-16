@@ -1,4 +1,5 @@
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { Kysely } from "kysely";
 import { getDb } from "./db/client";
@@ -21,6 +22,9 @@ export const auth = betterAuth({
       maxAge: 60 * 5,
     },
   },
+  plugins: [
+    admin(),
+  ],
 });
 
 export async function getSession(request: Request) {
