@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Plantgotchi</string>
+    <key>CFBundleDisplayName</key>
+    <string>Plantgotchi</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.plantgotchi.ios</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+    <key>UILaunchScreen</key>
+    <dict/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Plantgotchi uses Bluetooth to connect to your plant sensors and read moisture, temperature, light, and battery data.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Plantgotchi uses Bluetooth to communicate with your plant sensors.</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>bluetooth-central</string>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.plantgotchi.claude-analysis</string>
+    </array>
+</dict>
+</plist>

@@ -1,0 +1,68 @@
+---
+import HelpLayout from "../../layouts/HelpLayout.astro";
+---
+
+<HelpLayout title="AI Recommendations" category="Plant Care" description="How the offline rule engine and Claude AI work together to give you plant care advice.">
+  <p>
+    Plantgotchi uses a two-tier system to keep you informed about your plant's needs —
+    an instant offline rule engine and a periodic AI advisor.
+  </p>
+
+  <h2>Tier 1: Offline Rule Engine</h2>
+  <p>
+    Every time a new sensor reading arrives, the rule engine evaluates it against your plant's
+    thresholds. This happens instantly on your device — no internet needed.
+  </p>
+  <p>
+    The rules that are checked on every reading:
+  </p>
+  <table>
+    <thead>
+      <tr><th>Condition</th><th>Severity</th><th>Example Alert</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Moisture below minimum</td><td>Warning (Critical if &lt;20%)</td><td>"Needs water! Soil moisture at 18%"</td></tr>
+      <tr><td>Moisture above maximum</td><td>Warning</td><td>"May be overwatered — moisture at 92%"</td></tr>
+      <tr><td>Temperature below minimum</td><td>Warning (Critical if &gt;5°C below)</td><td>"Too cold! 8°C (minimum: 15°C)"</td></tr>
+      <tr><td>Temperature above maximum</td><td>Warning (Critical if &gt;5°C above)</td><td>"Too hot! 37°C (maximum: 30°C)"</td></tr>
+      <tr><td>Battery below 15%</td><td>Warning (Critical if &lt;5%)</td><td>"Sensor battery low — charge soon"</td></tr>
+      <tr><td>Light too low for preference</td><td>Info</td><td>"Prefers bright light but only getting 500 lux"</td></tr>
+    </tbody>
+  </table>
+  <p>
+    If all readings are within range, no recommendations are generated — your plant is happy!
+  </p>
+
+  <h2>Tier 2: Claude AI Advisor</h2>
+  <p>
+    Every 6 hours (when online), Plantgotchi sends your plant's recent data to Claude AI
+    for a personalized recommendation. The AI receives:
+  </p>
+  <ul>
+    <li>Your plant's name, species, and care preferences</li>
+    <li>The last 7 days of sensor readings (moisture, temperature trends)</li>
+    <li>Your last 10 care actions (when you watered, fertilized, etc.)</li>
+  </ul>
+  <p>
+    Claude analyzes the trends — not just the current reading — and provides a single,
+    actionable sentence. For example: "Your monstera's soil has been consistently dry; consider
+    increasing watering frequency to twice a week."
+  </p>
+
+  <h2>Recommendation Severity</h2>
+  <p>
+    AI recommendations are automatically tagged with a severity level:
+  </p>
+  <ul>
+    <li><strong>Urgent</strong> — the AI says "immediately" or "urgent" (act now)</li>
+    <li><strong>Warning</strong> — mentions "should," "consider," or "watch" (act soon)</li>
+    <li><strong>Info</strong> — general tips and observations (good to know)</li>
+  </ul>
+
+  <h2>Viewing Recommendations</h2>
+  <p>
+    All recommendations (from both the rule engine and AI) appear in your plant's detail view
+    under the Recommendations section. Each shows its source ("rules" or "claude"), severity,
+    and timestamp. You can mark recommendations as "acted on" to clear them.
+  </p>
+</HelpLayout>

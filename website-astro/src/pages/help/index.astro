@@ -1,0 +1,101 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SiteNav from "../../components/SiteNav";
+
+const categories = [
+  {
+    name: "Getting Started",
+    emoji: "🌱",
+    description: "New to Plantgotchi? Start here.",
+    articles: [
+      { title: "What is Plantgotchi?", href: "/help/what-is-plantgotchi", desc: "Learn how smart sensors and retro vibes keep your plants alive." },
+      { title: "Quick Start Guide", href: "/help/quick-start", desc: "From unboxing to your first reading in 5 minutes." },
+      { title: "Creating Your Account", href: "/help/creating-account", desc: "Sign up, log in, and manage your profile." },
+    ],
+  },
+  {
+    name: "Sensors & Hardware",
+    emoji: "📡",
+    description: "Everything about your plant sensors.",
+    articles: [
+      { title: "Sensor Types", href: "/help/sensor-types", desc: "Compare BLE Child, Solo, PlantCam, and PlantCam Pro." },
+      { title: "Sensor Setup", href: "/help/sensor-setup", desc: "Pairing via Bluetooth, WiFi configuration, and LED codes." },
+      { title: "Battery & Charging", href: "/help/sensor-battery", desc: "Battery life expectations, charging, and replacement." },
+    ],
+  },
+  {
+    name: "Mobile Apps",
+    emoji: "📱",
+    description: "Get the most from the Plantgotchi apps.",
+    articles: [
+      { title: "iOS App", href: "/help/ios-app", desc: "Features, BLE scanning, and local data on iPhone and iPad." },
+      { title: "Android App", href: "/help/android-app", desc: "Features, BLE scanning, and local data on Android devices." },
+      { title: "Syncing Your Data", href: "/help/syncing-data", desc: "How cloud sync works and what happens offline." },
+    ],
+  },
+  {
+    name: "Plant Care",
+    emoji: "🌿",
+    description: "Help your plants thrive with data.",
+    articles: [
+      { title: "Adding Plants", href: "/help/adding-plants", desc: "Add plants, set thresholds, and pick the perfect emoji." },
+      { title: "Reading Sensor Data", href: "/help/reading-data", desc: "Understand moisture, temperature, and light readings." },
+      { title: "AI Recommendations", href: "/help/ai-recommendations", desc: "How the rule engine and Claude AI provide care advice." },
+    ],
+  },
+  {
+    name: "Troubleshooting",
+    emoji: "🔧",
+    description: "Fix common issues quickly.",
+    articles: [
+      { title: "Sensor Not Connecting", href: "/help/sensor-not-connecting", desc: "BLE troubleshooting, range tips, and interference fixes." },
+      { title: "Data Not Syncing", href: "/help/data-not-syncing", desc: "Cloud sync issues and offline queue recovery." },
+      { title: "FAQ", href: "/help/faq", desc: "Answers to the most common questions." },
+    ],
+  },
+];
+---
+
+<BaseLayout title="Help Center - Plantgotchi" description="Get help with your Plantgotchi smart plant monitoring system.">
+  <SiteNav client:load />
+
+  <div class="max-w-5xl mx-auto px-4 py-8">
+    <nav class="text-xs text-pixel-gray mb-6">
+      <a href="/" class="hover:text-green-dark transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-pixel-black">Help</span>
+    </nav>
+
+    <div class="text-center mb-10">
+      <h1 class="pixel-font text-base sm:text-lg text-green-dark mb-3">Help Center</h1>
+      <p class="text-sm text-pixel-gray max-w-xl mx-auto">
+        Everything you need to know about setting up and using Plantgotchi.
+        Pick a topic below or browse by category.
+      </p>
+    </div>
+
+    {categories.map((cat) => (
+      <section class="mb-10">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-lg">{cat.emoji}</span>
+          <h2 class="pixel-font text-[11px] text-pixel-black">{cat.name}</h2>
+          <span class="text-xs text-pixel-gray ml-2">{cat.description}</span>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cat.articles.map((article) => (
+            <a
+              href={article.href}
+              class="block bg-white/60 p-4 pixel-border hover:bg-white/90 transition-colors group"
+            >
+              <h3 class="text-sm font-bold text-green-dark group-hover:text-green-plant transition-colors mb-1">
+                {article.title}
+              </h3>
+              <p class="text-xs text-pixel-gray leading-relaxed">{article.desc}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

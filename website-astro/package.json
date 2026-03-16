@@ -1,0 +1,30 @@
+{
+  "name": "website-astro",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^13.1.1",
+    "@astrojs/react": "^5.0.0",
+    "@libsql/client": "^0.17.0",
+    "@libsql/kysely-libsql": "^0.4.1",
+    "@tailwindcss/vite": "^4.2.1",
+    "astro": "^6.0.4",
+    "better-auth": "^1.5.5",
+    "kysely": "^0.28.12",
+    "posthog-js": "^1.360.2",
+    "posthog-node": "^5.28.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.0"
+  }
+}

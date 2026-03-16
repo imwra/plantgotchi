@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Plantgotchi</string>
+
+    <!-- Garden screen -->
+    <string name="garden_title">Plantgotchi</string>
+    <string name="garden_empty_title">No plants yet!</string>
+    <string name="garden_empty_subtitle">Tap + to add your first plant</string>
+    <string name="garden_add_plant">Add plant</string>
+    <string name="garden_scan_sensors">Scan sensors</string>
+    <string name="garden_settings">Settings</string>
+
+    <!-- Plant detail -->
+    <string name="detail_health">Health</string>
+    <string name="detail_sensor_readings">Sensor Readings</string>
+    <string name="detail_recommendations">Recommendations</string>
+    <string name="detail_care_log">Care Log</string>
+    <string name="detail_water">Water</string>
+    <string name="detail_fertilize">Fertilize</string>
+
+    <!-- Scan screen -->
+    <string name="scan_title">Scan Sensors</string>
+    <string name="scan_ready">Ready to scan</string>
+    <string name="scan_scanning">Scanning\u2026</string>
+    <string name="scan_connecting">Connecting\u2026</string>
+    <string name="scan_connected">Connected!</string>
+    <string name="scan_no_sensors">No sensors found</string>
+    <string name="scan_help">Make sure your Plantgotchi sensor is powered on and nearby</string>
+    <string name="scan_pair">Pair</string>
+
+    <!-- Add plant -->
+    <string name="add_title">Add Plant</string>
+    <string name="add_name_label">Plant name</string>
+    <string name="add_name_hint">e.g. Office Fern</string>
+    <string name="add_species_label">Species (optional)</string>
+    <string name="add_species_hint">e.g. Nephrolepis exaltata</string>
+    <string name="add_emoji_label">Choose an emoji</string>
+    <string name="add_light_label">Light preference</string>
+    <string name="add_moisture_label">Moisture range</string>
+    <string name="add_temp_label">Temperature range</string>
+    <string name="add_save">Add Plant</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_cloud_sync">Cloud Sync</string>
+    <string name="settings_cloud_desc">Connect to Turso to sync your plant data across devices.</string>
+    <string name="settings_turso_url">Turso Database URL</string>
+    <string name="settings_turso_token">Auth Token</string>
+    <string name="settings_save">Save</string>
+    <string name="settings_saved">Saved</string>
+    <string name="settings_paired_sensors">Paired Sensors</string>
+    <string name="settings_no_sensors">No sensors currently paired.</string>
+    <string name="settings_about">About</string>
+    <string name="settings_version">Plantgotchi v1.0.0</string>
+    <string name="settings_sign_out">Sign Out</string>
+
+    <!-- Status labels -->
+    <string name="status_happy">Happy</string>
+    <string name="status_thirsty">Thirsty</string>
+    <string name="status_unknown">Unknown</string>
+
+    <!-- BLE permissions -->
+    <string name="ble_permission_rationale">Plantgotchi needs Bluetooth access to connect to your plant sensors.</string>
+    <string name="location_permission_rationale">Location access is required on Android to scan for BLE devices.</string>
+</resources>

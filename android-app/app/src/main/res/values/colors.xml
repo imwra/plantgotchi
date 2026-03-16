@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Plantgotchi brand palette -->
+    <color name="cream">#FFF0EAD6</color>
+    <color name="text_brown">#FF3D3425</color>
+    <color name="green">#FF4A9E3F</color>
+    <color name="blue">#FF5BA3D9</color>
+    <color name="yellow">#FFE8B835</color>
+    <color name="red">#FFD95B5B</color>
+    <color name="purple">#FF9B6BB5</color>
+
+    <!-- Dark theme variants -->
+    <color name="cream_dark">#FF2A2520</color>
+    <color name="text_cream_light">#FFF0EAD6</color>
+</resources>

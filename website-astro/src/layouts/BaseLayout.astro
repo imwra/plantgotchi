@@ -1,0 +1,48 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Plantgotchi - Smart Plant Monitoring with Retro Soul",
+  description = "Stick it in soil. Connect to WiFi. Watch your plants thrive. Smart plant sensors with a Tamagotchi-inspired app experience.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+    <script>
+      import posthog from 'posthog-js';
+
+      const apiKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+      if (apiKey) {
+        posthog.init(apiKey, {
+          api_host: import.meta.env.PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+          capture_pageview: true,
+          autocapture: true,
+          session_recording: {
+            recordCrossOriginIframes: true,
+          },
+          persistence: 'localStorage+cookie',
+        });
+
+        posthog.register({ platform: 'web' });
+      }
+    </script>
+  </head>
+  <body class="bg-cream text-pixel-black antialiased">
+    <slot />
+  </body>
+</html>

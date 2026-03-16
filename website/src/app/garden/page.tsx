@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import SiteNav from "../components/SiteNav";
 
 const PIXEL_FONT = `"Press Start 2P", monospace`;
 
@@ -433,6 +434,7 @@ export default function GardenDashboard() {
       background: `linear-gradient(170deg, ${COLORS.bg} 0%, #e8e2ce 50%, #f5f0de 100%)`,
       fontFamily: PIXEL_FONT, color: COLORS.text,
     }}>
+      <SiteNav />
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes wilt { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(2px) rotate(-6deg)} }

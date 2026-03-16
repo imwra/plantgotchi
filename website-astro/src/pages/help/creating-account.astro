@@ -1,0 +1,47 @@
+---
+import HelpLayout from "../../layouts/HelpLayout.astro";
+---
+
+<HelpLayout title="Creating Your Account" category="Getting Started" description="How to sign up, log in, and manage your Plantgotchi profile.">
+  <p>
+    Your Plantgotchi account lets you sync plant data across devices and access your garden from
+    the web dashboard. Here's how to get set up.
+  </p>
+
+  <h2>Signing Up</h2>
+  <ol>
+    <li>Go to <a href="/signup">plantgotchi.com/signup</a> or tap "Sign Up" in the mobile app.</li>
+    <li>Enter your email address and choose a password.</li>
+    <li>Tap "Create Account" — you're in!</li>
+  </ol>
+  <p>
+    Plantgotchi uses email and password authentication powered by the better-auth library.
+    Your credentials are encrypted and session cookies expire after 5 minutes of inactivity,
+    then auto-refresh when you interact with the app.
+  </p>
+
+  <h2>Logging In</h2>
+  <p>
+    Visit <a href="/login">plantgotchi.com/login</a> or open the app and tap "Login."
+    Enter your email and password, and you'll be taken to your garden dashboard.
+  </p>
+
+  <h2>Your Garden Dashboard</h2>
+  <p>
+    Once logged in, the <a href="/garden">Garden</a> page shows all your plants with their
+    current HP, status, and latest sensor readings. From here you can:
+  </p>
+  <ul>
+    <li>Add new plants with the "+" button</li>
+    <li>Tap any plant card to see detailed readings and care history</li>
+    <li>Log care actions (watering, fertilizing, pruning, etc.)</li>
+    <li>View AI and rule-based recommendations</li>
+  </ul>
+
+  <h2>Account Security</h2>
+  <p>
+    Choose a strong password (12+ characters recommended). Your session data and plant records
+    are stored in a Turso cloud database, with all communication encrypted over HTTPS.
+    User IDs are linked to your plants, care logs, and recommendations so your data stays private.
+  </p>
+</HelpLayout>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
+import SiteNav from "../components/SiteNav";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -411,8 +412,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-cream text-pixel-black">
+      <SiteNav />
       {/* ---- Header ---- */}
-      <header className="bg-green-dark text-cream sticky top-0 z-30 shadow-lg">
+      <header className="bg-green-dark text-cream z-30 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h1 className="pixel-font text-base sm:text-lg tracking-wide">

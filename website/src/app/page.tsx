@@ -418,14 +418,8 @@ function IOSScreenMockup({ screen, children }: { screen: string; children: React
   );
 }
 
-/* ========================  NAV LINKS  ============================= */
-
-const NAV_LINKS = [
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Products", href: "#products" },
-  { label: "Garden", href: "#garden" },
-  { label: "Pricing", href: "#pricing" },
-] as const;
+/* ========================  SHARED NAV  ============================ */
+import SiteNav from "./components/SiteNav";
 
 /* ========================  DATA  ================================== */
 
@@ -519,30 +513,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-cream text-pixel-black">
       {/* ───────── STICKY NAV ───────── */}
-      <nav className="sticky top-0 z-50 bg-cream/90 backdrop-blur-sm border-b-2 border-pixel-black">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <a href="#" className="pixel-font text-green-dark text-xs sm:text-sm tracking-tight">
-            Plantgotchi
-          </a>
-          <div className="hidden sm:flex items-center gap-6">
-            {NAV_LINKS.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="text-sm text-pixel-gray hover:text-green-dark transition-colors"
-              >
-                {l.label}
-              </a>
-            ))}
-          </div>
-          <a
-            href="#pricing"
-            className="pixel-font text-[8px] sm:text-[10px] bg-green-plant text-cream px-3 py-2 pixel-border hover:bg-green-dark transition-colors"
-          >
-            Pre-order
-          </a>
-        </div>
-      </nav>
+      <SiteNav />
 
       {/* ───────── HERO ───────── */}
       <section className="relative overflow-hidden">

@@ -1,0 +1,14 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import AdminDashboard from "../components/AdminDashboard";
+import { getSession } from "../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) {
+  return Astro.redirect("/login");
+}
+---
+
+<BaseLayout title="Admin - Plantgotchi">
+  <AdminDashboard client:load />
+</BaseLayout>

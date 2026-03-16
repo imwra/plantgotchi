@@ -1,0 +1,58 @@
+---
+import HelpLayout from "../../layouts/HelpLayout.astro";
+---
+
+<HelpLayout title="Battery & Charging" category="Sensors & Hardware" description="Battery life expectations, charging instructions, and low battery alerts.">
+  <p>
+    Different Plantgotchi sensors have different power sources. Here's what to expect and
+    how to keep them running.
+  </p>
+
+  <h2>Battery Life by Sensor</h2>
+  <table>
+    <thead>
+      <tr><th>Sensor</th><th>Power Source</th><th>Expected Life</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>BLE Child</td><td>CR2032 coin cell</td><td>~2 years</td></tr>
+      <tr><td>Solo</td><td>USB-C rechargeable</td><td>Varies by usage</td></tr>
+      <tr><td>PlantCam</td><td>Internal battery</td><td>4–6 months</td></tr>
+      <tr><td>PlantCam Pro</td><td>USB-C (always on)</td><td>N/A — wall powered</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Charging the Solo Sensor</h2>
+  <p>
+    Plug any USB-C cable into the bottom of the Solo sensor. A full charge takes about 1–2 hours.
+    The LED turns solid green when fully charged. You can leave the sensor in soil while charging —
+    just run the cable along the pot edge.
+  </p>
+
+  <h2>Replacing the CR2032 (BLE Child)</h2>
+  <ol>
+    <li>Gently twist the sensor housing to open the battery compartment.</li>
+    <li>Remove the old CR2032 coin cell.</li>
+    <li>Insert a new CR2032 with the positive (+) side facing up.</li>
+    <li>Close the housing. The sensor will begin advertising over BLE within seconds.</li>
+  </ol>
+
+  <h2>Low Battery Alerts</h2>
+  <p>
+    Plantgotchi monitors battery levels automatically. The rule engine triggers alerts at two thresholds:
+  </p>
+  <ul>
+    <li><strong>Below 15%</strong> — Warning severity: "Sensor battery low — charge soon"</li>
+    <li><strong>Below 5%</strong> — Critical severity: urgent notification to charge immediately</li>
+  </ul>
+  <p>
+    These alerts appear as recommendations in your plant's detail view and in push notifications
+    (if enabled on mobile).
+  </p>
+
+  <h2>Maximizing Battery Life</h2>
+  <ul>
+    <li>Increase the BLE notification interval (60s instead of 30s) via sensor config.</li>
+    <li>Keep sensors within BLE range — connection retries drain battery faster.</li>
+    <li>For WiFi sensors, a stable WiFi connection uses less power than frequent reconnects.</li>
+  </ul>
+</HelpLayout>
