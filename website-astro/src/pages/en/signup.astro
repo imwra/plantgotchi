@@ -1,0 +1,149 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getSession } from "../../lib/auth";
+import { getLocaleFromPath, useTranslations } from "../../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+const prefix = locale === "en" ? "/en" : "";
+
+const session = await getSession(Astro.request);
+if (session) {
+  return Astro.redirect(`${prefix}/garden`);
+}
+---
+
+<BaseLayout title={`${t("signup.title")} - Plantgotchi`}>
+  <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #faf6e9; padding: 1rem;">
+    <div style="width: 100%; max-width: 22rem;">
+      <div
+        style="border: 3px solid #2d2d2d; border-radius: 8px; background: #f5f0e1; padding: 2rem; box-shadow: 4px 4px 0 #2d2d2d;"
+      >
+        <h1
+          style="font-family: 'Press Start 2P', monospace; font-size: 1.1rem; color: #4a9e3f; text-align: center; margin-bottom: 1.5rem;"
+        >
+          {t("signup.title")}
+        </h1>
+
+        <form id="signup-form" data-error-default={t("signup.errorDefault")} data-error-network={t("signup.errorNetwork")} data-submit-text={t("signup.submit")}>
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #2d2d2d; display: block; margin-bottom: 0.5rem;"
+            >
+              {t("signup.name")}
+            </label>
+            <input
+              type="text"
+              name="name"
+              required
+              style="width: 100%; padding: 0.5rem; border: 2px solid #2d2d2d; border-radius: 4px; font-family: monospace; font-size: 0.85rem; background: #fff; box-sizing: border-box;"
+            />
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label
+              style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #2d2d2d; display: block; margin-bottom: 0.5rem;"
+            >
+              {t("signup.email")}
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              style="width: 100%; padding: 0.5rem; border: 2px solid #2d2d2d; border-radius: 4px; font-family: monospace; font-size: 0.85rem; background: #fff; box-sizing: border-box;"
+            />
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label
+              style="font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: #2d2d2d; display: block; margin-bottom: 0.5rem;"
+            >
+              {t("signup.password")}
+            </label>
+            <input
+              type="password"
+              name="password"
+              required
+              minlength="8"
+              style="width: 100%; padding: 0.5rem; border: 2px solid #2d2d2d; border-radius: 4px; font-family: monospace; font-size: 0.85rem; background: #fff; box-sizing: border-box;"
+            />
+          </div>
+
+          <div
+            id="error-msg"
+            style="display: none; font-family: 'Press Start 2P', monospace; font-size: 0.55rem; color: #c0392b; border: 2px solid #c0392b; padding: 0.5rem; margin-bottom: 1rem; border-radius: 4px; background: #fdecea;"
+          >
+          </div>
+
+          <button
+            type="submit"
+            style="width: 100%; padding: 0.75rem; background: #4a9e3f; color: #f0ead6; border: 2px solid #2d2d2d; border-radius: 4px; font-family: 'Press Start 2P', monospace; font-size: 0.7rem; cursor: pointer; box-shadow: 2px 2px 0 #2d2d2d;"
+          >
+            {t("signup.submit")}
+          </button>
+        </form>
+
+        <p
+          style="text-align: center; margin-top: 1rem; font-family: 'Press Start 2P', monospace; font-size: 0.5rem; color: #666;"
+        >
+          {t("signup.hasAccount")} <a href={`${prefix}/login`} style="color: #4a9e3f; text-decoration: underline;">{t("signup.loginLink")}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    import posthog from 'posthog-js';
+    const form = document.getElementById("signup-form") as HTMLFormElement;
+    const errorMsg = document.getElementById("error-msg") as HTMLDivElement;
+    const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+
+    const errorDefault = form.dataset.errorDefault || "Could not create account";
+    const errorNetwork = form.dataset.errorNetwork || "Network error. Try again.";
+    const submitText = form.dataset.submitText || "CREATE ACCOUNT";
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = "none";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "...";
+
+      const formData = new FormData(form);
+      const name = formData.get("name") as string;
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+
+      try {
+        const res = await fetch("/api/auth/sign-up/email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          errorMsg.textContent = data.message || errorDefault;
+          errorMsg.style.display = "block";
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitText;
+          return;
+        }
+
+        const session = await res.json().catch(() => null);
+        if (session?.user?.id) {
+          posthog.identify(session.user.id, {
+            email: session.user.email,
+            name: session.user.name,
+          });
+        }
+
+        window.location.href = "/garden";
+      } catch {
+        errorMsg.textContent = errorNetwork;
+        errorMsg.style.display = "block";
+        submitBtn.disabled = false;
+        submitBtn.textContent = submitText;
+      }
+    });
+  </script>
+</BaseLayout>
