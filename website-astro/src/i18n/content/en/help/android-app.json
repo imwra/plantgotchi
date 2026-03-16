@@ -1,0 +1,32 @@
+{
+  "slug": "android-app",
+  "title": "Android App",
+  "category": "Mobile Apps",
+  "description": "Features, BLE scanning, and local data storage on Android devices.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>The Plantgotchi Android app is built with Jetpack Compose and Material 3, providing a modern experience with full offline support.</p>"
+    },
+    {
+      "heading": "Key Features",
+      "body": "<ul><li><strong>BLE sensor scanning</strong> \u2014 discover sensors using Android's BLE APIs</li><li><strong>Real-time readings</strong> \u2014 live moisture, temperature, light, and battery data</li><li><strong>Offline-first</strong> \u2014 local Room database (SQLite) stores all data</li><li><strong>Cloud sync</strong> \u2014 push and pull data from Turso when connected</li><li><strong>Care logging</strong> \u2014 track watering, fertilizing, repotting, pruning, and notes</li><li><strong>Rule engine</strong> \u2014 instant offline alerts when readings go out of range</li></ul>"
+    },
+    {
+      "heading": "BLE Scanning",
+      "body": "<p>The Android app scans for Plantgotchi sensors advertising the custom GATT service UUID (<code>0000FE00-...</code>). The <code>BLEManager</code> handles connection lifecycle, and <code>SensorParser</code> converts raw BLE bytes into typed readings.</p><p>Data parsing follows the same protocol: moisture (uint16 LE), temperature (int16 LE \u00f7 100), light (uint32 LE), and battery (uint8). Out-of-bounds values return null.</p>"
+    },
+    {
+      "heading": "Local Database",
+      "body": "<p>The app uses Room (Android's SQLite abstraction) with entity classes for Plant, SensorReading, CareLog, and Recommendation. DAO classes provide typed queries, and the schema matches the web and iOS platforms exactly for seamless cloud sync.</p>"
+    },
+    {
+      "heading": "Offline Rule Engine",
+      "body": "<p>The Android app includes a built-in <code>RuleEngine</code> that evaluates every sensor reading against your plant's thresholds. Alerts are generated instantly \u2014 no internet needed. Rules cover moisture (low/high), temperature (low/high), battery level, and light preference mismatches.</p>"
+    },
+    {
+      "heading": "Requirements",
+      "body": "<ul><li>Android 8.0 (API 26) or later</li><li>Bluetooth and location permissions for BLE scanning</li><li>Internet only needed for cloud sync and AI recommendations</li></ul>"
+    }
+  ]
+}

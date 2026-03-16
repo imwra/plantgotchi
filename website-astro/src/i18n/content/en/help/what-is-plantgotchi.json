@@ -1,0 +1,28 @@
+{
+  "slug": "what-is-plantgotchi",
+  "title": "What is Plantgotchi?",
+  "category": "Getting Started",
+  "description": "Learn how Plantgotchi uses smart sensors and a retro-inspired app to keep your plants thriving.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Plantgotchi is a smart plant monitoring system that combines affordable soil sensors with a Tamagotchi-inspired app experience. Stick a sensor in your plant's soil, connect it to your phone, and get real-time data on moisture, temperature, and light \u2014 plus AI-powered care recommendations.</p>"
+    },
+    {
+      "heading": "How It Works",
+      "body": "<p>Each Plantgotchi sensor is powered by an ESP32 microcontroller. It measures soil moisture (0\u2013100%), ambient temperature (in \u00b0C), light intensity (in lux), and reports its own battery level. The sensor broadcasts this data over Bluetooth Low Energy (BLE) every 30\u201360 seconds.</p><p>Your phone picks up these readings and stores them locally. When you're online, data syncs to the cloud via Turso (a distributed SQLite database), so you can also check your plants from the web dashboard.</p>"
+    },
+    {
+      "heading": "The Retro Vibe",
+      "body": "<p>Every plant in Plantgotchi has a health bar (HP), a status (\"happy\" or \"thirsty\"), and an emoji avatar. HP is calculated from how close your readings are to the plant's ideal moisture and temperature ranges. Think of it like a virtual pet \u2014 except it's a real plant and the stakes are slightly lower.</p>"
+    },
+    {
+      "heading": "Smart Recommendations",
+      "body": "<p>Plantgotchi uses a two-tier recommendation system:</p><ul><li><strong>Offline rules engine</strong> \u2014 instant alerts when moisture drops below your plant's minimum, temperature goes out of range, or battery is low. Works without internet.</li><li><strong>Claude AI advisor</strong> \u2014 every 6 hours (when online), an AI reviews your plant's recent sensor data and care history to give a personalized, one-sentence recommendation.</li></ul>"
+    },
+    {
+      "heading": "Multi-Platform",
+      "body": "<p>Plantgotchi runs on iOS, Android, and the web. All platforms share the same database schema, rule engine logic, and BLE protocol \u2014 so your data stays consistent no matter which device you use.</p>"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "sensor-battery",
+  "title": "Bateria e Carregamento",
+  "category": "Sensores e Hardware",
+  "description": "Expectativa de vida da bateria, instrucoes de carregamento e alertas de bateria baixa.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Diferentes sensores Plantgotchi tem diferentes fontes de energia. Veja o que esperar e como mante-los funcionando.</p>"
+    },
+    {
+      "heading": "Vida da Bateria por Sensor",
+      "body": "<table><thead><tr><th>Sensor</th><th>Fonte de Energia</th><th>Vida Esperada</th></tr></thead><tbody><tr><td>BLE Filho</td><td>Bateria CR2032</td><td>~2 anos</td></tr><tr><td>Solo</td><td>Recarregavel USB-C</td><td>Varia conforme uso</td></tr><tr><td>PlantCam</td><td>Bateria interna</td><td>4\u20136 meses</td></tr><tr><td>PlantCam Pro</td><td>USB-C (sempre ligado)</td><td>N/A \u2014 alimentado pela tomada</td></tr></tbody></table>"
+    },
+    {
+      "heading": "Carregando o Sensor Solo",
+      "body": "<p>Conecte qualquer cabo USB-C na parte inferior do Sensor Solo. Uma carga completa leva cerca de 1\u20132 horas. O LED fica verde solido quando totalmente carregado. Voce pode deixar o sensor no solo enquanto carrega \u2014 basta passar o cabo pela borda do vaso.</p>"
+    },
+    {
+      "heading": "Substituindo a CR2032 (BLE Filho)",
+      "body": "<ol><li>Gire suavemente o compartimento do sensor para abrir o compartimento da bateria.</li><li>Remova a bateria CR2032 antiga.</li><li>Insira uma nova CR2032 com o lado positivo (+) para cima.</li><li>Feche o compartimento. O sensor comecara a anunciar via BLE em segundos.</li></ol>"
+    },
+    {
+      "heading": "Alertas de Bateria Baixa",
+      "body": "<p>O Plantgotchi monitora niveis de bateria automaticamente. O motor de regras dispara alertas em dois limites:</p><ul><li><strong>Abaixo de 15%</strong> \u2014 Severidade de aviso: \"Bateria do sensor baixa \u2014 carregue em breve\"</li><li><strong>Abaixo de 5%</strong> \u2014 Severidade critica: notificacao urgente para carregar imediatamente</li></ul><p>Estes alertas aparecem como recomendacoes na visualizacao detalhada da sua planta e em notificacoes push (se habilitadas no mobile).</p>"
+    },
+    {
+      "heading": "Maximizando a Vida da Bateria",
+      "body": "<ul><li>Aumente o intervalo de notificacao BLE (60s em vez de 30s) pela configuracao do sensor.</li><li>Mantenha os sensores dentro do alcance BLE \u2014 tentativas de reconexao gastam mais bateria.</li><li>Para sensores WiFi, uma conexao WiFi estavel usa menos energia do que reconexoes frequentes.</li></ul>"
+    }
+  ]
+}

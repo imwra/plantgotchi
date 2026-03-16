@@ -1,0 +1,54 @@
+{
+  "categories": [
+    {
+      "name": "Primeiros Passos",
+      "emoji": "🌱",
+      "description": "Novo no Plantgotchi? Comece aqui.",
+      "articles": [
+        { "slug": "what-is-plantgotchi", "title": "O que e o Plantgotchi?", "desc": "Saiba como sensores inteligentes e vibes retro mantem suas plantas vivas." },
+        { "slug": "quick-start", "title": "Guia de Inicio Rapido", "desc": "Da caixa ate a primeira leitura em 5 minutos." },
+        { "slug": "creating-account", "title": "Criando Sua Conta", "desc": "Cadastre-se, faca login e gerencie seu perfil." }
+      ]
+    },
+    {
+      "name": "Sensores e Hardware",
+      "emoji": "📡",
+      "description": "Tudo sobre seus sensores de planta.",
+      "articles": [
+        { "slug": "sensor-types", "title": "Tipos de Sensores", "desc": "Compare BLE Filho, Solo, PlantCam e PlantCam Pro." },
+        { "slug": "sensor-setup", "title": "Configuracao do Sensor", "desc": "Pareamento via Bluetooth, configuracao WiFi e codigos LED." },
+        { "slug": "sensor-battery", "title": "Bateria e Carregamento", "desc": "Expectativa de vida da bateria, carregamento e substituicao." }
+      ]
+    },
+    {
+      "name": "Apps Mobile",
+      "emoji": "📱",
+      "description": "Aproveite ao maximo os apps do Plantgotchi.",
+      "articles": [
+        { "slug": "ios-app", "title": "App iOS", "desc": "Recursos, escaneamento BLE e dados locais no iPhone e iPad." },
+        { "slug": "android-app", "title": "App Android", "desc": "Recursos, escaneamento BLE e dados locais em dispositivos Android." },
+        { "slug": "syncing-data", "title": "Sincronizando Seus Dados", "desc": "Como a sincronizacao na nuvem funciona e o que acontece offline." }
+      ]
+    },
+    {
+      "name": "Cuidados com Plantas",
+      "emoji": "🌿",
+      "description": "Ajude suas plantas a prosperarem com dados.",
+      "articles": [
+        { "slug": "adding-plants", "title": "Adicionando Plantas", "desc": "Adicione plantas, defina limites e escolha o emoji perfeito." },
+        { "slug": "reading-data", "title": "Lendo Dados do Sensor", "desc": "Entenda leituras de umidade, temperatura e luz." },
+        { "slug": "ai-recommendations", "title": "Recomendacoes por IA", "desc": "Como o motor de regras e o Claude IA fornecem conselhos de cuidado." }
+      ]
+    },
+    {
+      "name": "Solucao de Problemas",
+      "emoji": "🔧",
+      "description": "Resolva problemas comuns rapidamente.",
+      "articles": [
+        { "slug": "sensor-not-connecting", "title": "Sensor Nao Conecta", "desc": "Solucao de problemas BLE, dicas de alcance e correcoes de interferencia." },
+        { "slug": "data-not-syncing", "title": "Dados Nao Sincronizam", "desc": "Problemas de sincronizacao na nuvem e recuperacao de fila offline." },
+        { "slug": "faq", "title": "Perguntas Frequentes", "desc": "Respostas para as perguntas mais comuns." }
+      ]
+    }
+  ]
+}

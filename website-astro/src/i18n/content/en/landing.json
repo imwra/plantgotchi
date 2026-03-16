@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "title": "Plantgotchi - Smart Plant Monitoring with Retro Soul",
+    "description": "Stick it in soil. Connect to WiFi. Watch your plants thrive. Smart plant sensors with a Tamagotchi-inspired app experience."
+  },
+  "hero": {
+    "tagline": "Smart plant sensors with a Tamagotchi-inspired app experience",
+    "heading": ["Stick it in soil.", "Connect to WiFi.", "Watch your plants", "thrive."],
+    "cta": "Pre-order Now",
+    "ctaSecondary": "See How It Works"
+  },
+  "products": [
+    {
+      "name": "BLE Child Sensor",
+      "price": "$9 - $12",
+      "nickname": "The tiny one",
+      "specs": ["BLE only", "CR2032 battery", "2-year battery life"]
+    },
+    {
+      "name": "Solo Sensor",
+      "price": "$15 - $19",
+      "nickname": "The independent one",
+      "specs": ["WiFi + BLE", "USB-C rechargeable", "OLED screen option"]
+    },
+    {
+      "name": "PlantCam",
+      "price": "$25 - $29",
+      "nickname": "The photographer",
+      "specs": ["5MP camera", "Auto time-lapse", "4-6 month battery"]
+    },
+    {
+      "name": "PlantCam Pro",
+      "price": "$69 - $79",
+      "nickname": "The brain",
+      "specs": ["AI plant disease detection", "Hub for all sensors", "Raspberry Pi powered"]
+    }
+  ],
+  "setups": [
+    {
+      "title": "Hub + Children",
+      "desc": "Best for plant collectors (5+ plants)",
+      "detail": "CamHub Pro + BLE sensors"
+    },
+    {
+      "title": "Standalone",
+      "desc": "Perfect for 1-3 plants",
+      "detail": "WiFi sensors work alone"
+    },
+    {
+      "title": "Parent + Children",
+      "desc": "No hub needed",
+      "detail": "Parent sensor relays data for children"
+    }
+  ],
+  "bundles": [
+    { "name": "Starter Kit", "price": "$35", "contents": "1 Solo Sensor + 1 PlantCam" },
+    { "name": "Home Garden Kit", "price": "$99", "contents": "5 BLE Sensors + 1 CamHub Pro" },
+    { "name": "Plant Parent Kit", "price": "$45", "contents": "5 BLE Sensors + 1 Solo (parent)" },
+    { "name": "Sensor 5-Pack", "price": "$29", "contents": "5 BLE Child Sensors" }
+  ],
+  "appFeatures": [
+    { "title": "Real-time monitoring", "desc": "Live moisture, light, and temperature data" },
+    { "title": "Push notifications", "desc": "Never forget to water again" },
+    { "title": "Photo timeline", "desc": "Automatic growth time-lapses" },
+    { "title": "Care history", "desc": "Track every action and trend" }
+  ],
+  "howItWorks": {
+    "title": "How It Works",
+    "steps": [
+      { "label": "STEP 1", "title": "Stick it in soil", "desc": "Insert sensor into your plant's pot" },
+      { "label": "STEP 2", "title": "Connect", "desc": "Pair via Bluetooth or WiFi" },
+      { "label": "STEP 3", "title": "Monitor", "desc": "See real-time data in the app" }
+    ]
+  },
+  "sections": {
+    "productLineup": "Product Lineup",
+    "setupConfigurations": "Setup Configurations",
+    "appExperience": "App Experience",
+    "preOrderBundles": "Pre-order Bundles",
+    "openSource": "Open Source"
+  },
+  "openSource": {
+    "title": "Built on Open Source",
+    "description": "Hardware based on b-parasite by rbaron. CC BY-SA 4.0 license — open designs, commercial sales allowed.",
+    "cta": "View on GitHub"
+  },
+  "footer": {
+    "tagline": "Made with love for plants and pixels",
+    "links": {
+      "help": "Help",
+      "github": "GitHub",
+      "privacy": "Privacy"
+    }
+  },
+  "notifications": [
+    { "title": "Aloe There is thirsty!", "time": "2m ago", "desc": "Moisture at 31%" },
+    { "title": "Herb needs more light", "time": "1h ago", "desc": "Light level low" },
+    { "title": "Fern-ando is thriving!", "time": "3h ago", "desc": "HP reached 92%" },
+    { "title": "Low battery: Herb", "time": "5h ago", "desc": "Sensor at 41%" },
+    { "title": "New photo captured", "time": "1d ago", "desc": "PlantCam auto-shot" }
+  ],
+  "gardenFeatures": [
+    "Segmented HP & moisture bars",
+    "Mini 7-day trend charts per plant",
+    "Live sensor indicators with animations",
+    "Tap-to-expand detail panel with full stats",
+    "Mobile bottom-sheet for plant details"
+  ],
+  "settingsGroups": [
+    { "section": "NOTIFICATIONS", "items": ["Water reminders", "Low battery alerts", "Daily summary"] },
+    { "section": "SENSORS", "items": ["Sync interval: 15 min", "LED brightness", "Sleep schedule"] },
+    { "section": "ACCOUNT", "items": ["Profile", "Export data"] }
+  ],
+  "photoLabels": ["Today", "3 days ago", "1 week ago", "2 weeks ago"]
+}

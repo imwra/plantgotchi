@@ -1,0 +1,32 @@
+{
+  "slug": "data-not-syncing",
+  "title": "Dados Nao Sincronizam",
+  "category": "Solucao de Problemas",
+  "description": "Resolva problemas de sincronizacao na nuvem, fila offline e consistencia de dados.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Se os dados das suas plantas nao estao aparecendo no painel web ou entre dispositivos, veja como diagnosticar e resolver problemas de sincronizacao.</p>"
+    },
+    {
+      "heading": "Verifique Sua Conexao",
+      "body": "<p>A sincronizacao na nuvem requer uma conexao ativa com a internet. O app so envia dados para o Turso quando <code>navigator.onLine</code> (web) ou acessibilidade de rede (mobile) retorna verdadeiro.</p><ul><li>Verifique sua conexao WiFi ou celular.</li><li>Tente abrir uma pagina web para confirmar acesso a internet.</li><li>Se voce esta em uma rede restrita (corporativa, hotel), o endpoint da API do Turso pode estar bloqueado.</li></ul>"
+    },
+    {
+      "heading": "Fila Offline",
+      "body": "<p>Quando voce esta offline, todas as leituras de sensores e registros de cuidados sao armazenados localmente e enfileirados para sincronizacao. Quando a conectividade retornar, o app reproduz a fila automaticamente. Se os dados parecem faltar apos voltar online:</p><ol><li>Aguarde 30 segundos \u2014 a sincronizacao pode ainda estar em andamento.</li><li>Puxe para baixo na tela do jardim para acionar uma sincronizacao manual.</li><li>Verifique se os dados aparecem no app local mas nao na web \u2014 isso confirma que e um problema de sincronizacao, nao do sensor.</li></ol>"
+    },
+    {
+      "heading": "Prevencao de Duplicatas",
+      "body": "<p>Leituras de sensores tem uma restricao unica em <code>(sensor_id, timestamp)</code>. Se dois celulares capturam a mesma leitura BLE, o banco de dados usa <code>INSERT OR IGNORE</code> para manter apenas uma copia. Isso e comportamento normal, nao perda de dados.</p>"
+    },
+    {
+      "heading": "Dados Aparecem em Um Dispositivo Mas Nao em Outro",
+      "body": "<p>A sincronizacao e push-then-pull: seu dispositivo envia seus dados locais primeiro, depois recebe atualizacoes. Se os dados estao no seu celular mas nao na web:</p><ul><li>Certifique-se de que voce esta logado na mesma conta em ambos os dispositivos.</li><li>Verifique se o push foi concluido \u2014 procure notificacoes de erro no app.</li><li>Atualize o painel web (ele nao atualiza automaticamente).</li></ul>"
+    },
+    {
+      "heading": "Status do Servico Turso",
+      "body": "<p>Se a sincronizacao falha consistentemente, o servico Turso na nuvem pode estar com problemas. A API HTTP pipeline do Turso (<code>v2/pipeline</code>) e o que o Plantgotchi usa para agrupar operacoes SQL. Se este endpoint esta inacessivel, todas as operacoes de sincronizacao falharao graciosamente e tentarao novamente depois.</p>"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "sensor-types",
+  "title": "Tipos de Sensores",
+  "category": "Sensores e Hardware",
+  "description": "Compare os quatro modelos de sensores Plantgotchi e encontre o ideal para seu setup.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>O Plantgotchi oferece quatro modelos de sensores, cada um projetado para diferentes configuracoes. Todos os sensores medem as mesmas metricas principais: umidade do solo, temperatura, luz e nivel de bateria.</p>"
+    },
+    {
+      "heading": "Sensor BLE Filho \u2014 R$49\u2013R$65",
+      "body": "<p><em>O pequenino.</em> Um sensor apenas Bluetooth alimentado por uma bateria CR2032. Dura ate 2 anos e e perfeito para parear com um hub ou sensor pai. Como e apenas BLE, precisa de um celular proximo, Sensor Solo (modo pai) ou PlantCam Pro para retransmitir seus dados.</p><ul><li>Apenas BLE \u2014 sem WiFi</li><li>Bateria CR2032, ~2 anos de vida</li><li>Menor e mais barato</li></ul>"
+    },
+    {
+      "heading": "Sensor Solo \u2014 R$79\u2013R$99",
+      "body": "<p><em>O independente.</em> Tem WiFi e BLE, podendo enviar dados diretamente para a nuvem sem precisar de um celular proximo. Recarregavel via USB-C com tela OLED opcional que mostra as leituras atuais.</p><ul><li>Conectividade WiFi + BLE</li><li>Recarregavel via USB-C</li><li>Display OLED opcional</li><li>Pode atuar como pai para sensores BLE Filho</li></ul>"
+    },
+    {
+      "heading": "PlantCam \u2014 R$139\u2013R$159",
+      "body": "<p><em>O fotografo.</em> Adiciona uma camera de 5MP para fotos automaticas em time-lapse do crescimento da sua planta. Tira uma foto a cada poucas horas e armazena localmente. Bateria dura 4\u20136 meses.</p><ul><li>Camera 5MP com time-lapse automatico</li><li>4\u20136 meses de bateria</li><li>Todas as leituras padrao do sensor incluidas</li></ul>"
+    },
+    {
+      "heading": "PlantCam Pro \u2014 R$379\u2013R$429",
+      "body": "<p><em>O cerebro.</em> Construido com Raspberry Pi, este e o hub para colecionadores serios de plantas. Executa deteccao de doencas por IA no dispositivo, atua como hub central para todos os seus sensores BLE Filho e conecta tudo a nuvem.</p><ul><li>Deteccao de doencas por IA</li><li>Hub para sensores BLE Filho ilimitados</li><li>Powered by Raspberry Pi</li><li>Sempre ligado (alimentado via USB-C)</li></ul>"
+    },
+    {
+      "heading": "Tabela Comparativa",
+      "body": "<table><thead><tr><th>Recurso</th><th>BLE Filho</th><th>Solo</th><th>PlantCam</th><th>Pro</th></tr></thead><tbody><tr><td>Preco</td><td>R$49\u201365</td><td>R$79\u201399</td><td>R$139\u2013159</td><td>R$379\u2013429</td></tr><tr><td>WiFi</td><td>Nao</td><td>Sim</td><td>Sim</td><td>Sim</td></tr><tr><td>BLE</td><td>Sim</td><td>Sim</td><td>Sim</td><td>Sim</td></tr><tr><td>Camera</td><td>Nao</td><td>Nao</td><td>5MP</td><td>5MP + IA</td></tr><tr><td>Bateria</td><td>~2 anos</td><td>Recarregavel</td><td>4\u20136 meses</td><td>USB powered</td></tr><tr><td>Modo hub</td><td>Nao</td><td>Apenas pai</td><td>Nao</td><td>Hub completo</td></tr></tbody></table>"
+    }
+  ]
+}

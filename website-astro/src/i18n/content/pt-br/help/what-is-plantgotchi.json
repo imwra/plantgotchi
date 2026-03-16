@@ -1,0 +1,28 @@
+{
+  "slug": "what-is-plantgotchi",
+  "title": "O que e o Plantgotchi?",
+  "category": "Primeiros Passos",
+  "description": "Saiba como o Plantgotchi usa sensores inteligentes e um app inspirado em retro para manter suas plantas prosperando.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Plantgotchi e um sistema inteligente de monitoramento de plantas que combina sensores de solo acessiveis com uma experiencia de app inspirada em Tamagotchi. Coloque um sensor no solo da sua planta, conecte ao seu celular e receba dados em tempo real sobre umidade, temperatura e luz \u2014 alem de recomendacoes de cuidado por IA.</p>"
+    },
+    {
+      "heading": "Como Funciona",
+      "body": "<p>Cada sensor Plantgotchi e alimentado por um microcontrolador ESP32. Ele mede umidade do solo (0\u2013100%), temperatura ambiente (em \u00b0C), intensidade de luz (em lux) e reporta seu proprio nivel de bateria. O sensor transmite esses dados via Bluetooth Low Energy (BLE) a cada 30\u201360 segundos.</p><p>Seu celular capta essas leituras e as armazena localmente. Quando voce esta online, os dados sincronizam com a nuvem via Turso (um banco de dados SQLite distribuido), para que voce tambem possa verificar suas plantas pelo painel web.</p>"
+    },
+    {
+      "heading": "A Vibe Retro",
+      "body": "<p>Cada planta no Plantgotchi tem uma barra de saude (HP), um status (\"feliz\" ou \"com sede\") e um emoji avatar. O HP e calculado com base em quao proximas suas leituras estao das faixas ideais de umidade e temperatura da planta. Pense nisso como um bichinho virtual \u2014 exceto que e uma planta real e os riscos sao um pouco menores.</p>"
+    },
+    {
+      "heading": "Recomendacoes Inteligentes",
+      "body": "<p>O Plantgotchi usa um sistema de recomendacao em duas camadas:</p><ul><li><strong>Motor de regras offline</strong> \u2014 alertas instantaneos quando a umidade cai abaixo do minimo da planta, a temperatura sai da faixa ou a bateria esta baixa. Funciona sem internet.</li><li><strong>Consultor Claude IA</strong> \u2014 a cada 6 horas (quando online), uma IA analisa os dados recentes do sensor e o historico de cuidados da sua planta para dar uma recomendacao personalizada em uma frase.</li></ul>"
+    },
+    {
+      "heading": "Multiplataforma",
+      "body": "<p>O Plantgotchi roda no iOS, Android e na web. Todas as plataformas compartilham o mesmo esquema de banco de dados, logica do motor de regras e protocolo BLE \u2014 para que seus dados fiquem consistentes independente do dispositivo que voce usar.</p>"
+    }
+  ]
+}

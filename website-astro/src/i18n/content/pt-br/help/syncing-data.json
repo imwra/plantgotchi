@@ -1,0 +1,28 @@
+{
+  "slug": "syncing-data",
+  "title": "Sincronizando Seus Dados",
+  "category": "Apps Mobile",
+  "description": "Como a sincronizacao na nuvem funciona entre dispositivos e o que acontece quando voce esta offline.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>O Plantgotchi usa uma arquitetura offline-first. Seu celular e o armazenamento principal de dados, e a nuvem e uma camada de sincronizacao que mantem tudo acessivel entre dispositivos.</p>"
+    },
+    {
+      "heading": "Como a Sincronizacao Funciona",
+      "body": "<p>Quando seu dispositivo esta online, o app sincroniza com o Turso \u2014 um banco de dados SQLite distribuido na nuvem. A sincronizacao acontece em duas direcoes:</p><ul><li><strong>Push</strong> \u2014 leituras de sensores e registros de cuidados sao enviados do seu celular para a nuvem.</li><li><strong>Pull</strong> \u2014 perfis de plantas e recomendacoes de IA sao baixados para o seu celular.</li></ul><p>O protocolo de sincronizacao usa a API HTTP pipeline do Turso, agrupando multiplas instrucoes SQL em uma unica requisicao para eficiencia.</p>"
+    },
+    {
+      "heading": "Resolucao de Conflitos",
+      "body": "<p>O que acontece quando dois celulares registram dados para a mesma planta? O Plantgotchi lida com isso elegantemente:</p><ul><li><strong>Leituras de sensores</strong> \u2014 deduplicadas por uma restricao unica em <code>(sensor_id, timestamp)</code>. Se dois celulares capturam a mesma leitura BLE, <code>INSERT OR IGNORE</code> mantem apenas uma copia.</li><li><strong>Registros de cuidados</strong> \u2014 cada registro tem um UUID, entao entradas de diferentes celulares sao ambas preservadas (sem conflito).</li><li><strong>Edicoes de plantas</strong> \u2014 o ultimo push vence. Se voce renomear uma planta em dois dispositivos, o nome sincronizado mais recentemente e mantido.</li></ul>"
+    },
+    {
+      "heading": "Modo Offline",
+      "body": "<p>Quando voce esta offline, o app funciona normalmente:</p><ul><li>Leituras de sensores BLE continuam sendo capturadas e armazenadas localmente.</li><li>O motor de regras offline ainda gera alertas instantaneamente.</li><li>Acoes de cuidado sao registradas no banco de dados local.</li><li>Todas as alteracoes pendentes sao enfileiradas e sincronizadas automaticamente quando a conectividade retornar.</li></ul><p>Os unicos recursos que requerem internet sao recomendacoes por IA (do Claude) e acesso ao seu jardim pelo painel web.</p>"
+    },
+    {
+      "heading": "Frequencia de Sincronizacao",
+      "body": "<p>O app sincroniza automaticamente quando detecta uma conexao de rede. Voce tambem pode acionar uma sincronizacao manual puxando para baixo na tela do jardim. Recomendacoes por IA rodam em um ciclo de 6 horas quando online.</p>"
+    }
+  ]
+}

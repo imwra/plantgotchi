@@ -1,0 +1,28 @@
+{
+  "slug": "syncing-data",
+  "title": "Syncing Your Data",
+  "category": "Mobile Apps",
+  "description": "How cloud sync works across devices and what happens when you're offline.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Plantgotchi uses an offline-first architecture. Your phone is the primary data store, and the cloud is a sync layer that keeps everything accessible across devices.</p>"
+    },
+    {
+      "heading": "How Sync Works",
+      "body": "<p>When your device is online, the app syncs with Turso \u2014 a distributed SQLite database in the cloud. Sync happens in two directions:</p><ul><li><strong>Push</strong> \u2014 sensor readings and care logs are uploaded from your phone to the cloud.</li><li><strong>Pull</strong> \u2014 plant profiles and AI recommendations are downloaded to your phone.</li></ul><p>The sync protocol uses Turso's HTTP pipeline API, batching multiple SQL statements into a single request for efficiency.</p>"
+    },
+    {
+      "heading": "Conflict Resolution",
+      "body": "<p>What happens when two phones record data for the same plant? Plantgotchi handles this gracefully:</p><ul><li><strong>Sensor readings</strong> \u2014 deduplicated by a unique constraint on <code>(sensor_id, timestamp)</code>. If two phones capture the same BLE reading, <code>INSERT OR IGNORE</code> keeps just one copy.</li><li><strong>Care logs</strong> \u2014 each log has a UUID, so entries from different phones are both preserved (no conflict).</li><li><strong>Plant edits</strong> \u2014 last push wins. If you rename a plant on two devices, the most recently synced name is kept.</li></ul>"
+    },
+    {
+      "heading": "Offline Mode",
+      "body": "<p>When you're offline, the app works normally:</p><ul><li>BLE sensor readings continue to be captured and stored locally.</li><li>The offline rule engine still generates alerts instantly.</li><li>Care actions are logged to the local database.</li><li>All pending changes are queued and automatically synced when connectivity returns.</li></ul><p>The only features that require internet are AI recommendations (from Claude) and accessing your garden from the web dashboard.</p>"
+    },
+    {
+      "heading": "Sync Frequency",
+      "body": "<p>The app syncs automatically when it detects a network connection. You can also trigger a manual sync by pulling down on the garden screen. AI recommendations run on a 6-hour cycle when online.</p>"
+    }
+  ]
+}

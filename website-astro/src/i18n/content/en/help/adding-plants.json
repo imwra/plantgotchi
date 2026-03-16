@@ -1,0 +1,28 @@
+{
+  "slug": "adding-plants",
+  "title": "Adding Plants",
+  "category": "Plant Care",
+  "description": "How to add plants, set care thresholds, and personalize your garden.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Each plant in Plantgotchi gets its own profile with custom care thresholds. Here's how to set one up.</p>"
+    },
+    {
+      "heading": "Creating a Plant Profile",
+      "body": "<ol><li>Open your <a href=\"/garden\">Garden dashboard</a> and tap the \"Add Plant\" button.</li><li>Give your plant a <strong>name</strong> \u2014 get creative! \"Fernando the Fern\" works great.</li><li>Optionally set a <strong>species</strong> (e.g., \"Monstera Deliciosa\") for more targeted AI recommendations.</li><li>Pick an <strong>emoji avatar</strong> from the selector \u2014 this appears on your plant card.</li><li>Optionally add a <strong>photo URL</strong> if you want a real picture of your plant.</li></ol>"
+    },
+    {
+      "heading": "Setting Thresholds",
+      "body": "<p>Thresholds tell Plantgotchi when to alert you. You can customize these for each plant:</p><table><thead><tr><th>Metric</th><th>Default Min</th><th>Default Max</th><th>Notes</th></tr></thead><tbody><tr><td>Moisture</td><td>30%</td><td>80%</td><td>Good for most houseplants</td></tr><tr><td>Temperature</td><td>15\u00b0C</td><td>30\u00b0C</td><td>Tropical plants may need higher</td></tr></tbody></table><p>You can also set a <strong>light preference</strong> \u2014 low, medium, or high. This is used by the rule engine: if your plant prefers high light but the sensor reads below 1,000 lux, you'll get a gentle reminder to move it.</p>"
+    },
+    {
+      "heading": "Light Preference Guide",
+      "body": "<ul><li><strong>Low</strong> \u2014 under 1,000 lux (e.g., snake plant, pothos, ZZ plant)</li><li><strong>Medium</strong> \u2014 1,000\u20132,000 lux (e.g., philodendron, peace lily)</li><li><strong>High</strong> \u2014 over 2,000 lux (e.g., succulents, herbs, fiddle leaf fig)</li></ul>"
+    },
+    {
+      "heading": "Editing and Deleting Plants",
+      "body": "<p>Tap on any plant card to open its detail view, then use the edit button to change its name, thresholds, or emoji. You can also delete a plant \u2014 this removes the plant profile but preserves historical sensor readings in the database.</p>"
+    }
+  ]
+}

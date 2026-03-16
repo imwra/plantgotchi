@@ -1,0 +1,40 @@
+{
+  "slug": "quick-start",
+  "title": "Quick Start Guide",
+  "category": "Getting Started",
+  "description": "Go from unboxing to your first plant reading in 5 minutes.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Ready to give your plants a digital heartbeat? Follow these steps to get up and running fast.</p>"
+    },
+    {
+      "heading": "Step 1: Create Your Account",
+      "body": "<p>Head to <a href=\"/signup\">plantgotchi.com/signup</a> and create an account with your email and a password. You can also sign up directly in the iOS or Android app.</p>"
+    },
+    {
+      "heading": "Step 2: Charge or Insert Battery",
+      "body": "<p>If you have a <strong>Solo Sensor</strong> or <strong>PlantCam</strong>, charge it via USB-C until the LED turns green. For the <strong>BLE Child Sensor</strong>, insert the included CR2032 coin cell battery.</p>"
+    },
+    {
+      "heading": "Step 3: Stick It In Soil",
+      "body": "<p>Push the sensor probe into your plant's soil about 2\u20133 inches deep. The moisture probes need good soil contact to get accurate readings. Avoid placing it right against the pot edge.</p>"
+    },
+    {
+      "heading": "Step 4: Open the App and Scan",
+      "body": "<p>Open the Plantgotchi app on your phone. Tap \"Scan for Sensors\" \u2014 the app uses Bluetooth Low Energy to discover nearby Plantgotchi devices. Your sensor should appear within a few seconds. Tap it to pair.</p>"
+    },
+    {
+      "heading": "Step 5: Add Your Plant",
+      "body": "<p>Once the sensor is paired, you'll be prompted to create a plant profile. Give your plant a name, choose a species (or leave it generic), pick an emoji avatar, and set your moisture and temperature thresholds. Defaults of 30\u201380% moisture and 15\u201330\u00b0C work well for most houseplants.</p>"
+    },
+    {
+      "heading": "Step 6: Watch the Data Flow",
+      "body": "<p>Within 30\u201360 seconds you'll see your first reading appear \u2014 moisture percentage, temperature, light level, and battery status. Your plant now has an HP bar and a status indicator. You're all set!</p>"
+    },
+    {
+      "heading": "What's Next?",
+      "body": "<ul><li>Learn about <a href=\"/help/reading-data\">reading your sensor data</a></li><li>Set up <a href=\"/help/syncing-data\">cloud sync</a> for web access</li><li>Explore <a href=\"/help/ai-recommendations\">AI-powered care recommendations</a></li></ul>"
+    }
+  ]
+}
