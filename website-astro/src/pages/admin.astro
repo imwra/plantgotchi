@@ -1,14 +1,21 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import AdminDashboard from "../components/AdminDashboard";
+import AdminPanel from "../components/admin/AdminPanel";
 import { getSession } from "../lib/auth";
 
 const session = await getSession(Astro.request);
 if (!session) {
   return Astro.redirect("/login");
 }
+
+// Only allow admin users
+if ((session.user as any).role !== "admin") {
+  return Astro.redirect("/garden");
+}
+
+const userName = session.user.name || session.user.email;
 ---
 
 <BaseLayout title="Admin - Plantgotchi">
-  <AdminDashboard client:load />
+  <AdminPanel client:load userName={userName} />
 </BaseLayout>
