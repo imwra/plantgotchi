@@ -39,7 +39,7 @@ jobs:
           cp -r dist/server/chunks dist-pages/_worker.js/
           cp dist/server/entry.mjs dist-pages/_worker.js/index.js
           cp dist/server/virtual_astro_middleware.mjs dist-pages/_worker.js/
-          rm -f dist/server/wrangler.json
+          rm -rf dist/server/wrangler.json .wrangler/deploy
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
