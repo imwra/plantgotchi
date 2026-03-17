@@ -127,13 +127,51 @@ struct GardenView: View {
         isLoading = true
         defer { isLoading = false }
 
-        let db = AppDatabase.shared
         do {
-            plants = try db.getPlants(userId: userId)
-            plantViews = try plants.map { plant in
-                let reading = try db.getLatestReading(plantId: plant.id)
-                let logs = try db.getCareLogs(plantId: plant.id, limit: 5)
-                return toPlantView(plant: plant, latestReading: reading, recentCareLogs: logs)
+            let baseURL: String
+            if let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
+               let config = NSDictionary(contentsOfFile: configPath),
+               let url = config["APIBaseURL"] as? String, !url.isEmpty {
+                baseURL = url
+            } else {
+                baseURL = "http://localhost:4321"
+            }
+
+            let client = AuthenticatedHTTPClient(baseURL: baseURL)
+            let (data, httpResponse) = try await client.request(
+                path: "/api/plants",
+                method: "GET"
+            )
+
+            guard httpResponse.statusCode == 200 else {
+                print("[GardenView] API returned non-200")
+                return
+            }
+
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                print("[GardenView] Failed to parse response")
+                return
+            }
+
+            plants = json.compactMap { entry -> Plant? in
+                guard let p = entry["plant"] as? [String: Any],
+                      let id = p["id"] as? String,
+                      let name = p["name"] as? String else { return nil }
+                return Plant(
+                    id: id,
+                    userId: p["user_id"] as? String ?? "",
+                    name: name,
+                    species: p["species"] as? String,
+                    emoji: p["emoji"] as? String ?? "\u{1F331}",
+                    moistureMin: p["moisture_min"] as? Int ?? 30,
+                    moistureMax: p["moisture_max"] as? Int ?? 80,
+                    tempMin: p["temp_min"] as? Double ?? 15.0,
+                    tempMax: p["temp_max"] as? Double ?? 30.0,
+                    lightPreference: p["light_preference"] as? String ?? "medium"
+                )
+            }
+            plantViews = plants.map { plant in
+                toPlantView(plant: plant, latestReading: nil, recentCareLogs: [])
             }
             PostHogSDK.shared.capture("garden_viewed", properties: [
                 "plant_count": plantViews.count,
