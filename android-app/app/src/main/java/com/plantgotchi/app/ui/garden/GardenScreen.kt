@@ -97,7 +97,13 @@ fun GardenScreen(
         }
     }
 
-    LaunchedEffect(Unit) { fetchPlants() }
+    LaunchedEffect(Unit) {
+        fetchPlants()
+        while (true) {
+            kotlinx.coroutines.delay(15_000)
+            fetchPlants()
+        }
+    }
 
     // Track garden view when plants change
     LaunchedEffect(plants) {
