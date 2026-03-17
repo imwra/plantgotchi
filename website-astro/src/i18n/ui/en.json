@@ -158,5 +158,18 @@
   "comments.unpin": "Unpin",
   "comments.pinned": "Pinned",
   "comments.noComments": "No comments yet",
-  "comments.edited": "edited"
+  "comments.edited": "edited",
+  "projects.board.boardBy": "Board by",
+  "projects.board.emptyColumn": "No issues",
+  "projects.board.dragHint": "Drag to reorder or change status",
+  "projects.views.default": "Default",
+  "projects.views.newView": "New View",
+  "projects.views.saveAsNew": "Save as new view?",
+  "projects.views.updateDefault": "Update default",
+  "projects.views.rename": "Rename",
+  "projects.views.delete": "Delete",
+  "projects.inline.clickToEdit": "Click to edit",
+  "projects.inline.saving": "Saving...",
+  "projects.inline.saved": "Saved",
+  "projects.inline.error": "Error saving"
 }
