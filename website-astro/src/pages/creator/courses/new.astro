@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CourseEditor from "../../../components/ui/organisms/CourseEditor";
+import { getSession } from "../../../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) return Astro.redirect("/login");
+---
+
+<BaseLayout title="New Course">
+  <CourseEditor client:load />
+</BaseLayout>

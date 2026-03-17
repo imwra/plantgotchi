@@ -161,3 +161,120 @@ export async function runMigrations(): Promise<string[]> {
 
   return tables;
 }
+
+export async function runLmsMigrations(): Promise<string[]> {
+  const db = getDb();
+
+  const tables = [
+    'creator_profiles',
+    'courses',
+    'course_phases',
+    'phase_modules',
+    'module_content_blocks',
+    'course_enrollments',
+    'module_completions',
+  ];
+
+  await db.batch([
+    {
+      sql: `CREATE TABLE IF NOT EXISTS creator_profiles (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL UNIQUE,
+        display_name TEXT NOT NULL,
+        bio TEXT,
+        avatar_url TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_creator_profiles_user_id ON creator_profiles(user_id)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS courses (
+        id TEXT PRIMARY KEY,
+        creator_id TEXT NOT NULL REFERENCES creator_profiles(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        slug TEXT NOT NULL UNIQUE,
+        description TEXT,
+        cover_image_url TEXT,
+        price_cents INTEGER NOT NULL DEFAULT 0,
+        currency TEXT NOT NULL DEFAULT 'USD',
+        status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft', 'published', 'archived')),
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_courses_creator_id ON courses(creator_id)`, args: [] },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_courses_slug ON courses(slug)`, args: [] },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_courses_status ON courses(status)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS course_phases (
+        id TEXT PRIMARY KEY,
+        course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        description TEXT,
+        sort_order INTEGER NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_course_phases_course_id_sort ON course_phases(course_id, sort_order)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS phase_modules (
+        id TEXT PRIMARY KEY,
+        phase_id TEXT NOT NULL REFERENCES course_phases(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        description TEXT,
+        sort_order INTEGER NOT NULL,
+        is_preview INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_phase_modules_phase_id_sort ON phase_modules(phase_id, sort_order)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS module_content_blocks (
+        id TEXT PRIMARY KEY,
+        module_id TEXT NOT NULL REFERENCES phase_modules(id) ON DELETE CASCADE,
+        block_type TEXT NOT NULL CHECK(block_type IN ('video', 'text', 'quiz')),
+        sort_order INTEGER NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_content_blocks_module_id_sort ON module_content_blocks(module_id, sort_order)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS course_enrollments (
+        id TEXT PRIMARY KEY,
+        course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL,
+        price_paid_cents INTEGER NOT NULL DEFAULT 0,
+        enrolled_at TEXT DEFAULT (datetime('now')),
+        UNIQUE(course_id, user_id)
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_course_enrollments_user_id ON course_enrollments(user_id)`, args: [] },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_course_enrollments_course_id ON course_enrollments(course_id)`, args: [] },
+    {
+      sql: `CREATE TABLE IF NOT EXISTS module_completions (
+        id TEXT PRIMARY KEY,
+        module_id TEXT NOT NULL REFERENCES phase_modules(id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL,
+        completed_at TEXT DEFAULT (datetime('now')),
+        quiz_answers TEXT,
+        UNIQUE(module_id, user_id)
+      )`,
+      args: [],
+    },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_module_completions_user_id ON module_completions(user_id)`, args: [] },
+    { sql: `CREATE INDEX IF NOT EXISTS idx_module_completions_module_id ON module_completions(module_id)`, args: [] },
+  ]);
+
+  return tables;
+}

@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CourseLandingPage from "../../../components/ui/organisms/CourseLandingPage";
+
+const { slug } = Astro.params;
+---
+
+<BaseLayout title="Course">
+  <CourseLandingPage client:load slug={slug!} />
+</BaseLayout>
