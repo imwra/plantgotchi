@@ -452,9 +452,8 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
 .dash-tags::-webkit-scrollbar{display:none}
 @media(min-width:480px){.dash-tags{flex-wrap:wrap;overflow-x:visible;gap:8px}}
 .plant-grid{display:grid;grid-template-columns:1fr;gap:8px}
-@media(min-width:400px){.plant-grid{grid-template-columns:1fr 1fr;gap:10px}}
-@media(min-width:768px){.plant-grid{grid-template-columns:1fr 1fr 1fr;gap:12px}}
-@media(min-width:820px){.plant-grid{grid-template-columns:1fr 1fr;gap:12px}}
+@media(min-width:640px){.plant-grid{grid-template-columns:1fr 1fr;gap:10px}}
+@media(min-width:1060px){.plant-grid{grid-template-columns:1fr 1fr 1fr;gap:12px}}
 .plant-card{padding:10px}
 @media(min-width:480px){.plant-card{padding:14px}}
 .plant-emoji{font-size:28px}
@@ -465,11 +464,11 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
 @media(min-width:480px){.stat-value{font-size:13px}}
 .detail-mobile-sheet{padding:0 12px 24px;padding-bottom:env(safe-area-inset-bottom, 24px)}
 .main-layout{display:flex;flex-direction:column;gap:16px}
-@media(min-width:820px){.main-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}}
+@media(min-width:1060px){.main-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}}
 .detail-desktop{display:none}
-@media(min-width:820px){.detail-desktop{display:block;position:sticky;top:16px}}
+@media(min-width:1060px){.detail-desktop{display:block;position:sticky;top:16px}}
 .detail-mobile-overlay{display:flex}
-@media(min-width:820px){.detail-mobile-overlay{display:none!important}}`}</style>
+@media(min-width:1060px){.detail-mobile-overlay{display:none!important}}`}</style>
 
       <div className="dash-container">
         {/* Header */}
