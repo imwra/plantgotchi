@@ -11,11 +11,23 @@ Instrument every user-facing feature across all three platforms with a unified P
 ## Current State
 
 PostHog SDKs are initialized on all three platforms with basic config:
-- **Web:** `posthog-js` + `posthog-node`. Autocapture, page views, session replay enabled. 3 custom events.
-- **iOS:** PostHog iOS SDK. Screen views, lifecycle events, session replay enabled. 4 custom events.
-- **Android:** PostHog Android SDK. Screen views, lifecycle events, session replay enabled. 3 custom events.
+- **Web:** `posthog-js` + `posthog-node`. Autocapture, page views, session replay enabled. 3 custom events (`garden_viewed`, `plant_added`, `care_logged`). `identify()` exists on login/signup pages but only sends `email` and `name`. Missing `app_version` global property.
+- **iOS:** PostHog iOS SDK. Screen views, lifecycle events, session replay enabled. 4 custom events (`garden_viewed`, `plant_added`, `recommendation_viewed`, `care_logged`, `sensor_connected`, `reading_received`). No `identify()` or `reset()`.
+- **Android:** PostHog Android SDK. Screen views, lifecycle events, session replay enabled. 3 custom events (`garden_viewed`, `plant_added`, `care_logged`, `demo_mode_enabled`, `demo_mode_disabled`). No `identify()` or `reset()`.
 
-**Gaps:** No user identification, no error tracking, no logging, minimal custom events (~10 total), no event naming consistency across platforms.
+### Migration: Existing Event Renames
+
+All existing events must be renamed to match the new taxonomy. Old event names will be replaced in-place (not aliased).
+
+| Platform | Old Name | New Name |
+|----------|----------|----------|
+| All | `plant_added` | `plant_created` |
+| iOS | `sensor_connected` | `sensor_paired` |
+| iOS | `reading_received` | `sensor_reading_received` |
+| iOS | `recommendation_viewed` | `care_recommendation_viewed` |
+| iOS/Android | `demo_mode_enabled` | `demo_data_loaded` |
+| iOS/Android | `demo_mode_disabled` | (remove — not needed) |
+| Web | `recommendation_generated` | (remove — server-side, not a user action) |
 
 ## Design
 
@@ -27,6 +39,8 @@ All events use `category_action` naming (snake_case), consistent across platform
 - `platform`: `web` | `ios` | `android`
 - `app_version`: `1.0.0`
 
+Note: Web currently only registers `platform`. Must add `app_version` registration in `BaseLayout.astro`.
+
 #### Auth Events (all platforms)
 | Event | Properties |
 |-------|-----------|
@@ -34,7 +48,8 @@ All events use `category_action` naming (snake_case), consistent across platform
 | `auth_login` | `method` (email/apple) |
 | `auth_logout` | — |
 | `auth_login_failed` | `method`, `error` |
-| `auth_apple_signin` | — |
+
+Note: No separate `auth_apple_signin` event. Apple sign-in is tracked via `auth_signup` or `auth_login` with `method: "apple"`.
 
 #### Plant Events (all platforms)
 | Event | Properties |
@@ -64,6 +79,8 @@ All events use `category_action` naming (snake_case), consistent across platform
 | `sensor_reading_received` | `sensor_id`, `battery`, `moisture` |
 | `sensor_scan_started` | — |
 
+**Sampling:** `sensor_reading_received` fires frequently from BLE. Rate-limit to max 1 event per sensor per 60 seconds to avoid excessive volume.
+
 #### Sync Events (mobile only)
 | Event | Properties |
 |-------|-----------|
@@ -85,11 +102,15 @@ All events use `category_action` naming (snake_case), consistent across platform
 | `api_request_completed` | `endpoint`, `method`, `status_code`, `duration_ms` |
 | `api_request_failed` | `endpoint`, `method`, `status_code`, `error`, `duration_ms` |
 
+**Sampling:** Only track API events for mutations (POST/PUT/DELETE) and failures. Do not track GET requests to avoid high volume.
+
 #### Navigation Events (all platforms)
 | Event | Properties |
 |-------|-----------|
-| `screen_viewed` | `screen_name`, `previous_screen` |
+| `screen_viewed` | `screen_name` |
 | `tab_changed` | `tab_name` |
+
+**Mobile auto-capture:** iOS and Android have `captureScreenViews = true` which auto-captures screen views with PostHog-generated names. Keep auto-capture enabled for session replay context. The manual `screen_viewed` events use human-readable `screen_name` values and are the canonical events for dashboard queries. Both coexist — auto-capture for replay, manual for analytics.
 
 #### Chat Events (web only)
 | Event | Properties |
@@ -194,26 +215,32 @@ posthog.identify(userId, {
 })
 ```
 
-**On sign-out:** Call `posthog.reset()` to unlink the identity. Subsequent events are anonymous until next login.
+**Where to add identify:**
+- **Web:** Update existing calls in `login.astro` and `signup.astro` to include `is_creator` and `created_at`
+- **iOS:** Add in `AuthService.swift` after successful `signIn`/`signUp`/`signInWithApple`, and in `PlantgotchiApp.swift` init when `keychain.getToken() != nil`
+- **Android:** Add in `AuthService.kt` after successful `signIn`/`signUp`, and in `PlantgotchiApp.kt` onCreate when `tokenManager.getToken() != null`
+
+**Where to add reset:**
+- **Web:** In the logout handler/page
+- **iOS:** In `AuthService.signOut()`
+- **Android:** In `AuthService.signOut()`
 
 ### 3. Error Tracking
 
+Uses PostHog's native exception capture APIs on each platform.
+
 **Web:**
-- PostHog JS auto-captures `window.onerror` and unhandled promise rejections via session replay
+- PostHog JS auto-captures `window.onerror` and unhandled promise rejections
 - Add explicit `posthog.captureException(error)` in: API route catch blocks, React error boundaries, chat/project/LMS service errors
+- Note: Verify `posthog-js` exposes `captureException()`. If not, use `posthog.capture('$exception', { $exception_type, $exception_message, $exception_stack_trace_raw })`.
 
 **iOS:**
-- `PostHogSDK.shared.capture("$exception", properties: ...)` in catch blocks for: AuthService, TursoSync, BLE operations, API calls
+- Use `PostHogSDK.shared.captureException(error)` (typed SDK method) in catch blocks for: AuthService, TursoSync, BLE operations, API calls
 - Global uncaught exception handler via `NSSetUncaughtExceptionHandler`
 
 **Android:**
-- `PostHog.capture("$exception", properties: ...)` in catch blocks for: AuthService, TursoSync, BLE operations, API calls
+- Use `PostHog.captureException(throwable)` (typed SDK method) in catch blocks for: AuthService, TursoSync, BLE operations, API calls
 - Global handler via `Thread.setDefaultUncaughtExceptionHandler`
-
-**Error properties (PostHog standard):**
-- `$exception_type`: exception class name
-- `$exception_message`: error message
-- `$exception_stack_trace_raw`: stack trace string
 
 ### 4. Logging
 
@@ -221,12 +248,13 @@ Create a thin logging wrapper on each platform that sends important operation lo
 
 **Log levels:** `info`, `warn`, `error`
 
-**What to log (not every line — key operations only):**
+**What to log (key operations only):**
 - Sync start/complete/fail with duration
-- API request/response with status and timing
 - Auth flow steps
 - BLE connection state changes
 - Feature-critical errors
+
+Note: API request tracking uses the structured `api_request_completed`/`api_request_failed` events from the taxonomy, NOT `log_entry`. The `log_entry` event is for operational context that doesn't fit an existing event category.
 
 **Event:** `log_entry` with properties: `level`, `message`, `context` (dict of extra data)
 
@@ -279,44 +307,57 @@ object Analytics {
 
 ### 7. Instrumentation Locations
 
-Events fire at the **service/API layer**, not in views. This keeps views clean and ensures events fire regardless of which UI triggers the action.
+**Rule:** Mutation events (created, updated, deleted, logged) fire at the service/API layer. Read-only events (viewed, refreshed) fire in views/screens since the "view" IS the action.
 
 **Web instrumentation points:**
-- `src/lib/posthog.ts` → expand to `src/lib/analytics.ts`
-- API routes: add `Analytics.track()` in each POST/PUT/DELETE handler
-- React components: add tracking in `useEffect` for page/screen views
-- Error boundaries: add `Analytics.captureException()`
-- Chat service functions
-- LMS/course service functions
-- Project/issue service functions
+- `src/lib/posthog.ts` → replace with `src/lib/analytics.ts`
+- `src/layouts/BaseLayout.astro`: add `app_version` to registered properties
+- API routes (POST/PUT/DELETE handlers): mutation events + `api_request_failed`
+- React components (`useEffect`): `*_viewed` events
+- Error boundaries: `Analytics.captureException()`
+- Chat organism components: chat events
+- LMS/course organism components: creator and course events
+- Project/issue organism components: project, issue, board events
+- Login/signup pages: update existing `identify()` calls
 
 **iOS instrumentation points:**
 - `AuthService.swift`: auth events + identify/reset
 - `TursoSync.swift`: sync events
-- `BLEManager.swift`: sensor events
-- `GardenView.swift`: garden_viewed
-- `PlantDetailView.swift`: plant_viewed
-- `AddPlantView.swift`: plant_created
+- `BLEManager.swift`: sensor events (with rate limiting)
+- `GardenView.swift`: `garden_viewed`
+- `PlantDetailView.swift`: `plant_viewed`
+- `AddPlantView.swift`: `plant_created`
 - `SettingsView.swift`: settings events
-- `ScanView.swift`: sensor_scan_started
+- `ScanView.swift`: `sensor_scan_started`
+- `PlantgotchiApp.swift`: identify on launch if token exists
 
 **Android instrumentation points:**
 - `AuthService.kt`: auth events + identify/reset
 - `TursoSync.kt`: sync events
-- `BLEManager.kt`: sensor events
-- `GardenScreen.kt`: garden_viewed
-- `PlantDetailScreen.kt`: plant_viewed
-- `AddPlantScreen.kt`: plant_created
+- `BLEManager.kt`: sensor events (with rate limiting)
+- `GardenScreen.kt`: `garden_viewed`
+- `PlantDetailScreen.kt`: `plant_viewed`
+- `AddPlantScreen.kt`: `plant_created`
 - `SettingsScreen.kt`: settings events
-- `ScanScreen.kt`: sensor_scan_started
+- `ScanScreen.kt`: `sensor_scan_started`
+- `PlantgotchiApp.kt`: identify on launch if token exists
 
-### 8. Testing Strategy
+### 8. Rollout Plan
+
+Implement in phases, platform by platform:
+
+1. **Phase 1 — Analytics wrappers** (all platforms): Create `Analytics` module, register global properties, add identify/reset in auth flows
+2. **Phase 2 — Core events** (all platforms): Auth, plant, garden, care, sensor, sync, settings, error tracking (~30 events)
+3. **Phase 3 — Web-only events**: Chat, project, issue, board, admin, help, catalog, creator, course (~45 events)
+4. **Phase 4 — Verification**: Check PostHog dashboard, verify events from all platforms, confirm user linking
+
+### 9. Testing Strategy
 
 - **Unit tests:** Verify Analytics wrapper calls PostHog with correct event names and properties (mock PostHog SDK)
 - **Web:** Vitest tests for analytics.ts functions
 - **iOS:** Swift tests for Analytics.swift with mock PostHog
 - **Android:** JUnit tests for Analytics.kt with mock PostHog
-- **Integration:** Manually verify events appear in PostHog dashboard after each platform's implementation
+- **Integration:** Manually verify events appear in PostHog dashboard after each phase
 
 ## Out of Scope
 
@@ -324,6 +365,7 @@ Events fire at the **service/API layer**, not in views. This keeps views clean a
 - A/B testing
 - PostHog plugins/warehouse sync
 - Custom dashboards (created manually in PostHog UI after instrumentation)
+- GDPR/consent management (add when needed for EU users)
 
 ## Event Count Summary
 
