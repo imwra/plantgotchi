@@ -1,5 +1,7 @@
 package com.plantgotchi.app.sync
 
+import com.plantgotchi.app.analytics.Analytics
+import com.plantgotchi.app.analytics.LogLevel
 import com.plantgotchi.app.model.CareLog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.Recommendation
@@ -19,62 +21,112 @@ class TursoSync(
     // MARK: - Push Operations
 
     suspend fun pushReadings(readings: List<SensorReading>) {
-        for (reading in readings) {
-            val response = httpClient.post("$baseURL/api/readings") {
-                contentType(ContentType.Application.Json)
-                setBody(buildJsonObject {
-                    put("plant_id", reading.plantId)
-                    put("sensor_id", reading.sensorId)
-                    reading.moisture?.let { put("moisture", it) }
-                    reading.temperature?.let { put("temperature", it) }
-                    reading.light?.let { put("light", it) }
-                    reading.battery?.let { put("battery", it) }
-                }.toString())
+        val start = System.currentTimeMillis()
+        Analytics.log(LogLevel.INFO, "Sync push started", mapOf("method" to "pushReadings"))
+        Analytics.track("sync_started", mapOf("direction" to "push"))
+        try {
+            for (reading in readings) {
+                val response = httpClient.post("$baseURL/api/readings") {
+                    contentType(ContentType.Application.Json)
+                    setBody(buildJsonObject {
+                        put("plant_id", reading.plantId)
+                        put("sensor_id", reading.sensorId)
+                        reading.moisture?.let { put("moisture", it) }
+                        reading.temperature?.let { put("temperature", it) }
+                        reading.light?.let { put("light", it) }
+                        reading.battery?.let { put("battery", it) }
+                    }.toString())
+                }
+                if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
+                    throw TursoSyncException("Push reading failed: HTTP ${response.status.value}")
+                }
             }
-            if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
-                throw TursoSyncException("Push reading failed: HTTP ${response.status.value}")
-            }
+            val duration = System.currentTimeMillis() - start
+            Analytics.track("sync_completed", mapOf("direction" to "push", "item_count" to readings.size, "duration_ms" to duration))
+        } catch (e: Exception) {
+            Analytics.track("sync_failed", mapOf("direction" to "push", "error" to (e.message ?: "")))
+            Analytics.captureException(e, mapOf("operation" to "pushReadings"))
+            Analytics.log(LogLevel.ERROR, "Sync push failed", mapOf("method" to "pushReadings", "error" to (e.message ?: "")))
+            throw e
         }
     }
 
     suspend fun pushCareLogs(logs: List<CareLog>) {
-        for (log in logs) {
-            val response = httpClient.post("$baseURL/api/care-logs") {
-                contentType(ContentType.Application.Json)
-                setBody(buildJsonObject {
-                    put("plant_id", log.plantId)
-                    put("action", log.action)
-                    log.notes?.let { put("notes", it) }
-                }.toString())
+        val start = System.currentTimeMillis()
+        Analytics.log(LogLevel.INFO, "Sync push started", mapOf("method" to "pushCareLogs"))
+        Analytics.track("sync_started", mapOf("direction" to "push"))
+        try {
+            for (log in logs) {
+                val response = httpClient.post("$baseURL/api/care-logs") {
+                    contentType(ContentType.Application.Json)
+                    setBody(buildJsonObject {
+                        put("plant_id", log.plantId)
+                        put("action", log.action)
+                        log.notes?.let { put("notes", it) }
+                    }.toString())
+                }
+                if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
+                    throw TursoSyncException("Push care log failed: HTTP ${response.status.value}")
+                }
             }
-            if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
-                throw TursoSyncException("Push care log failed: HTTP ${response.status.value}")
-            }
+            val duration = System.currentTimeMillis() - start
+            Analytics.track("sync_completed", mapOf("direction" to "push", "item_count" to logs.size, "duration_ms" to duration))
+        } catch (e: Exception) {
+            Analytics.track("sync_failed", mapOf("direction" to "push", "error" to (e.message ?: "")))
+            Analytics.captureException(e, mapOf("operation" to "pushCareLogs"))
+            Analytics.log(LogLevel.ERROR, "Sync push failed", mapOf("method" to "pushCareLogs", "error" to (e.message ?: "")))
+            throw e
         }
     }
 
     // MARK: - Pull Operations
 
     suspend fun pullPlants(userId: String): List<Plant> {
-        val response = httpClient.get("$baseURL/api/plants") {
-            parameter("user_id", userId)
-        }
-        if (response.status != HttpStatusCode.OK) return emptyList()
+        val start = System.currentTimeMillis()
+        Analytics.log(LogLevel.INFO, "Sync pull started", mapOf("method" to "pullPlants"))
+        Analytics.track("sync_started", mapOf("direction" to "pull"))
+        try {
+            val response = httpClient.get("$baseURL/api/plants") {
+                parameter("user_id", userId)
+            }
+            if (response.status != HttpStatusCode.OK) return emptyList()
 
-        val body = response.bodyAsText()
-        val arr = json.parseToJsonElement(body).jsonArray
-        return arr.mapNotNull { parsePlant(it.jsonObject) }
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            val result = arr.mapNotNull { parsePlant(it.jsonObject) }
+            val duration = System.currentTimeMillis() - start
+            Analytics.track("sync_completed", mapOf("direction" to "pull", "item_count" to result.size, "duration_ms" to duration))
+            return result
+        } catch (e: Exception) {
+            Analytics.track("sync_failed", mapOf("direction" to "pull", "error" to (e.message ?: "")))
+            Analytics.captureException(e, mapOf("operation" to "pullPlants"))
+            Analytics.log(LogLevel.ERROR, "Sync pull failed", mapOf("method" to "pullPlants", "error" to (e.message ?: "")))
+            throw e
+        }
     }
 
     suspend fun pullRecommendations(plantId: String): List<Recommendation> {
-        val response = httpClient.get("$baseURL/api/recommendations") {
-            parameter("plant_id", plantId)
-        }
-        if (response.status != HttpStatusCode.OK) return emptyList()
+        val start = System.currentTimeMillis()
+        Analytics.log(LogLevel.INFO, "Sync pull started", mapOf("method" to "pullRecommendations"))
+        Analytics.track("sync_started", mapOf("direction" to "pull"))
+        try {
+            val response = httpClient.get("$baseURL/api/recommendations") {
+                parameter("plant_id", plantId)
+            }
+            if (response.status != HttpStatusCode.OK) return emptyList()
 
-        val body = response.bodyAsText()
-        val arr = json.parseToJsonElement(body).jsonArray
-        return arr.mapNotNull { parseRecommendation(it.jsonObject) }
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            val result = arr.mapNotNull { parseRecommendation(it.jsonObject) }
+            val duration = System.currentTimeMillis() - start
+            Analytics.track("sync_completed", mapOf("direction" to "pull", "item_count" to result.size, "duration_ms" to duration))
+            return result
+        } catch (e: Exception) {
+            Analytics.track("sync_failed", mapOf("direction" to "pull", "error" to (e.message ?: "")))
+            Analytics.captureException(e, mapOf("operation" to "pullRecommendations"))
+            Analytics.log(LogLevel.ERROR, "Sync pull failed", mapOf("method" to "pullRecommendations", "error" to (e.message ?: "")))
+            throw e
+        }
     }
 
     // MARK: - Parsing
