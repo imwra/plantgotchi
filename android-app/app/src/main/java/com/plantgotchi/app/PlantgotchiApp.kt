@@ -2,30 +2,54 @@ package com.plantgotchi.app
 
 import android.app.Application
 import android.content.Context
+import com.plantgotchi.app.auth.AuthInterceptor
+import com.plantgotchi.app.auth.AuthService
+import com.plantgotchi.app.auth.TokenManager
 import com.plantgotchi.app.db.AppDatabase
 import com.posthog.PostHog
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
-/**
- * Application class for Plantgotchi.
- * Initializes Room database and BLE manager as singletons.
- */
 class PlantgotchiApp : Application() {
 
-    /** Room database singleton — accessible from anywhere via `PlantgotchiApp.database`. */
-    val database: AppDatabase by lazy {
-        AppDatabase.create(this)
-    }
+    val database: AppDatabase by lazy { AppDatabase.create(this) }
+
+    lateinit var tokenManager: TokenManager
+        private set
+    lateinit var authService: AuthService
+        private set
+    lateinit var authInterceptor: AuthInterceptor
+        private set
+    lateinit var httpClient: HttpClient
+        private set
 
     override fun onCreate() {
         super.onCreate()
         instance = this
 
-        // Seed demo data on first launch
+        // Initialize auth
+        tokenManager = TokenManager.create(this)
+        authInterceptor = AuthInterceptor(tokenManager)
+        httpClient = HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+            authInterceptor.install(this)
+        }
+        authService = AuthService(
+            baseURL = BuildConfig.API_BASE_URL,
+            tokenManager = tokenManager,
+            httpClient = httpClient,
+        )
+
         seedDemoDataIfNeeded()
 
         // Initialize PostHog analytics
@@ -50,9 +74,10 @@ class PlantgotchiApp : Application() {
         val demoSeeded = prefs.getBoolean("demo_seeded", false)
         if (!demoSeeded) {
             CoroutineScope(Dispatchers.IO).launch {
-                val plants = database.plantDao().getPlantsByUserOnce("local-user")
+                val userId = tokenManager.getUserId() ?: "local-user"
+                val plants = database.plantDao().getPlantsByUserOnce(userId)
                 if (plants.isEmpty()) {
-                    com.plantgotchi.app.ui.settings.DemoDataLoader.load("local-user", database)
+                    com.plantgotchi.app.ui.settings.DemoDataLoader.load(userId, database)
                     prefs.edit().putBoolean("demo_seeded", true).apply()
                     prefs.edit().putBoolean("demo_mode_on", true).apply()
                 }

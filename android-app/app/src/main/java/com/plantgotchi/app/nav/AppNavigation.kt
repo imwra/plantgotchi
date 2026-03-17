@@ -1,27 +1,26 @@
 package com.plantgotchi.app.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.plantgotchi.app.PlantgotchiApp
 import com.plantgotchi.app.ui.add.AddPlantScreen
+import com.plantgotchi.app.ui.auth.LoginScreen
+import com.plantgotchi.app.ui.auth.SignUpScreen
 import com.plantgotchi.app.ui.detail.PlantDetailScreen
 import com.plantgotchi.app.ui.garden.GardenScreen
 import com.plantgotchi.app.ui.scan.ScanScreen
 import com.plantgotchi.app.ui.settings.SettingsScreen
 
-/**
- * Top-level Compose Navigation graph.
- *
- * Routes:
- * - garden (start) -> detail/{plantId}
- * - garden -> add
- * - garden -> scan
- * - garden -> settings
- */
 object Routes {
+    const val LOGIN = "login"
+    const val SIGN_UP = "signup"
     const val GARDEN = "garden"
     const val PLANT_DETAIL = "detail/{plantId}"
     const val ADD_PLANT = "add"
@@ -34,11 +33,46 @@ object Routes {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val app = PlantgotchiApp.instance
+    val isAuthenticated by app.authService.isAuthenticated.collectAsState()
+
+    val startDestination = if (isAuthenticated) Routes.GARDEN else Routes.LOGIN
+
+    // React to auth state changes: navigate when login/logout happens
+    LaunchedEffect(isAuthenticated) {
+        if (isAuthenticated) {
+            navController.navigate(Routes.GARDEN) {
+                popUpTo(Routes.LOGIN) { inclusive = true }
+            }
+        } else {
+            navController.navigate(Routes.LOGIN) {
+                popUpTo(Routes.GARDEN) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
-        startDestination = Routes.GARDEN,
+        startDestination = startDestination,
     ) {
+        composable(Routes.LOGIN) {
+            LoginScreen(
+                authService = app.authService,
+                onSignUpClick = {
+                    navController.navigate(Routes.SIGN_UP)
+                },
+            )
+        }
+
+        composable(Routes.SIGN_UP) {
+            SignUpScreen(
+                authService = app.authService,
+                onBackToLogin = {
+                    navController.popBackStack()
+                },
+            )
+        }
+
         composable(Routes.GARDEN) {
             GardenScreen(
                 onPlantClick = { plantId ->
@@ -83,7 +117,6 @@ fun AppNavigation() {
             ScanScreen(
                 onBack = { navController.popBackStack() },
                 onSensorPaired = { _ ->
-                    // Return to garden after pairing
                     navController.popBackStack()
                 },
             )
