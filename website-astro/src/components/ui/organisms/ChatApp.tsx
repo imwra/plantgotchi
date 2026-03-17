@@ -376,41 +376,36 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
         currentPath={typeof window !== 'undefined' ? window.location.pathname : '/chat'}
       />
 
-      <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-3.5 pb-6">
-        {/* spacer */}
-        <div className="h-2" />
+      {/* Loading */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="text-3xl mb-4 animate-pulse">💬</div>
+          <p className="font-pixel text-pixel-sm text-text-light">{labels.loadingMessages}</p>
+        </div>
+      )}
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-12">
-            <div className="text-3xl mb-4 animate-pulse">💬</div>
-            <p className="font-pixel text-pixel-sm text-text-light">{labels.loadingMessages}</p>
-          </div>
-        )}
+      {/* Error */}
+      {error && (
+        <div className="text-center py-8 text-danger">
+          <p className="font-pixel text-pixel-sm">{error}</p>
+        </div>
+      )}
 
-        {/* Error */}
-        {error && (
-          <div className="text-center py-8 text-danger">
-            <p className="font-pixel text-pixel-sm">{error}</p>
-          </div>
-        )}
-
-        {/* Chat panel */}
-        {!loading && !error && (
-          <div className="h-[calc(100vh-180px)] min-h-[400px]">
-            <ChatPanel
-              conversations={conversations}
-              messages={messages}
-              activeConversationId={activeConversationId}
-              onSelectConversation={handleSelectConversation}
-              onSend={handleSend}
-              onNewConversation={() => setShowNewConversation(true)}
-              typingUsers={typingUsers}
-              labels={labels}
-            />
-          </div>
-        )}
-      </div>
+      {/* Chat panel — edge to edge */}
+      {!loading && !error && (
+        <div className="h-[calc(100vh-56px)]">
+          <ChatPanel
+            conversations={conversations}
+            messages={messages}
+            activeConversationId={activeConversationId}
+            onSelectConversation={handleSelectConversation}
+            onSend={handleSend}
+            onNewConversation={() => setShowNewConversation(true)}
+            typingUsers={typingUsers}
+            labels={labels}
+          />
+        </div>
+      )}
 
       {/* New conversation modal */}
       {showNewConversation && (
