@@ -18,9 +18,10 @@ export default defineConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        // Force all @libsql/client imports (including from @libsql/kysely-libsql)
-        // to use the web/fetch-based implementation instead of Node.js https
+        // Force @libsql/client to use fetch-based HTTP client (no WebSocket/Node deps)
         "@libsql/client": new URL("./node_modules/@libsql/client/lib-esm/http.js", import.meta.url).pathname,
+        // Replace node-fetch with global fetch (available in Cloudflare Workers)
+        "node-fetch": new URL("./src/lib/fetch-shim.ts", import.meta.url).pathname,
       },
     },
   },
