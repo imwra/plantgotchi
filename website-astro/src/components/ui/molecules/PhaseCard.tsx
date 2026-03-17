@@ -66,10 +66,10 @@ export default function PhaseCard({
         </span>
 
         {/* Phase name */}
-        <span className="font-pixel text-pixel-sm text-text flex-1 text-left">{name}</span>
+        <span className="font-pixel text-pixel-md text-text flex-1 text-left">{name}</span>
 
         {/* Progress count */}
-        <span className="font-pixel text-pixel-xs text-primary-dark shrink-0">
+        <span className="font-pixel text-pixel-sm text-primary-dark shrink-0">
           {done}/{total}
         </span>
       </button>

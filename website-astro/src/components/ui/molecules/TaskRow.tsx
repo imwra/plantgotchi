@@ -50,9 +50,9 @@ export default function TaskRow({
       </button>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-pixel text-pixel-xs text-text">{title}</span>
+          <span className="font-pixel text-pixel-base text-text">{title}</span>
           {critical && (
-            <span className="font-pixel text-pixel-xs text-danger">CRITICAL</span>
+            <span className="font-pixel text-pixel-sm text-danger">CRITICAL</span>
           )}
         </div>
         {onNotesChange !== undefined && (
