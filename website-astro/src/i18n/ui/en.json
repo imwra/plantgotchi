@@ -40,5 +40,7 @@
   "help.subtitle": "Everything you need to know about setting up and using Plantgotchi. Pick a topic below or browse by category.",
   "help.breadcrumb.home": "Home",
   "help.breadcrumb.help": "Help",
-  "help.sidebar.title": "Help Topics"
+  "help.sidebar.title": "Help Topics",
+  "mocks.title": "HTML Mockups",
+  "mocks.subtitle": "Interactive HTML/CSS replicas of the Plantgotchi dashboard"
 }

@@ -40,5 +40,7 @@
   "help.subtitle": "Tudo que voce precisa saber sobre como configurar e usar o Plantgotchi. Escolha um topico abaixo ou navegue por categoria.",
   "help.breadcrumb.home": "Inicio",
   "help.breadcrumb.help": "Ajuda",
-  "help.sidebar.title": "Topicos de Ajuda"
+  "help.sidebar.title": "Topicos de Ajuda",
+  "mocks.title": "Mockups HTML",
+  "mocks.subtitle": "Replicas interativas em HTML/CSS do dashboard Plantgotchi"
 }

@@ -212,7 +212,7 @@
     "emailPlaceholder": "voce@email.com",
     "emailAriaLabel": "Endereco de e-mail",
     "linksTitle": "Links",
-    "linkItems": ["Como Funciona", "Produtos", "Precos", "App"],
+    "linkItems": ["Como Funciona", "Produtos", "Precos", "App", "Mockups"],
     "followUs": "Siga-nos",
     "socialLinks": ["GitHub", "Twitter", "Discord"]
   }

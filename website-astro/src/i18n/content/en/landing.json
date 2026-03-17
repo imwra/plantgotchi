@@ -212,7 +212,7 @@
     "emailPlaceholder": "you@email.com",
     "emailAriaLabel": "Email address",
     "linksTitle": "Links",
-    "linkItems": ["How It Works", "Products", "Pricing", "App"],
+    "linkItems": ["How It Works", "Products", "Pricing", "App", "Mocks"],
     "followUs": "Follow us",
     "socialLinks": ["GitHub", "Twitter", "Discord"]
   }
