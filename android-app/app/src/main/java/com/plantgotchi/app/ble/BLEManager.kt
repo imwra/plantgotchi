@@ -2,7 +2,7 @@ package com.plantgotchi.app.ble
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.posthog.PostHog
+import com.plantgotchi.app.analytics.Analytics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,6 +55,9 @@ class BLEManager(private val context: Context) {
         val battery: Int? = null,
     )
 
+    private val lastReadingEventTime = mutableMapOf<String, Long>()
+    private var connectedSensorAddress: String? = null
+
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
@@ -84,17 +87,37 @@ class BLEManager(private val context: Context) {
         val sensor = _discoveredSensors.value.find { it.address == address } ?: return
         stopScan()
         _state.value = BleState.CONNECTING
-        PostHog.capture("sensor_connect_attempt", properties = mapOf(
-            "sensor_id" to address,
-        ))
+        connectedSensorAddress = sensor.address
+        Analytics.track("sensor_paired", mapOf("sensor_id" to sensor.address))
     }
 
     /**
      * Disconnect the current peripheral.
      */
     fun disconnect() {
+        connectedSensorAddress?.let { sensorId ->
+            Analytics.track("sensor_disconnected", mapOf("sensor_id" to sensorId))
+        }
         _state.value = BleState.DISCONNECTED
         _latestReading.value = null
+        connectedSensorAddress = null
+    }
+
+    /**
+     * Called when a sensor reading is received from a connected peripheral.
+     * Applies rate-limiting: fires at most one analytics event per sensor per minute.
+     */
+    fun onSensorReading(sensorId: String, battery: Int, moisture: Int) {
+        val now = System.currentTimeMillis()
+        val last = lastReadingEventTime[sensorId] ?: 0L
+        if (now - last >= 60_000) {
+            lastReadingEventTime[sensorId] = now
+            Analytics.track("sensor_reading_received", mapOf(
+                "sensor_id" to sensorId,
+                "battery" to battery,
+                "moisture" to moisture,
+            ))
+        }
     }
 
     /**

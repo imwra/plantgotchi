@@ -7,9 +7,11 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.plantgotchi.app.PlantgotchiApp
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.ui.add.AddPlantScreen
 import com.plantgotchi.app.ui.auth.LoginScreen
 import com.plantgotchi.app.ui.auth.SignUpScreen
@@ -37,6 +39,21 @@ fun AppNavigation() {
     val isAuthenticated by app.authService.isAuthenticated.collectAsState()
 
     val startDestination = if (isAuthenticated) Routes.GARDEN else Routes.LOGIN
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    LaunchedEffect(currentRoute) {
+        val tabName = when (currentRoute) {
+            Routes.GARDEN -> "garden"
+            Routes.SCAN -> "scan"
+            Routes.SETTINGS -> "settings"
+            else -> null
+        }
+        if (tabName != null) {
+            Analytics.track("tab_changed", mapOf("tab_name" to tabName))
+        }
+    }
 
     // React to auth state changes: navigate when login/logout happens
     LaunchedEffect(isAuthenticated) {

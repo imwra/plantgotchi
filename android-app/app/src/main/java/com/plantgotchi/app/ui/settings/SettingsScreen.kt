@@ -60,10 +60,11 @@ import com.plantgotchi.app.model.CareLog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.Recommendation
 import com.plantgotchi.app.model.SensorReading
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.ui.theme.Green
 import com.plantgotchi.app.ui.theme.Red
-import com.posthog.PostHog
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.LaunchedEffect
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -85,6 +86,10 @@ fun SettingsScreen(
     var currentLocale by remember { mutableStateOf(getCurrentLocale(context)) }
 
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        Analytics.track("screen_viewed", mapOf("screen_name" to "settings"))
+    }
 
     if (showDemoLoadedAlert) {
         AlertDialog(
@@ -162,7 +167,7 @@ fun SettingsScreen(
                             onClick = {
                                 setAppLocale(context, "pt-BR")
                                 currentLocale = "pt"
-                                PostHog.capture("language_changed", properties = mapOf("language" to "pt-BR"))
+                                Analytics.track("language_changed", mapOf("locale" to "pt-BR"))
                             },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(8.dp),
@@ -188,7 +193,7 @@ fun SettingsScreen(
                             onClick = {
                                 setAppLocale(context, "en")
                                 currentLocale = "en"
-                                PostHog.capture("language_changed", properties = mapOf("language" to "en"))
+                                Analytics.track("language_changed", mapOf("locale" to "en"))
                             },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(8.dp),
@@ -360,11 +365,10 @@ private suspend fun toggleDemoMode(enabled: Boolean, context: Context) {
     if (enabled) {
         DemoDataLoader.load(userId, db)
         prefs.edit().putBoolean("demo_mode_on", true).apply()
-        PostHog.capture("demo_mode_enabled")
+        Analytics.track("demo_data_loaded")
     } else {
         db.plantDao().deleteAllByUser(userId)
         prefs.edit().putBoolean("demo_mode_on", false).apply()
-        PostHog.capture("demo_mode_disabled")
     }
 }
 

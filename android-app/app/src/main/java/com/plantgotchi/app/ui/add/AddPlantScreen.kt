@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
 import com.plantgotchi.app.R
-import com.posthog.PostHog
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.BuildConfig
 import com.plantgotchi.app.ui.theme.Green
 import io.ktor.client.request.*
@@ -293,7 +293,7 @@ fun AddPlantScreen(
                                 val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
                                 val plantId = body["id"]?.jsonPrimitive?.content ?: return@launch
                                 onPlantAdded(plantId)
-                                PostHog.capture("plant_added", properties = mapOf("plant_id" to plantId))
+                                Analytics.track("plant_created", mapOf("plant_id" to plantId, "species" to species, "emoji" to selectedEmoji))
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()

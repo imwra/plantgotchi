@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,9 +52,9 @@ import com.plantgotchi.app.R
 import com.plantgotchi.app.ble.BLEManager
 import com.plantgotchi.app.ble.BleState
 import com.plantgotchi.app.ble.DiscoveredSensor
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.ui.theme.Blue
 import com.plantgotchi.app.ui.theme.Green
-import com.posthog.PostHog
 
 /**
  * BLE scanning screen — discovers Plantgotchi sensors and allows pairing.
@@ -101,6 +102,10 @@ fun ScanScreen(
         onDispose {
             bleManager.stopScan()
         }
+    }
+
+    LaunchedEffect(Unit) {
+        Analytics.track("screen_viewed", mapOf("screen_name" to "scan"))
     }
 
     Scaffold(
@@ -170,7 +175,7 @@ fun ScanScreen(
                         onClick = {
                             if (permissionsGranted || bleManager.isBluetoothEnabled()) {
                                 bleManager.startScan()
-                                PostHog.capture("sensor_scan_started")
+                                Analytics.track("sensor_scan_started")
                             } else {
                                 permissionLauncher.launch(blePermissions)
                             }
@@ -227,9 +232,7 @@ fun ScanScreen(
                             onConnect = {
                                 bleManager.connectToSensor(sensor.address)
                                 onSensorPaired(sensor.address)
-                                PostHog.capture("sensor_paired", properties = mapOf(
-                                    "sensor_id" to sensor.address,
-                                ))
+                                Analytics.track("sensor_paired", mapOf("sensor_id" to sensor.address))
                             },
                         )
                     }

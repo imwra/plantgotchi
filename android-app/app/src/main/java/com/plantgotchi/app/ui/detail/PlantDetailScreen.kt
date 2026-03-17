@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,7 +49,7 @@ import com.plantgotchi.app.ui.theme.Blue
 import com.plantgotchi.app.ui.theme.Green
 import com.plantgotchi.app.ui.theme.Red
 import com.plantgotchi.app.ui.theme.Yellow
-import com.posthog.PostHog
+import com.plantgotchi.app.analytics.Analytics
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -100,6 +101,14 @@ fun PlantDetailScreen(
         currentPlant.tempMin, currentPlant.tempMax,
     )
     val lightLabel = RuleEngine.getLightLabel(light)
+
+    LaunchedEffect(Unit) {
+        Analytics.track("screen_viewed", mapOf("screen_name" to "plant_detail"))
+    }
+
+    LaunchedEffect(currentPlant) {
+        Analytics.track("plant_viewed", mapOf("plant_id" to plantId, "species" to (currentPlant.species ?: "")))
+    }
 
     Scaffold(
         topBar = {
@@ -216,10 +225,7 @@ fun PlantDetailScreen(
                                         notes = wateredNote,
                                     )
                                 )
-                                PostHog.capture("care_logged", properties = mapOf(
-                                    "plant_id" to plantId,
-                                    "action" to "water",
-                                ))
+                                Analytics.track("care_logged", mapOf("plant_id" to plantId, "action" to "water"))
                             }
                         },
                         modifier = Modifier.weight(1f),
@@ -240,10 +246,7 @@ fun PlantDetailScreen(
                                         notes = fertilizedNote,
                                     )
                                 )
-                                PostHog.capture("care_logged", properties = mapOf(
-                                    "plant_id" to plantId,
-                                    "action" to "fertilize",
-                                ))
+                                Analytics.track("care_logged", mapOf("plant_id" to plantId, "action" to "fertilize"))
                             }
                         },
                         modifier = Modifier.weight(1f),
