@@ -20,7 +20,8 @@ struct AddPlantView: View {
     @State private var showError = false
     @State private var errorMessage = ""
 
-    private let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
+    @EnvironmentObject private var authService: AuthService
+    private var userId: String { authService.userId ?? "default-user" }
 
     private let emojiOptions = [
         "\u{1F331}", "\u{1F33F}", "\u{1F335}", "\u{1F33B}", "\u{1F337}",
