@@ -301,6 +301,8 @@ export default function GardenDashboard({
 
   useEffect(() => {
     fetchPlants();
+    const pollIv = setInterval(fetchPlants, 15000);
+    return () => clearInterval(pollIv);
   }, []);
 
   useEffect(() => {

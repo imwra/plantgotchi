@@ -101,6 +101,11 @@ struct GardenView: View {
             }
             .task {
                 await refreshPlants()
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 15_000_000_000)
+                    guard !Task.isCancelled else { break }
+                    await refreshPlants()
+                }
             }
         }
     }
