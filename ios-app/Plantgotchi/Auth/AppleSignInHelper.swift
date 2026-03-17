@@ -1,3 +1,4 @@
+#if os(iOS)
 import Foundation
 import AuthenticationServices
 import CryptoKit
@@ -48,3 +49,4 @@ enum AppleSignInHelper {
         return (idToken, nonce)
     }
 }
+#endif

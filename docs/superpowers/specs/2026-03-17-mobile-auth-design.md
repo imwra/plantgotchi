@@ -145,7 +145,7 @@ A Ktor HTTP client plugin (or OkHttp interceptor) that:
 
 ### TursoSync Changes
 
-Same as iOS — remove direct Turso credentials, route through authenticated Astro API.
+Same goal as iOS — remove direct Turso credentials, route through authenticated Astro API. Implementation differs: Android's `TursoSync` takes `tursoUrl` and `authToken` as constructor parameters (not SharedPreferences), so the refactoring replaces those constructor params and swaps the Ktor client's base URL from Turso to the Astro API.
 
 ### UI
 

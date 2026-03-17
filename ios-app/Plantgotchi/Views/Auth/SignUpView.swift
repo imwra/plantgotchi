@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import AuthenticationServices
 
@@ -161,3 +162,4 @@ struct SignUpView: View {
         }
     }
 }
+#endif

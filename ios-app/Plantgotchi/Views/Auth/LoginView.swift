@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import AuthenticationServices
 
@@ -163,3 +164,4 @@ struct LoginView: View {
         }
     }
 }
+#endif
