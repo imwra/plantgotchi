@@ -130,6 +130,9 @@ final class AuthService: ObservableObject {
                 let token = extractSessionToken(from: setCookie) {
             try keychain.save(token: token)
         }
+        else {
+            throw AuthError.invalidResponse
+        }
 
         if let user = json["user"] as? [String: Any],
            let id = user["id"] as? String {
