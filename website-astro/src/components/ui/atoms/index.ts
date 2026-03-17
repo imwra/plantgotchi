@@ -9,3 +9,7 @@ export { default as EmojiAvatar } from './EmojiAvatar';
 export { default as Badge } from './Badge';
 export { default as ProgressBar } from './ProgressBar';
 export { default as LanguageSwitcher } from './LanguageSwitcher';
+export { default as ChatBubble } from './ChatBubble';
+export { default as ChatInput } from './ChatInput';
+export { default as UnreadBadge } from './UnreadBadge';
+export { default as TypingDots } from './TypingDots';

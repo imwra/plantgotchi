@@ -6,3 +6,6 @@ export { default as CareHistory } from './CareHistory';
 export { default as RecommendationItem } from './RecommendationItem';
 export { default as TaskRow } from './TaskRow';
 export { default as PhaseCard } from './PhaseCard';
+export { default as ConversationListItem } from './ConversationListItem';
+export { default as MessageBubble } from './MessageBubble';
+export { default as ReactionPicker } from './ReactionPicker';
