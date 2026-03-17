@@ -7,15 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06C946500A93B1A353F77FC6 /* MenuBarSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */; };
 		1E3F8AFA9AD1075D6496EB7B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E70C9994B7630D18168495D /* AppDelegate.swift */; };
 		2DBD43B96216ABD13EE39383 /* PlantgotchiWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */; };
+		3E54DF8A164473DF3C041FAE /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */; };
 		43632FC680F6D33CC2078EDD /* PlantgotchiMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044637DDBB0844989C5054C5 /* PlantgotchiMacApp.swift */; };
 		43765D933B30BFDAE6AC0EED /* PlantgotchiMacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */; };
 		4E904C77A1B9FB33C5719A40 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
 		7AE523B877EE5B7C044D3A71 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
+		7C6FABFA11AA542F8227AD46 /* PlantgotchiCore in Frameworks */ = {isa = PBXBuildFile; productRef = B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */; };
+		AA0815E7E0F8F8DF7CD783CF /* MenuBarPanelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */; };
 		AE2797A2957769D9F3B5E595 /* PlantgotchiWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9273AB71ED38472FB2EB5864 /* PlantgotchiWidgetsBundle.swift */; };
 		B3DA5265393790FB2B394F63 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
 		CEEF9EDE119BCBD1B6E3A08B /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A22EADB8E07163580FAC8A9 /* Config.plist */; };
+		EA1A90CBC7007832420BE8E8 /* MenuBarPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */; };
+		FA7EFD17368D37131E150F51 /* MenuBarPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,16 +58,21 @@
 /* Begin PBXFileReference section */
 		0421B2C799DA73D59EB08DFF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		044637DDBB0844989C5054C5 /* PlantgotchiMacApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiMacApp.swift; sourceTree = "<group>"; };
+		074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelViewModelTests.swift; sourceTree = "<group>"; };
 		07B04E9764637E1CC6986563 /* PlantgotchiMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlantgotchiMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A22EADB8E07163580FAC8A9 /* Config.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
+		19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarSceneController.swift; sourceTree = "<group>"; };
 		2F5F94F66F0F46276A166405 /* PlantgotchiWidgets.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = PlantgotchiWidgets.entitlements; sourceTree = "<group>"; };
 		37C2F5CBAF09DB6922B42DCC /* PlantgotchiMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlantgotchiMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiMacTests.swift; sourceTree = "<group>"; };
+		3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
 		4E70C9994B7630D18168495D /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		81719EFAA9EAAB258781C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		9273AB71ED38472FB2EB5864 /* PlantgotchiWidgetsBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiWidgetsBundle.swift; sourceTree = "<group>"; };
 		A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PlantgotchiWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8F2DC70841A22C3D541D14F /* PlantgotchiMac.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = PlantgotchiMac.entitlements; sourceTree = "<group>"; };
+		ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelViewModel.swift; sourceTree = "<group>"; };
+		FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +97,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4E904C77A1B9FB33C5719A40 /* Cocoa.framework in Frameworks */,
+				7C6FABFA11AA542F8227AD46 /* PlantgotchiCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +109,7 @@
 			children = (
 				3E691CD3821C9B66A9125B0A /* App */,
 				915E94D39E5A2BB8D564CAF2 /* Support */,
+				CEBFCBB49779CDB51DF0EDD5 /* MenuBar */,
 			);
 			name = PlantgotchiMac;
 			path = PlantgotchiMac;
@@ -158,9 +171,22 @@
 			isa = PBXGroup;
 			children = (
 				389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */,
+				074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */,
 			);
 			name = PlantgotchiMacTests;
 			path = PlantgotchiMacTests;
+			sourceTree = "<group>";
+		};
+		CEBFCBB49779CDB51DF0EDD5 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */,
+				3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */,
+				FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */,
+				ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */,
+			);
+			name = MenuBar;
+			path = MenuBar;
 			sourceTree = "<group>";
 		};
 		DFAE94D9BCBE2840AFBEE101 /* OS X */ = {
@@ -197,6 +223,9 @@
 				85B064FBCD433200D59F49EE /* PBXTargetDependency */,
 			);
 			name = PlantgotchiMac;
+			packageProductDependencies = (
+				B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */,
+			);
 			productName = PlantgotchiMac;
 			productReference = 07B04E9764637E1CC6986563 /* PlantgotchiMac.app */;
 			productType = "com.apple.product-type.application";
@@ -255,6 +284,9 @@
 			);
 			mainGroup = 8CD458804ECDF2B052E18225;
 			minimizedProjectReferenceProxies = 0;
+			packageReferences = (
+				A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AAF67D7734289419C11507BA /* Products */;
 			projectDirPath = "";
@@ -299,6 +331,10 @@
 			files = (
 				43632FC680F6D33CC2078EDD /* PlantgotchiMacApp.swift in Sources */,
 				1E3F8AFA9AD1075D6496EB7B /* AppDelegate.swift in Sources */,
+				06C946500A93B1A353F77FC6 /* MenuBarSceneController.swift in Sources */,
+				3E54DF8A164473DF3C041FAE /* MenuBarStatusView.swift in Sources */,
+				FA7EFD17368D37131E150F51 /* MenuBarPanelView.swift in Sources */,
+				EA1A90CBC7007832420BE8E8 /* MenuBarPanelViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +351,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				43765D933B30BFDAE6AC0EED /* PlantgotchiMacTests.swift in Sources */,
+				AA0815E7E0F8F8DF7CD783CF /* MenuBarPanelViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -601,6 +638,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../ios-app";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */;
+			productName = PlantgotchiCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3541B43211BEB6DDBE53B968 /* Project object */;
 }
