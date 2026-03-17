@@ -1,6 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import SiteNav from './SiteNav';
 import IssueTable from './IssueTable';
+import BoardView from './BoardView';
+import ViewTabs from '../molecules/ViewTabs';
+import { useProjectViews } from '../../hooks/useProjectViews';
+import { useAutoSaveView } from '../../hooks/useAutoSaveView';
 
 interface FieldDef {
   id: string;
@@ -16,6 +20,16 @@ interface MemberData {
   user_email: string;
   user_image: string | null;
   role: string;
+}
+
+interface IssueData {
+  id: string;
+  title: string;
+  status: string;
+  parent_issue_id: string | null;
+  updated_at: string;
+  assignee_ids: string | null;
+  fieldValues: { field_id: string; field_name: string; value: string }[];
 }
 
 interface ProjectData {
@@ -43,6 +57,27 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
   const [showSettings, setShowSettings] = useState(false);
   const [newIssueTitle, setNewIssueTitle] = useState('');
   const [showNewIssue, setShowNewIssue] = useState(false);
+  const [viewType, setViewType] = useState<'table' | 'board'>('table');
+  const [boardField, setBoardField] = useState('status');
+
+  // Board view state
+  const [boardIssues, setBoardIssues] = useState<IssueData[]>([]);
+  const [boardLoading, setBoardLoading] = useState(false);
+
+  // Saved views
+  const { views, activeView, selectView, createView, updateView, deleteView } = useProjectViews(projectId);
+
+  // View config for auto-save
+  const viewConfig = useMemo(() => ({
+    viewType,
+    boardField,
+  }), [viewType, boardField]);
+
+  const { pendingSave, clearPendingSave } = useAutoSaveView(
+    activeView?.id || null,
+    viewConfig,
+    updateView as any
+  );
 
   // Field management
   const [newFieldName, setNewFieldName] = useState('');
@@ -67,9 +102,42 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
     }
   };
 
+  const fetchBoardIssues = useCallback(async () => {
+    if (viewType !== 'board') return;
+    setBoardLoading(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/issues`);
+      if (res.ok) {
+        const data = await res.json();
+        setBoardIssues(data.issues || []);
+      }
+    } catch {
+      // silent
+    } finally {
+      setBoardLoading(false);
+    }
+  }, [projectId, viewType]);
+
   useEffect(() => {
     fetchProject();
   }, [projectId]);
+
+  useEffect(() => {
+    fetchBoardIssues();
+  }, [fetchBoardIssues]);
+
+  // Apply saved view config when active view changes
+  useEffect(() => {
+    if (activeView) {
+      try {
+        const config = JSON.parse(activeView.config || '{}');
+        if (config.viewType) setViewType(config.viewType);
+        if (config.boardField) setBoardField(config.boardField);
+      } catch {
+        // invalid config, ignore
+      }
+    }
+  }, [activeView?.id]);
 
   const handleSaveName = async () => {
     if (!editName.trim()) return;
@@ -91,8 +159,8 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
     });
     setNewIssueTitle('');
     setShowNewIssue(false);
-    // Force table re-render by updating project
     fetchProject();
+    if (viewType === 'board') fetchBoardIssues();
   };
 
   const handleAddField = async () => {
@@ -115,6 +183,100 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
     await fetch(`/api/projects/${projectId}/fields/${fieldId}`, { method: 'DELETE' });
     fetchProject();
   };
+
+  // Board drag-and-drop handlers
+  const handleBoardStatusChange = async (issueId: string, newStatus: string) => {
+    // Optimistic update
+    setBoardIssues(prev => prev.map(i => i.id === issueId ? { ...i, status: newStatus } : i));
+    try {
+      await fetch(`/api/issues/${issueId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+    } catch {
+      fetchBoardIssues(); // revert on error
+    }
+  };
+
+  const handleBoardReorder = async (issueIds: string[]) => {
+    try {
+      await fetch(`/api/projects/${projectId}/issues/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ issueIds }),
+      });
+    } catch {
+      fetchBoardIssues(); // revert on error
+    }
+  };
+
+  const handleIssueClick = (issueId: string) => {
+    window.location.href = `${prefix}/issues/${issueId}`;
+  };
+
+  // Inline editing handlers
+  const handleTitleUpdate = async (issueId: string, title: string) => {
+    setBoardIssues(prev => prev.map(i => i.id === issueId ? { ...i, title } : i));
+    try {
+      await fetch(`/api/issues/${issueId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      });
+    } catch {
+      fetchBoardIssues();
+    }
+  };
+
+  const handleFieldUpdate = async (issueId: string, fieldId: string, value: string) => {
+    try {
+      await fetch(`/api/projects/${projectId}/issues/${issueId}/fields`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [fieldId]: value }),
+      });
+    } catch {
+      // silent
+    }
+  };
+
+  // View management
+  const handleCreateView = async (name: string) => {
+    await createView(name, viewType, viewConfig);
+  };
+
+  const handleRenameView = async (viewId: string, name: string) => {
+    await updateView(viewId, { name });
+  };
+
+  const handleSaveAsNewView = () => {
+    clearPendingSave();
+    // Will be handled by ViewTabs create flow
+  };
+
+  // Derive users for UserPicker from project members
+  const users = useMemo(() =>
+    project?.members.map(m => ({
+      id: m.user_id,
+      name: m.user_name || m.user_email,
+      imageUrl: m.user_image || undefined,
+    })) || [],
+    [project?.members]
+  );
+
+  // Board field options (single-select fields)
+  const boardFieldOptions = useMemo(() => {
+    const opts = [{ value: 'status', label: 'Status' }];
+    if (project) {
+      for (const f of project.fields) {
+        if (f.field_type === 'single_select') {
+          opts.push({ value: f.id, label: f.name });
+        }
+      }
+    }
+    return opts;
+  }, [project?.fields]);
 
   if (loading) {
     return (
@@ -280,53 +442,135 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
 
       {/* View switcher + toolbar */}
       <div className="bg-white border-b border-bg-warm shadow-sm sticky top-14 z-40">
-        <div className="max-w-7xl mx-auto px-4 flex items-center gap-4 h-10">
-          <span className="font-pixel text-[10px] text-primary-dark border-b-2 border-primary px-2 py-2">
-            {labels.viewTable || 'Table'}
-          </span>
-          <span className="font-pixel text-[10px] text-text-mid px-2 py-2 relative">
-            {labels.viewBoard || 'Board'}
-            <span className="ml-1 text-[8px] bg-bg-warm text-text-mid px-1 rounded">{labels.viewBoardSoon || 'Coming soon'}</span>
-          </span>
-          <div className="ml-auto flex items-center gap-2">
-            {showNewIssue ? (
-              <div className="flex items-center gap-2">
-                <input
-                  value={newIssueTitle}
-                  onChange={(e) => setNewIssueTitle(e.target.value)}
-                  placeholder="Issue title..."
-                  className="px-2 py-1 text-xs border border-bg-warm rounded focus:outline-none focus:border-primary"
-                  autoFocus
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddIssue()}
-                />
-                <button onClick={handleAddIssue} className="px-2 py-1 text-xs bg-primary text-bg rounded hover:bg-primary-dark cursor-pointer">
-                  {labels.create || 'Create'}
-                </button>
-                <button onClick={() => { setShowNewIssue(false); setNewIssueTitle(''); }} className="text-xs text-text-mid cursor-pointer">
-                  {labels.cancel || 'Cancel'}
-                </button>
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-4 h-10">
+            {/* View type switcher */}
+            <button
+              onClick={() => setViewType('table')}
+              className={`font-pixel text-[10px] px-2 py-2 cursor-pointer ${
+                viewType === 'table'
+                  ? 'text-primary-dark border-b-2 border-primary'
+                  : 'text-text-mid hover:text-text'
+              }`}
+            >
+              {labels.viewTable || 'Table'}
+            </button>
+            <button
+              onClick={() => setViewType('board')}
+              className={`font-pixel text-[10px] px-2 py-2 cursor-pointer ${
+                viewType === 'board'
+                  ? 'text-primary-dark border-b-2 border-primary'
+                  : 'text-text-mid hover:text-text'
+              }`}
+            >
+              {labels.viewBoard || 'Board'}
+            </button>
+
+            {/* Board field selector */}
+            {viewType === 'board' && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-text-mid">{labels.boardBy || 'Board by'}:</span>
+                <select
+                  value={boardField}
+                  onChange={(e) => setBoardField(e.target.value)}
+                  className="text-xs border border-bg-warm rounded px-2 py-1 bg-white focus:outline-none focus:border-primary"
+                >
+                  {boardFieldOptions.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
               </div>
-            ) : (
-              <button
-                onClick={() => setShowNewIssue(true)}
-                className="font-pixel text-[10px] text-primary-dark hover:text-primary cursor-pointer"
-              >
-                + {labels.addIssue || 'Add Issue'}
-              </button>
             )}
+
+            {/* Add issue */}
+            <div className="ml-auto flex items-center gap-2">
+              {pendingSave && (
+                <button
+                  onClick={handleSaveAsNewView}
+                  className="text-[10px] text-primary-dark bg-primary-pale/30 px-2 py-1 rounded cursor-pointer hover:bg-primary-pale/50"
+                >
+                  {labels.saveAsNew || 'Save as new view?'}
+                </button>
+              )}
+              {showNewIssue ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    value={newIssueTitle}
+                    onChange={(e) => setNewIssueTitle(e.target.value)}
+                    placeholder="Issue title..."
+                    className="px-2 py-1 text-xs border border-bg-warm rounded focus:outline-none focus:border-primary"
+                    autoFocus
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddIssue()}
+                  />
+                  <button onClick={handleAddIssue} className="px-2 py-1 text-xs bg-primary text-bg rounded hover:bg-primary-dark cursor-pointer">
+                    {labels.create || 'Create'}
+                  </button>
+                  <button onClick={() => { setShowNewIssue(false); setNewIssueTitle(''); }} className="text-xs text-text-mid cursor-pointer">
+                    {labels.cancel || 'Cancel'}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowNewIssue(true)}
+                  className="font-pixel text-[10px] text-primary-dark hover:text-primary cursor-pointer"
+                >
+                  + {labels.addIssue || 'Add Issue'}
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* View tabs */}
+          {views.length > 0 && (
+            <ViewTabs
+              views={views}
+              activeViewId={activeView?.id || null}
+              onSelect={selectView}
+              onCreate={handleCreateView}
+              onDelete={deleteView}
+              onRename={handleRenameView}
+              labels={{
+                newView: labels.newView || 'New View',
+                rename: labels.rename || 'Rename',
+                delete: labels.delete || 'Delete',
+                default: labels.default || 'Default',
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Table */}
+      {/* Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <IssueTable
-          key={project.fields.length} // force re-mount when fields change
-          projectId={projectId}
-          fields={project.fields}
-          labels={labels}
-          locale={locale}
-        />
+        {viewType === 'board' ? (
+          boardLoading ? (
+            <div className="text-center py-8">
+              <span className="font-pixel text-primary-dark text-sm">Loading...</span>
+            </div>
+          ) : (
+            <BoardView
+              projectId={projectId}
+              issues={boardIssues}
+              fields={project.fields}
+              boardField={boardField}
+              onStatusChange={handleBoardStatusChange}
+              onReorder={handleBoardReorder}
+              onIssueClick={handleIssueClick}
+              emptyLabel={labels.emptyColumn || 'No issues'}
+            />
+          )
+        ) : (
+          <IssueTable
+            key={project.fields.length}
+            projectId={projectId}
+            fields={project.fields}
+            labels={labels}
+            locale={locale}
+            onTitleUpdate={handleTitleUpdate}
+            onFieldUpdate={handleFieldUpdate}
+            users={users}
+          />
+        )}
       </main>
     </div>
   );

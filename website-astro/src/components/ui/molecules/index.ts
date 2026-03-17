@@ -15,3 +15,6 @@ export { default as GroupHeader } from './GroupHeader';
 export { default as CommentItem } from './CommentItem';
 export { default as FieldEditor } from './FieldEditor';
 export { default as IssueSidebar } from './IssueSidebar';
+export { default as BoardCard } from './BoardCard';
+export { default as BoardColumn } from './BoardColumn';
+export { default as ViewTabs } from './ViewTabs';

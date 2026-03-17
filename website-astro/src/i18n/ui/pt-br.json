@@ -158,5 +158,18 @@
   "comments.unpin": "Desafixar",
   "comments.pinned": "Fixado",
   "comments.noComments": "Nenhum comentario ainda",
-  "comments.edited": "editado"
+  "comments.edited": "editado",
+  "projects.board.boardBy": "Agrupar por",
+  "projects.board.emptyColumn": "Sem issues",
+  "projects.board.dragHint": "Arraste para reordenar ou alterar status",
+  "projects.views.default": "Padrao",
+  "projects.views.newView": "Nova Visao",
+  "projects.views.saveAsNew": "Salvar como nova visao?",
+  "projects.views.updateDefault": "Atualizar padrao",
+  "projects.views.rename": "Renomear",
+  "projects.views.delete": "Excluir",
+  "projects.inline.clickToEdit": "Clique para editar",
+  "projects.inline.saving": "Salvando...",
+  "projects.inline.saved": "Salvo",
+  "projects.inline.error": "Erro ao salvar"
 }

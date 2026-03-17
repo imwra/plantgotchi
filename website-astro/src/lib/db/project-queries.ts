@@ -498,6 +498,34 @@ export async function addAssignee(issueId: string, userId: string) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Reorder & Status Update
+// ---------------------------------------------------------------------------
+
+const VALID_STATUSES = ['todo', 'in_progress', 'done', 'blocked', 'archived'];
+
+export async function reorderProjectIssues(projectId: string, issueIds: string[]): Promise<void> {
+  const db = getDb();
+  const statements = issueIds.map((issueId, index) => ({
+    sql: `UPDATE project_issues SET position = ? WHERE project_id = ? AND issue_id = ?`,
+    args: [index, projectId, issueId] as any[],
+  }));
+  if (statements.length > 0) {
+    await db.batch(statements);
+  }
+}
+
+export async function updateIssueStatus(issueId: string, status: string): Promise<void> {
+  if (!VALID_STATUSES.includes(status)) {
+    throw new Error(`Invalid status: ${status}. Must be one of: ${VALID_STATUSES.join(', ')}`);
+  }
+  const db = getDb();
+  await db.execute({
+    sql: `UPDATE issues SET status = ?, updated_at = datetime('now') WHERE id = ?`,
+    args: [status, issueId],
+  });
+}
+
 export async function removeAssignee(issueId: string, userId: string) {
   const db = getDb();
   await db.execute({

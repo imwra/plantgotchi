@@ -13,3 +13,7 @@ export { default as ChatBubble } from './ChatBubble';
 export { default as ChatInput } from './ChatInput';
 export { default as UnreadBadge } from './UnreadBadge';
 export { default as TypingDots } from './TypingDots';
+export { default as InlineEditor } from './InlineEditor';
+export { default as FieldDropdown } from './FieldDropdown';
+export { default as DatePicker } from './DatePicker';
+export { default as UserPicker } from './UserPicker';

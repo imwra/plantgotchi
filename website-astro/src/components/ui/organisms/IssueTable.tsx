@@ -1,6 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import IssueRow from '../molecules/IssueRow';
 import GroupHeader from '../molecules/GroupHeader';
+import InlineEditor from '../atoms/InlineEditor';
+import FieldDropdown from '../atoms/FieldDropdown';
+import DatePicker from '../atoms/DatePicker';
+import UserPicker from '../atoms/UserPicker';
 
 interface FieldDef {
   id: string;
@@ -24,9 +28,22 @@ export interface IssueTableProps {
   fields: FieldDef[];
   labels?: Record<string, string>;
   locale?: string;
+  onFieldUpdate?: (issueId: string, fieldId: string, value: string) => void;
+  onTitleUpdate?: (issueId: string, title: string) => void;
+  onAssigneeUpdate?: (issueId: string, userId: string | null) => void;
+  users?: { id: string; name: string; imageUrl?: string }[];
 }
 
-export default function IssueTable({ projectId, fields, labels = {}, locale = 'pt-br' }: IssueTableProps) {
+export default function IssueTable({
+  projectId,
+  fields,
+  labels = {},
+  locale = 'pt-br',
+  onFieldUpdate,
+  onTitleUpdate,
+  onAssigneeUpdate,
+  users = [],
+}: IssueTableProps) {
   const [issues, setIssues] = useState<IssueData[]>([]);
   const [grouped, setGrouped] = useState<Record<string, IssueData[]> | null>(null);
   const [groupBy, setGroupBy] = useState<string>('');
@@ -69,15 +86,61 @@ export default function IssueTable({ projectId, fields, labels = {}, locale = 'p
   }, [fields]);
 
   const handleStatusCycle = async (issueId: string, newStatus: string) => {
+    // Optimistic update
+    setIssues(prev => prev.map(i => i.id === issueId ? { ...i, status: newStatus } : i));
     try {
       await fetch(`/api/issues/${issueId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
-      fetchIssues();
     } catch {
-      // silent
+      fetchIssues(); // revert on error
+    }
+  };
+
+  const handleTitleSave = (issueId: string, title: string) => {
+    if (onTitleUpdate) {
+      onTitleUpdate(issueId, title);
+    } else {
+      // Optimistic + API
+      setIssues(prev => prev.map(i => i.id === issueId ? { ...i, title } : i));
+      fetch(`/api/issues/${issueId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }),
+      }).catch(() => fetchIssues());
+    }
+  };
+
+  const handleFieldSave = (issueId: string, fieldId: string, value: string) => {
+    if (onFieldUpdate) {
+      onFieldUpdate(issueId, fieldId, value);
+    } else {
+      // Optimistic + API
+      setIssues(prev => prev.map(i => {
+        if (i.id !== issueId) return i;
+        const fvs = [...i.fieldValues];
+        const existing = fvs.findIndex(fv => fv.field_id === fieldId);
+        const field = fields.find(f => f.id === fieldId);
+        if (existing >= 0) {
+          fvs[existing] = { ...fvs[existing], value };
+        } else {
+          fvs.push({ field_id: fieldId, field_name: field?.name || '', value });
+        }
+        return { ...i, fieldValues: fvs };
+      }));
+      fetch(`/api/projects/${projectId}/issues/${issueId}/fields`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [fieldId]: value }),
+      }).catch(() => fetchIssues());
+    }
+  };
+
+  const handleAssigneeSave = (issueId: string, userId: string | null) => {
+    if (onAssigneeUpdate) {
+      onAssigneeUpdate(issueId, userId);
     }
   };
 
@@ -127,6 +190,133 @@ export default function IssueTable({ projectId, fields, labels = {}, locale = 'p
     done: labels.statusDone || 'Done',
     blocked: labels.statusBlocked || 'Blocked',
     archived: labels.statusArchived || 'Archived',
+  };
+
+  // Render an inline-editable cell based on field type
+  const renderEditableCell = (issue: IssueData, fieldName: string) => {
+    const field = fields.find(f => f.name === fieldName);
+    if (!field) return <span className="text-xs text-text-mid">-</span>;
+
+    const fv = issue.fieldValues.find(f => f.field_name === fieldName);
+    const currentValue = fv?.value || '';
+
+    switch (field.field_type) {
+      case 'text':
+        return (
+          <InlineEditor
+            value={currentValue}
+            type="text"
+            onSave={(v) => handleFieldSave(issue.id, field.id, v)}
+            placeholder="-"
+          />
+        );
+      case 'number':
+        return (
+          <InlineEditor
+            value={currentValue}
+            type="number"
+            onSave={(v) => handleFieldSave(issue.id, field.id, v)}
+            placeholder="-"
+          />
+        );
+      case 'date':
+        return (
+          <DatePicker
+            value={currentValue}
+            onChange={(v) => handleFieldSave(issue.id, field.id, v)}
+            placeholder="-"
+          />
+        );
+      case 'single_select': {
+        let opts: string[] = [];
+        try { opts = JSON.parse(field.options); } catch {}
+        return (
+          <FieldDropdown
+            options={opts.map(o => ({ value: o, label: o }))}
+            value={currentValue}
+            onChange={(v) => handleFieldSave(issue.id, field.id, v as string)}
+            placeholder="-"
+          />
+        );
+      }
+      case 'multi_select': {
+        let opts: string[] = [];
+        try { opts = JSON.parse(field.options); } catch {}
+        const vals = currentValue ? currentValue.split(',').map(s => s.trim()) : [];
+        return (
+          <FieldDropdown
+            options={opts.map(o => ({ value: o, label: o }))}
+            value={vals}
+            multi
+            onChange={(v) => handleFieldSave(issue.id, field.id, (v as string[]).join(', '))}
+            placeholder="-"
+          />
+        );
+      }
+      case 'user':
+        return (
+          <UserPicker
+            users={users}
+            value={currentValue || null}
+            onChange={(v) => handleFieldSave(issue.id, field.id, v || '')}
+            placeholder="-"
+          />
+        );
+      default:
+        return <span className="text-xs text-text-mid">{currentValue || '-'}</span>;
+    }
+  };
+
+  // Render a full row with inline editing
+  const renderEditableRow = (issue: IssueData, isSubIssue: boolean) => {
+    const prefix = locale === 'en' ? '/en' : '';
+    return (
+      <tr key={issue.id} className="border-b border-bg-warm hover:bg-bg-warm/50 transition-colors">
+        <td className={`px-3 py-2 ${isSubIssue ? 'pl-8' : ''}`}>
+          <IssueStatusButton
+            issueId={issue.id}
+            status={issue.status}
+            onCycle={handleStatusCycle}
+          />
+        </td>
+        <td className={`px-3 py-2 ${isSubIssue ? 'pl-8' : ''}`}>
+          <div className="flex items-center gap-1">
+            {isSubIssue && <span className="text-text-mid mr-1">&#8627;</span>}
+            <InlineEditor
+              value={issue.title}
+              type="text"
+              onSave={(v) => handleTitleSave(issue.id, v)}
+            />
+          </div>
+        </td>
+        {displayFields.map((fieldName) => (
+          <td key={fieldName} className="px-3 py-2">
+            {renderEditableCell(issue, fieldName)}
+          </td>
+        ))}
+        <td className="px-3 py-2">
+          {users.length > 0 ? (
+            <UserPicker
+              users={users}
+              value={issue.assignee_ids?.split(',')[0] || null}
+              onChange={(v) => handleAssigneeSave(issue.id, v)}
+              placeholder="-"
+            />
+          ) : (
+            <div className="flex -space-x-1">
+              {(issue.assignee_ids ? issue.assignee_ids.split(',') : []).slice(0, 3).map((a, i) => (
+                <div key={i} className="w-5 h-5 rounded-full bg-primary-light/30 border border-white flex items-center justify-center text-[7px] text-primary-dark font-bold">
+                  {a.charAt(0).toUpperCase()}
+                </div>
+              ))}
+            </div>
+          )}
+        </td>
+        <td className="px-3 py-2 text-xs text-text-mid whitespace-nowrap">
+          {issue.updated_at ? new Date(issue.updated_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'pt-BR') : '-'}
+        </td>
+      </tr>
+    );
   };
 
   return (
@@ -237,40 +427,16 @@ export default function IssueTable({ projectId, fields, labels = {}, locale = 'p
                         onToggle={() => toggleGroup(groupKey)}
                         colSpan={colSpan}
                       />
-                      {!collapsed && rows.map(({ issue, isSubIssue }) => (
-                        <IssueRow
-                          key={issue.id}
-                          id={issue.id}
-                          title={issue.title}
-                          status={issue.status}
-                          isSubIssue={isSubIssue}
-                          assignees={issue.assignee_ids ? issue.assignee_ids.split(',') : []}
-                          customFields={issue.fieldValues}
-                          updatedAt={issue.updated_at}
-                          visibleFields={displayFields}
-                          onStatusCycle={handleStatusCycle}
-                          locale={locale}
-                        />
-                      ))}
+                      {!collapsed && rows.map(({ issue, isSubIssue }) =>
+                        renderEditableRow(issue, isSubIssue)
+                      )}
                     </Fragment>
                   );
                 })
               ) : (
-                buildRows(issues).map(({ issue, isSubIssue }) => (
-                  <IssueRow
-                    key={issue.id}
-                    id={issue.id}
-                    title={issue.title}
-                    status={issue.status}
-                    isSubIssue={isSubIssue}
-                    assignees={issue.assignee_ids ? issue.assignee_ids.split(',') : []}
-                    customFields={issue.fieldValues}
-                    updatedAt={issue.updated_at}
-                    visibleFields={displayFields}
-                    onStatusCycle={handleStatusCycle}
-                    locale={locale}
-                  />
-                ))
+                buildRows(issues).map(({ issue, isSubIssue }) =>
+                  renderEditableRow(issue, isSubIssue)
+                )
               )}
             </tbody>
           </table>
@@ -280,5 +446,51 @@ export default function IssueTable({ projectId, fields, labels = {}, locale = 'p
   );
 }
 
-// Need to import Fragment for JSX
-import { Fragment } from 'react';
+// ---------------------------------------------------------------------------
+// IssueStatusButton (extracted for reuse)
+// ---------------------------------------------------------------------------
+
+const STATUS_COLORS: Record<string, string> = {
+  todo: 'bg-text-mid/20 text-text-mid',
+  in_progress: 'bg-water/20 text-water',
+  done: 'bg-primary/20 text-primary-dark',
+  blocked: 'bg-danger/20 text-danger',
+  archived: 'bg-text-mid/10 text-text-mid',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  todo: 'Todo',
+  in_progress: 'In Progress',
+  done: 'Done',
+  blocked: 'Blocked',
+  archived: 'Archived',
+};
+
+const STATUS_ORDER: string[] = ['todo', 'in_progress', 'done', 'blocked', 'archived'];
+
+function IssueStatusButton({
+  issueId,
+  status,
+  onCycle,
+}: {
+  issueId: string;
+  status: string;
+  onCycle: (id: string, newStatus: string) => void;
+}) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const idx = STATUS_ORDER.indexOf(status);
+    const next = STATUS_ORDER[(idx + 1) % STATUS_ORDER.length];
+    onCycle(issueId, next);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold cursor-pointer whitespace-nowrap ${STATUS_COLORS[status] || STATUS_COLORS.todo}`}
+    >
+      {STATUS_LABELS[status] || status}
+    </button>
+  );
+}
