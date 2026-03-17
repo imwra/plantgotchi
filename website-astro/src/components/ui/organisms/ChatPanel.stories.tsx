@@ -55,3 +55,35 @@ export const EmptyState: Story = {
     messages: [],
   },
 };
+
+// ── Edge-to-Edge Layout Comparison ──────────────────────────
+
+export const EdgeToEdge: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ position: 'fixed', inset: 0, top: 56, background: '#f0ead6' }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    conversations: DEMO_CONVERSATIONS,
+    messages: DEMO_MESSAGES,
+    activeConversationId: '1',
+    typingUsers: ['Maria Silva'],
+  },
+};
+
+export const EdgeToEdgeEmpty: Story = {
+  decorators: [
+    (Story) => (
+      <div style={{ position: 'fixed', inset: 0, top: 56, background: '#f0ead6' }}>
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    conversations: DEMO_CONVERSATIONS,
+    messages: [],
+  },
+};
