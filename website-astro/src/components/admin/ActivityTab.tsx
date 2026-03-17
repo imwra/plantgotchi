@@ -27,26 +27,26 @@ export default function ActivityTab() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-sm text-pixel-gray">Loading activity...</p>;
-  if (error) return <p className="text-sm text-accent-red">{error}</p>;
+  if (loading) return <p className="text-sm text-text-mid">Loading activity...</p>;
+  if (error) return <p className="text-sm text-danger">{error}</p>;
 
   return (
     <div className="space-y-4">
-      <h2 className="pixel-font text-xs text-green-dark">RECENT ACTIVITY</h2>
+      <h2 className="pixel-font text-xs text-primary-dark">RECENT ACTIVITY</h2>
 
-      <div className="bg-white rounded-xl shadow-sm border border-cream-dark divide-y divide-cream-dark/50">
+      <div className="bg-white rounded-xl shadow-sm border border-bg-warm divide-y divide-bg-warm/50">
         {activity.length === 0 && (
-          <p className="px-4 py-6 text-sm text-pixel-gray text-center italic">
+          <p className="px-4 py-6 text-sm text-text-mid text-center italic">
             No activity yet
           </p>
         )}
         {activity.map((item) => (
-          <div key={`${item.type}-${item.id}`} className="px-4 py-3 flex items-start gap-3 hover:bg-cream/30 transition">
+          <div key={`${item.type}-${item.id}`} className="px-4 py-3 flex items-start gap-3 hover:bg-bg/30 transition">
             {/* Type icon */}
             <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full font-semibold ${
               item.type === "care_log"
-                ? "bg-green-plant/20 text-green-dark"
-                : "bg-accent-blue/20 text-accent-blue"
+                ? "bg-primary/20 text-primary-dark"
+                : "bg-water/20 text-water"
             }`}>
               {item.type === "care_log" ? "CARE" : "READING"}
             </span>
@@ -56,10 +56,10 @@ export default function ActivityTab() {
               <div className="flex items-center gap-2 flex-wrap text-sm">
                 <span>{item.plantEmoji}</span>
                 <span className="font-medium">{item.plantName}</span>
-                <span className="text-pixel-gray">—</span>
-                <span className="text-pixel-gray truncate">{item.detail}</span>
+                <span className="text-text-mid">—</span>
+                <span className="text-text-mid truncate">{item.detail}</span>
               </div>
-              <div className="text-xs text-pixel-gray mt-1">
+              <div className="text-xs text-text-mid mt-1">
                 {item.userEmail} · {new Date(item.timestamp).toLocaleString()}
               </div>
             </div>

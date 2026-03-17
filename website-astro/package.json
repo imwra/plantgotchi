@@ -7,7 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.1",
@@ -17,6 +19,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.0.4",
     "better-auth": "^1.5.5",
+    "clsx": "^2.1.1",
     "kysely": "^0.28.12",
     "posthog-js": "^1.360.2",
     "posthog-node": "^5.28.2",
@@ -25,6 +28,13 @@
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^8.6.18",
+    "@storybook/addon-essentials": "^8.6.18",
+    "@storybook/blocks": "^8.6.18",
+    "@storybook/react": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
+    "@storybook/theming": "^8.6.18",
+    "storybook": "^8.6.18",
     "vitest": "^4.1.0"
   }
 }

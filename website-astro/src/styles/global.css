@@ -1,20 +1,86 @@
 @import "tailwindcss";
+@import "./animations.css";
 
 @theme {
-  --color-cream: #FFF8E7;
-  --color-cream-dark: #F5ECD7;
-  --color-green-plant: #4CAF50;
-  --color-green-dark: #2E7D32;
-  --color-green-light: #81C784;
-  --color-brown: #795548;
-  --color-brown-light: #A1887F;
-  --color-pixel-black: #2C2C2C;
-  --color-pixel-gray: #6B6B6B;
-  --color-accent-orange: #FF9800;
-  --color-accent-blue: #42A5F5;
-  --color-accent-red: #EF5350;
-  --color-accent-purple: #AB47BC;
+  /* Backgrounds */
+  --color-bg: #f0ead6;
+  --color-bg-warm: #faf5e8;
+  --color-bg-card: #fffdf5;
+  --color-bg-card-hover: #fff8e0;
+
+  /* Borders */
+  --color-border: #c8b88a;
+  --color-border-light: #e0d5b8;
+  --color-border-accent: #8bba6a;
+
+  /* Primary (Green) */
+  --color-primary: #4a9e3f;
+  --color-primary-dark: #357a2c;
+  --color-primary-light: #a8d89a;
+  --color-primary-pale: #e4f5de;
+
+  /* Secondary (Teal) */
+  --color-secondary: #5bb5a6;
+  --color-secondary-pale: #ddf3ef;
+
+  /* Water (Blue) */
+  --color-water: #5ba3d9;
+  --color-water-pale: #ddeefb;
+  --color-water-dark: #3a7cb8;
+
+  /* Sun (Yellow) */
+  --color-sun: #e8b835;
+  --color-sun-pale: #fef5d4;
+
+  /* Danger (Red) */
+  --color-danger: #d95b5b;
+  --color-danger-pale: #fce0e0;
+
+  /* Orange */
+  --color-orange: #e8883b;
+
+  /* Purple */
+  --color-purple: #9b6bb5;
+
+  /* Brown (Earth) */
+  --color-brown: #9c7a4f;
+  --color-brown-light: #c4a97a;
+  --color-brown-pale: #f0e6d2;
+
+  /* Text */
+  --color-text: #3d3425;
+  --color-text-mid: #7a6e5a;
+  --color-text-light: #a89e8a;
+  --color-white: #fffdf5;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 6px rgba(60, 50, 30, 0.08);
+  --shadow-md: 0 4px 16px rgba(60, 50, 30, 0.12);
+
+  /* Typography */
   --font-pixel: 'Press Start 2P', monospace;
+  --text-pixel-xs: 6px;
+  --text-pixel-sm: 7px;
+  --text-pixel-base: 8px;
+  --text-pixel-md: 9px;
+  --text-pixel-lg: 12px;
+  --text-pixel-xl: 15px;
+
+  /* Border Radii */
+  --radius-sm: 3px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+  --radius-2xl: 12px;
+
+  /* Animations */
+  --animate-bounce-plant: bounce-plant 2.5s ease-in-out infinite;
+  --animate-wilt: wilt 2s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 2s ease-in-out infinite;
+  --animate-live-pulse: live-pulse 2s ease-in-out infinite;
+  --animate-fade-in: fade-in 0.3s ease both;
+  --animate-slide-up: slide-up 0.25s ease;
+  --animate-sway: sway 3s ease-in-out infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
 }
 
 @font-face {
@@ -33,49 +99,7 @@ body {
   font-family: var(--font-pixel);
 }
 
-/* Pixel art plant animation */
-@keyframes bounce-plant {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes sway {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
-@keyframes float-up {
-  0% { transform: translateY(0); opacity: 1; }
-  100% { transform: translateY(-20px); opacity: 0; }
-}
-
-.animate-bounce-plant {
-  animation: bounce-plant 2s ease-in-out infinite;
-}
-
-.animate-sway {
-  animation: sway 3s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* Pixel border effect */
-.pixel-border {
-  box-shadow:
-    4px 0 0 0 var(--color-pixel-black),
-    -4px 0 0 0 var(--color-pixel-black),
-    0 4px 0 0 var(--color-pixel-black),
-    0 -4px 0 0 var(--color-pixel-black);
-}
-
-/* Scanline overlay */
+/* Scanline overlay — kept as utility */
 .scanlines::after {
   content: '';
   position: absolute;
