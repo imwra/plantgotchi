@@ -4,7 +4,25 @@ const now = new Date();
 const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600000).toISOString();
 const daysAgo = (d: number) => new Date(now.getTime() - d * 86400000).toISOString();
 
-export const DEMO_PLANTS: { plant: Plant; latestReading: SensorReading | null; recentCareLogs: CareLog[] }[] = [
+const CARE_NOTES_PT: Record<string, string> = {
+  "Liquid fertilizer": "Adubo liquido",
+  "Morning mist": "Borrifacao matinal",
+  "Removed dead fronds": "Removidas folhas mortas",
+  "Larger pot": "Vaso maior",
+};
+
+function localizePlants(plants: typeof DEMO_PLANTS_EN, locale: string) {
+  if (locale === "en") return plants;
+  return plants.map(p => ({
+    ...p,
+    recentCareLogs: p.recentCareLogs.map(log => ({
+      ...log,
+      notes: log.notes ? (CARE_NOTES_PT[log.notes] || log.notes) : null,
+    })),
+  }));
+}
+
+const DEMO_PLANTS_EN: { plant: Plant; latestReading: SensorReading | null; recentCareLogs: CareLog[] }[] = [
   {
     plant: {
       id: "demo-1", user_id: "demo", name: "Jiboia", species: "Epipremnum aureum",
@@ -135,9 +153,14 @@ const RECOMMENDATIONS_PT: Recommendation[] = [
   },
 ];
 
+export function getDemoPlants(locale: string) {
+  return localizePlants(DEMO_PLANTS_EN, locale);
+}
+
 export function getDemoRecommendations(locale: string): Recommendation[] {
   return locale === "en" ? RECOMMENDATIONS_EN : RECOMMENDATIONS_PT;
 }
 
 // Keep backward compat
+export const DEMO_PLANTS = DEMO_PLANTS_EN;
 export const DEMO_RECOMMENDATIONS = RECOMMENDATIONS_EN;

@@ -70,6 +70,7 @@
   "dash.addFirstPlant": "ADICIONE SUA PRIMEIRA PLANTA",
   "dash.add": "+ NOVA",
   "dash.footer": "PLANTGOTCHI \u2022 ESP32 + SENSOR DE SOLO \u2022 FEITO COM \u2764 EM \ud83c\udde7\ud83c\uddf7",
+  "dash.noLogsYet": "SEM REGISTROS DE CUIDADOS",
   "dash.dismiss": "DISPENSAR",
   "dash.careWater": "Regar",
   "dash.careFertilize": "Adubar",

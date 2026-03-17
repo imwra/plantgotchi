@@ -14,6 +14,12 @@ interface Recommendation {
 interface RecommendationsListProps {
   recommendations: Recommendation[];
   onDismissed: () => void;
+  labels?: {
+    dismiss?: string;
+    severityInfo?: string;
+    severityWarning?: string;
+    severityUrgent?: string;
+  };
 }
 
 const SEVERITY_COLORS: Record<string, { bg: string; border: string }> = {
@@ -22,9 +28,16 @@ const SEVERITY_COLORS: Record<string, { bg: string; border: string }> = {
   info: { bg: "#e8f5e9", border: "#27ae60" },
 };
 
-export default function RecommendationsList({ recommendations, onDismissed }: RecommendationsListProps) {
+export default function RecommendationsList({ recommendations, onDismissed, labels }: RecommendationsListProps) {
   const [dismissing, setDismissing] = useState<string | null>(null);
   const PIXEL_FONT = "'Press Start 2P', monospace";
+
+  const severityLabels: Record<string, string> = {
+    info: labels?.severityInfo || "INFO",
+    warning: labels?.severityWarning || "WARNING",
+    urgent: labels?.severityUrgent || "URGENT",
+  };
+  const dismissLabel = labels?.dismiss || "DISMISS";
 
   const active = recommendations.filter((r) => !r.acted_on);
   if (active.length === 0) return null;
@@ -64,7 +77,7 @@ export default function RecommendationsList({ recommendations, onDismissed }: Re
           >
             <div style={{ fontFamily: "monospace", fontSize: "0.75rem", flex: 1 }}>
               <span style={{ fontFamily: PIXEL_FONT, fontSize: "0.45rem", textTransform: "uppercase", color: colors.border }}>
-                {rec.severity}
+                {severityLabels[rec.severity] || rec.severity.toUpperCase()}
               </span>
               <br />
               {rec.message}
@@ -83,7 +96,7 @@ export default function RecommendationsList({ recommendations, onDismissed }: Re
                 whiteSpace: "nowrap",
               }}
             >
-              {dismissing === rec.id ? "..." : "DISMISS"}
+              {dismissing === rec.id ? "..." : dismissLabel}
             </button>
           </div>
         );

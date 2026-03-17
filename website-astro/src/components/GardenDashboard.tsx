@@ -8,7 +8,7 @@ import CareLogForm from "./CareLogForm";
 import ReadingForm from "./ReadingForm";
 import RecommendationsList from "./RecommendationsList";
 import CareHistory from "./CareHistory";
-import { DEMO_PLANTS, getDemoRecommendations } from "../lib/demo-data";
+import { DEMO_PLANTS, getDemoPlants, getDemoRecommendations } from "../lib/demo-data";
 
 const PIXEL_FONT = `"Press Start 2P", monospace`;
 
@@ -70,6 +70,7 @@ interface DashLabels {
   addFirstPlant: string;
   add: string;
   footer: string;
+  noLogsYet: string;
   dismiss: string;
   careWater: string;
   careFertilize: string;
@@ -108,6 +109,7 @@ const DEFAULT_DASH_LABELS: DashLabels = {
   addFirstPlant: "ADD YOUR FIRST PLANT",
   add: "+ ADD",
   footer: "PLANTGOTCHI \u2022 ESP32 + SOIL SENSOR \u2022 MADE WITH \u2764 IN \ud83c\udde7\ud83c\uddf7",
+  noLogsYet: "NO CARE LOGS YET",
   dismiss: "DISMISS",
   careWater: "Water",
   careFertilize: "Fertilize",
@@ -292,7 +294,8 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode, labels, locale }: { 
   useEffect(() => {
     if (!plant) return;
     if (demoMode) {
-      const demoEntry = DEMO_PLANTS.find(d => d.plant.id === plant.id);
+      const demoData = getDemoPlants(locale || "pt-br");
+      const demoEntry = demoData.find(d => d.plant.id === plant.id);
       setCareLogs(demoEntry?.recentCareLogs ?? []);
       setRecommendations(getDemoRecommendations(locale || "pt-br").filter(r => r.plant_id === plant.id));
       return;
@@ -402,7 +405,12 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode, labels, locale }: { 
           <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
             {"\u26a0\ufe0f"} {labels.recommendations}
           </div>
-          <RecommendationsList recommendations={recommendations} onDismissed={refreshDetails} />
+          <RecommendationsList recommendations={recommendations} onDismissed={refreshDetails} labels={{
+            dismiss: labels.dismiss,
+            severityInfo: labels.severityInfo,
+            severityWarning: labels.severityWarning,
+            severityUrgent: labels.severityUrgent,
+          }} />
         </div>
       )}
 
@@ -431,7 +439,17 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode, labels, locale }: { 
         <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
           {"\ud83d\udccb"} {labels.careHistory}
         </div>
-        <CareHistory logs={careLogs} />
+        <CareHistory logs={careLogs} labels={{
+          noLogsYet: labels.noLogsYet,
+          actionLabels: {
+            water: labels.careWater,
+            fertilize: labels.careFertilize,
+            prune: labels.carePrune,
+            repot: labels.careRepot,
+            mist: labels.careMist,
+            pest_treatment: labels.carePestTreatment,
+          },
+        }} />
       </div>
     </div>
   );
@@ -460,7 +478,8 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
 
   const fetchPlants = async () => {
     if (demoMode) {
-      const views = DEMO_PLANTS.map((d) => toPlantView(d.plant, d.latestReading, d.recentCareLogs));
+      const demoData = getDemoPlants(locale || "pt-br");
+      const views = demoData.map((d) => toPlantView(d.plant, d.latestReading, d.recentCareLogs));
       setPlants(views);
       setLoading(false);
       return;

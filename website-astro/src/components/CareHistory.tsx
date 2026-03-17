@@ -7,6 +7,10 @@ interface CareLog {
 
 interface CareHistoryProps {
   logs: CareLog[];
+  labels?: {
+    noLogsYet?: string;
+    actionLabels?: Record<string, string>;
+  };
 }
 
 const ACTION_ICONS: Record<string, string> = {
@@ -19,13 +23,15 @@ const ACTION_ICONS: Record<string, string> = {
   other: "📝",
 };
 
-export default function CareHistory({ logs }: CareHistoryProps) {
+export default function CareHistory({ logs, labels }: CareHistoryProps) {
   const PIXEL_FONT = "'Press Start 2P', monospace";
+  const noLogsText = labels?.noLogsYet || "NO CARE LOGS YET";
+  const actionLabels = labels?.actionLabels || {};
 
   if (logs.length === 0) {
     return (
       <div style={{ fontFamily: PIXEL_FONT, fontSize: "0.5rem", color: "#999", textAlign: "center", padding: "1rem" }}>
-        NO CARE LOGS YET
+        {noLogsText}
       </div>
     );
   }
@@ -46,7 +52,7 @@ export default function CareHistory({ logs }: CareHistoryProps) {
           <span style={{ fontSize: "1rem" }}>{ACTION_ICONS[log.action] || "📝"}</span>
           <div style={{ flex: 1 }}>
             <div style={{ fontFamily: PIXEL_FONT, fontSize: "0.45rem", textTransform: "capitalize" }}>
-              {log.action.replace("_", " ")}
+              {actionLabels[log.action] || log.action.replace("_", " ")}
             </div>
             {log.notes && (
               <div style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#666" }}>
