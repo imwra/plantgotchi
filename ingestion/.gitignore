@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# Keep raw/ and staged/ tracked — they're our archive
+# Only ignore the 'latest' symlink-style files
+raw/*/latest.csv
