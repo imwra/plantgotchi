@@ -56,6 +56,9 @@ export const POST: APIRoute = async ({ request }) => {
     moisture_max: moisture_max ?? 80,
     temp_min: temp_min ?? 15,
     temp_max: temp_max ?? 30,
+    garden_id: null,
+    catalog_id: null,
+    identification_confidence: null,
   };
 
   await createPlant(plant);
