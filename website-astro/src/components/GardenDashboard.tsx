@@ -8,7 +8,7 @@ import CareLogForm from "./CareLogForm";
 import ReadingForm from "./ReadingForm";
 import RecommendationsList from "./RecommendationsList";
 import CareHistory from "./CareHistory";
-import { DEMO_PLANTS, DEMO_RECOMMENDATIONS } from "../lib/demo-data";
+import { DEMO_PLANTS, getDemoRecommendations } from "../lib/demo-data";
 
 const PIXEL_FONT = `"Press Start 2P", monospace`;
 
@@ -44,7 +44,83 @@ const COLORS = {
   shadowMd: "rgba(60, 50, 30, 0.12)",
 };
 
-function HPBar({ value, max = 100 }: { value: number; max?: number }) {
+interface DashLabels {
+  subtitle: string;
+  plants: string;
+  happy: string;
+  needWater: string;
+  allPlants: string;
+  plantDetails: string;
+  tapPlant: string;
+  hp: string;
+  moisture: string;
+  temp: string;
+  light: string;
+  health: string;
+  watered: string;
+  noData: string;
+  statusHappy: string;
+  statusThirsty: string;
+  recommendations: string;
+  careHistory: string;
+  logReading: string;
+  logCare: string;
+  loading: string;
+  noPlantsYet: string;
+  addFirstPlant: string;
+  add: string;
+  footer: string;
+  dismiss: string;
+  careWater: string;
+  careFertilize: string;
+  carePrune: string;
+  careRepot: string;
+  careMist: string;
+  carePestTreatment: string;
+  severityInfo: string;
+  severityWarning: string;
+  severityUrgent: string;
+}
+
+const DEFAULT_DASH_LABELS: DashLabels = {
+  subtitle: "HOME GARDEN MONITOR v0.1",
+  plants: "PLANTS",
+  happy: "HAPPY",
+  needWater: "NEED WATER",
+  allPlants: "ALL PLANTS",
+  plantDetails: "PLANT DETAILS",
+  tapPlant: "TAP A PLANT\nTO VIEW DETAILS",
+  hp: "HP",
+  moisture: "MOISTURE",
+  temp: "TEMP",
+  light: "LIGHT",
+  health: "HEALTH",
+  watered: "WATERED",
+  noData: "NO DATA",
+  statusHappy: "HAPPY",
+  statusThirsty: "THIRSTY!",
+  recommendations: "RECOMMENDATIONS",
+  careHistory: "CARE HISTORY",
+  logReading: "LOG READING",
+  logCare: "LOG CARE",
+  loading: "LOADING GARDEN...",
+  noPlantsYet: "NO PLANTS YET",
+  addFirstPlant: "ADD YOUR FIRST PLANT",
+  add: "+ ADD",
+  footer: "PLANTGOTCHI \u2022 ESP32 + SOIL SENSOR \u2022 MADE WITH \u2764 IN \ud83c\udde7\ud83c\uddf7",
+  dismiss: "DISMISS",
+  careWater: "Water",
+  careFertilize: "Fertilize",
+  carePrune: "Prune",
+  careRepot: "Repot",
+  careMist: "Mist",
+  carePestTreatment: "Pest Treatment",
+  severityInfo: "INFO",
+  severityWarning: "WARNING",
+  severityUrgent: "URGENT",
+};
+
+function HPBar({ value, max = 100, labels }: { value: number; max?: number; labels: DashLabels }) {
   const pct = Math.round((value / max) * 100);
   const color = pct > 60 ? COLORS.primary : pct > 30 ? COLORS.sun : COLORS.danger;
   const paleBg = pct > 60 ? COLORS.primaryPale : pct > 30 ? COLORS.sunPale : COLORS.dangerPale;
@@ -53,7 +129,7 @@ function HPBar({ value, max = 100 }: { value: number; max?: number }) {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid }}>HP</span>
+      <span style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid }}>{labels.hp}</span>
       <div style={{
         display: "flex", gap: 2, padding: 3,
         background: paleBg, borderRadius: 3,
@@ -70,14 +146,14 @@ function HPBar({ value, max = 100 }: { value: number; max?: number }) {
   );
 }
 
-function MoistureBar({ value }: { value: number | null }) {
+function MoistureBar({ value, labels }: { value: number | null; labels: DashLabels }) {
   if (value === null) return (
     <div style={{
       fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textLight,
       background: COLORS.brownPale, padding: "3px 8px", borderRadius: 3,
       border: `1px dashed ${COLORS.brownLight}`, display: "inline-block",
     }}>
-      NO DATA
+      {labels.noData}
     </div>
   );
   const segments = 8;
@@ -104,11 +180,11 @@ function MoistureBar({ value }: { value: number | null }) {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, labels }: { status: string; labels: DashLabels }) {
   const config: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-    happy: { label: "HAPPY", color: COLORS.primary, bg: COLORS.primaryPale, icon: "♥" },
-    thirsty: { label: "THIRSTY!", color: COLORS.danger, bg: COLORS.dangerPale, icon: "💧" },
-    unknown: { label: "NO DATA", color: COLORS.brown, bg: COLORS.brownPale, icon: "?" },
+    happy: { label: labels.statusHappy, color: COLORS.primary, bg: COLORS.primaryPale, icon: "\u2665" },
+    thirsty: { label: labels.statusThirsty, color: COLORS.danger, bg: COLORS.dangerPale, icon: "\ud83d\udca7" },
+    unknown: { label: labels.noData, color: COLORS.brown, bg: COLORS.brownPale, icon: "?" },
   };
   const c = config[status] || config.unknown;
 
@@ -126,7 +202,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: () => void; isSelected: boolean }) {
+function PlantCard({ plant, onClick, isSelected, labels }: { plant: PlantView; onClick: () => void; isSelected: boolean; labels: DashLabels }) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -161,7 +237,7 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
             {plant.species}
           </div>
         </div>
-        <StatusBadge status={plant.status} />
+        <StatusBadge status={plant.status} labels={labels} />
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
@@ -174,9 +250,9 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
           {plant.emoji}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <HPBar value={plant.hp} />
+          <HPBar value={plant.hp} labels={labels} />
           <div style={{ height: 5 }} />
-          <MoistureBar value={plant.moisture} />
+          <MoistureBar value={plant.moisture} labels={labels} />
         </div>
       </div>
 
@@ -186,13 +262,13 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
             <span style={{
               fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid,
               background: COLORS.sunPale, padding: "2px 6px", borderRadius: 3,
-            }}>🌡 {plant.temp}°</span>
+            }}>{"\ud83c\udf21"} {plant.temp}{"\u00b0"}</span>
           )}
           {plant.lightLabel !== "unknown" && (
             <span style={{
               fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid,
               background: COLORS.sunPale, padding: "2px 6px", borderRadius: 3,
-            }}>☀ {plant.lightLabel.toUpperCase()}</span>
+            }}>{"\u2600"} {plant.lightLabel.toUpperCase()}</span>
           )}
         </div>
       </div>
@@ -202,14 +278,14 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
           marginTop: 10, paddingTop: 8, borderTop: `1px solid ${COLORS.borderLight}`,
           fontFamily: PIXEL_FONT, fontSize: 6, color: COLORS.textLight,
         }}>
-          💧 WATERED {new Date(plant.lastWatered).toLocaleDateString().toUpperCase()}
+          {"\ud83d\udca7"} {labels.watered} {new Date(plant.lastWatered).toLocaleDateString().toUpperCase()}
         </div>
       )}
     </div>
   );
 }
 
-function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView | undefined; onClose?: () => void; onRefresh: () => void; demoMode?: boolean }) {
+function DetailPanel({ plant, onClose, onRefresh, demoMode, labels, locale }: { plant: PlantView | undefined; onClose?: () => void; onRefresh: () => void; demoMode?: boolean; labels: DashLabels; locale?: string }) {
   const [careLogs, setCareLogs] = useState<CareLog[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
@@ -218,7 +294,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
     if (demoMode) {
       const demoEntry = DEMO_PLANTS.find(d => d.plant.id === plant.id);
       setCareLogs(demoEntry?.recentCareLogs ?? []);
-      setRecommendations(DEMO_RECOMMENDATIONS.filter(r => r.plant_id === plant.id));
+      setRecommendations(getDemoRecommendations(locale || "pt-br").filter(r => r.plant_id === plant.id));
       return;
     }
     const fetchDetails = async () => {
@@ -230,7 +306,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       if (recsRes.ok) setRecommendations(await recsRes.json());
     };
     fetchDetails();
-  }, [plant?.id, demoMode]);
+  }, [plant?.id, demoMode, locale]);
 
   const refreshDetails = async () => {
     if (!plant) return;
@@ -244,6 +320,8 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
     if (recsRes.ok) setRecommendations(await recsRes.json());
   };
 
+  const tapPlantLines = labels.tapPlant.split("\n");
+
   if (!plant) return (
     <div style={{
       background: COLORS.bgCard, border: `2px solid ${COLORS.borderLight}`,
@@ -251,9 +329,11 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       minHeight: 240, textAlign: "center", boxShadow: `0 2px 8px ${COLORS.shadow}`,
     }}>
-      <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>🌱</div>
+      <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.4 }}>{"\ud83c\udf31"}</div>
       <div style={{ fontFamily: PIXEL_FONT, fontSize: 8, color: COLORS.textLight, lineHeight: 2.2 }}>
-        TAP A PLANT<br />TO VIEW DETAILS
+        {tapPlantLines.map((line, i) => (
+          <span key={i}>{line}{i < tapPlantLines.length - 1 && <br />}</span>
+        ))}
       </div>
     </div>
   );
@@ -271,7 +351,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
           fontFamily: PIXEL_FONT, fontSize: 8, color: COLORS.textMid,
           cursor: "pointer", width: 28, height: 28, display: "flex",
           alignItems: "center", justifyContent: "center", padding: 0,
-        }}>✕</button>
+        }}>{"\u2715"}</button>
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
@@ -290,17 +370,17 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
           <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textLight, marginBottom: 5 }}>
             {plant.species}
           </div>
-          <StatusBadge status={plant.status} />
+          <StatusBadge status={plant.status} labels={labels} />
         </div>
       </div>
 
       {/* Stats grid */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 14 }}>
         {[
-          { label: "MOISTURE", value: plant.moisture !== null ? `${plant.moisture}%` : "—", icon: "💧", bg: COLORS.waterPale, color: COLORS.waterDark },
-          { label: "TEMP", value: plant.temp !== null ? `${plant.temp}°C` : "—", icon: "🌡", bg: COLORS.sunPale, color: COLORS.brown },
-          { label: "LIGHT", value: plant.lightLabel !== "unknown" ? plant.lightLabel.toUpperCase() : "—", icon: "☀️", bg: COLORS.sunPale, color: COLORS.brown },
-          { label: "HEALTH", value: `${plant.hp}/100`, icon: "♥", bg: COLORS.primaryPale, color: COLORS.primaryDark },
+          { label: labels.moisture, value: plant.moisture !== null ? `${plant.moisture}%` : "\u2014", icon: "\ud83d\udca7", bg: COLORS.waterPale, color: COLORS.waterDark },
+          { label: labels.temp, value: plant.temp !== null ? `${plant.temp}\u00b0C` : "\u2014", icon: "\ud83c\udf21", bg: COLORS.sunPale, color: COLORS.brown },
+          { label: labels.light, value: plant.lightLabel !== "unknown" ? plant.lightLabel.toUpperCase() : "\u2014", icon: "\u2600\ufe0f", bg: COLORS.sunPale, color: COLORS.brown },
+          { label: labels.health, value: `${plant.hp}/100`, icon: "\u2665", bg: COLORS.primaryPale, color: COLORS.primaryDark },
         ].map(stat => (
           <div key={stat.label} style={{
             background: stat.bg, borderRadius: 8, padding: 10,
@@ -320,7 +400,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       {recommendations.length > 0 && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-            ⚠️ RECOMMENDATIONS
+            {"\u26a0\ufe0f"} {labels.recommendations}
           </div>
           <RecommendationsList recommendations={recommendations} onDismissed={refreshDetails} />
         </div>
@@ -330,7 +410,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       {!demoMode && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-            📊 LOG READING
+            {"\ud83d\udcca"} {labels.logReading}
           </div>
           <ReadingForm plantId={plant.id} onSubmitted={refreshDetails} />
         </div>
@@ -340,7 +420,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       {!demoMode && (
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-            🌱 LOG CARE
+            {"\ud83c\udf31"} {labels.logCare}
           </div>
           <CareLogForm plantId={plant.id} onLogged={refreshDetails} />
         </div>
@@ -349,7 +429,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
       {/* Care History */}
       <div>
         <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-          📋 CARE HISTORY
+          {"\ud83d\udccb"} {labels.careHistory}
         </div>
         <CareHistory logs={careLogs} />
       </div>
@@ -363,9 +443,11 @@ interface GardenDashboardProps {
   demoBannerText?: string;
   locale?: string;
   navLabels?: Record<string, string>;
+  dashLabels?: DashLabels;
 }
 
-export default function GardenDashboard({ userName, demoMode, demoBannerText, locale, navLabels }: GardenDashboardProps) {
+export default function GardenDashboard({ userName, demoMode, demoBannerText, locale, navLabels, dashLabels }: GardenDashboardProps) {
+  const labels = dashLabels || DEFAULT_DASH_LABELS;
   const [plants, setPlants] = useState<PlantView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -478,10 +560,10 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
         }}>
           <div>
             <div className="dash-title" style={{ color: COLORS.primaryDark, letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 22 }}>🌱</span> PLANTGOTCHI
+              <span style={{ fontSize: 22 }}>{"\ud83c\udf31"}</span> PLANTGOTCHI
             </div>
             <div style={{ fontSize: 6, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 }}>
-              HOME GARDEN MONITOR v0.1
+              {labels.subtitle}
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -495,7 +577,7 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
                   boxShadow: `1px 1px 0 ${COLORS.primaryDark}`,
                 }}
               >
-                + ADD
+                {labels.add}
               </button>
             )}
             <div style={{
@@ -511,9 +593,9 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
         {/* Tags */}
         <div className="dash-tags" style={{ marginBottom: 16 }}>
           {[
-            { label: `${plants.length} PLANTS`, bg: COLORS.primaryPale, color: COLORS.primaryDark, icon: "🌿" },
-            { label: `${happyCount} HAPPY`, bg: COLORS.primaryPale, color: COLORS.primary, icon: "♥" },
-            ...(alertCount > 0 ? [{ label: `${alertCount} NEED WATER`, bg: COLORS.dangerPale, color: COLORS.danger, icon: "⚠️" }] : []),
+            { label: `${plants.length} ${labels.plants}`, bg: COLORS.primaryPale, color: COLORS.primaryDark, icon: "\ud83c\udf3f" },
+            { label: `${happyCount} ${labels.happy}`, bg: COLORS.primaryPale, color: COLORS.primary, icon: "\u2665" },
+            ...(alertCount > 0 ? [{ label: `${alertCount} ${labels.needWater}`, bg: COLORS.dangerPale, color: COLORS.danger, icon: "\u26a0\ufe0f" }] : []),
           ].map(t => (
             <div key={t.label} style={{
               fontFamily: PIXEL_FONT, fontSize: 7, background: t.bg, color: t.color,
@@ -528,8 +610,8 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
         {/* Loading state */}
         {loading && (
           <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-            <div style={{ fontSize: "2rem", marginBottom: "1rem", animation: "pulse 1.5s ease-in-out infinite" }}>🌱</div>
-            <p style={{ fontFamily: PIXEL_FONT, fontSize: "0.7rem", color: COLORS.textLight }}>LOADING GARDEN...</p>
+            <div style={{ fontSize: "2rem", marginBottom: "1rem", animation: "pulse 1.5s ease-in-out infinite" }}>{"\ud83c\udf31"}</div>
+            <p style={{ fontFamily: PIXEL_FONT, fontSize: "0.7rem", color: COLORS.textLight }}>{labels.loading}</p>
           </div>
         )}
 
@@ -543,8 +625,8 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
         {/* Empty state */}
         {!loading && !error && plants.length === 0 && (
           <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🌱</div>
-            <p style={{ fontFamily: PIXEL_FONT, fontSize: "0.8rem", marginBottom: "1rem", color: COLORS.text }}>NO PLANTS YET</p>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>{"\ud83c\udf31"}</div>
+            <p style={{ fontFamily: PIXEL_FONT, fontSize: "0.8rem", marginBottom: "1rem", color: COLORS.text }}>{labels.noPlantsYet}</p>
             <button
               onClick={() => setShowAddModal(true)}
               style={{
@@ -554,7 +636,7 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
                 boxShadow: `2px 2px 0 ${COLORS.primaryDark}`,
               }}
             >
-              ADD YOUR FIRST PLANT
+              {labels.addFirstPlant}
             </button>
           </div>
         )}
@@ -564,12 +646,12 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
           <div className="main-layout">
             <div>
               <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textLight, marginBottom: 10 }}>
-                ALL PLANTS ({plants.length})
+                {labels.allPlants} ({plants.length})
               </div>
               <div className="plant-grid">
                 {plants.map((p, i) => (
                   <div key={p.id} style={{ animation: `fadeIn 0.3s ease ${i * 0.05}s both` }}>
-                    <PlantCard plant={p} isSelected={selectedId === p.id}
+                    <PlantCard plant={p} isSelected={selectedId === p.id} labels={labels}
                       onClick={() => { setSelectedId(p.id); setShowDetail(true); }} />
                   </div>
                 ))}
@@ -578,9 +660,9 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
 
             <div className="detail-desktop">
               <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textLight, marginBottom: 10 }}>
-                PLANT DETAILS
+                {labels.plantDetails}
               </div>
-              <DetailPanel plant={selectedPlant} onRefresh={fetchPlants} demoMode={demoMode} />
+              <DetailPanel plant={selectedPlant} onRefresh={fetchPlants} demoMode={demoMode} labels={labels} locale={locale} />
             </div>
           </div>
         )}
@@ -598,7 +680,7 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
             overflowY: "auto", animation: "slideUp 0.25s ease",
           }}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: COLORS.borderLight, margin: "8px auto 12px" }} />
-            <DetailPanel plant={selectedPlant} onClose={() => setShowDetail(false)} onRefresh={fetchPlants} demoMode={demoMode} />
+            <DetailPanel plant={selectedPlant} onClose={() => setShowDetail(false)} onRefresh={fetchPlants} demoMode={demoMode} labels={labels} locale={locale} />
           </div>
         </div>
       )}
@@ -610,7 +692,7 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText, lo
         textAlign: "center", padding: "16px 16px 20px",
         fontFamily: PIXEL_FONT, fontSize: 6, color: COLORS.textLight, letterSpacing: 0.5,
       }}>
-        PLANTGOTCHI • ESP32 + SOIL SENSOR • MADE WITH ♥ IN 🇧🇷
+        {labels.footer}
       </div>
     </div>
   );

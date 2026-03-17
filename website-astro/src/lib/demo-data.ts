@@ -99,7 +99,7 @@ export const DEMO_PLANTS: { plant: Plant; latestReading: SensorReading | null; r
   },
 ];
 
-export const DEMO_RECOMMENDATIONS: Recommendation[] = [
+const RECOMMENDATIONS_EN: Recommendation[] = [
   {
     id: "rec-1", plant_id: "demo-2", source: "rules",
     message: "Moisture is below minimum threshold (31% < 40%). Consider watering soon.",
@@ -116,3 +116,28 @@ export const DEMO_RECOMMENDATIONS: Recommendation[] = [
     severity: "info", acted_on: false, created_at: hoursAgo(6),
   },
 ];
+
+const RECOMMENDATIONS_PT: Recommendation[] = [
+  {
+    id: "rec-1", plant_id: "demo-2", source: "rules",
+    message: "Umidade abaixo do limite minimo (31% < 40%). Considere regar em breve.",
+    severity: "warning", acted_on: false, created_at: hoursAgo(1),
+  },
+  {
+    id: "rec-2", plant_id: "demo-1", source: "claude",
+    message: "Sua Jiboia esta otima! Mantenha o cronograma atual de rega a cada 2-3 dias.",
+    severity: "info", acted_on: false, created_at: hoursAgo(12),
+  },
+  {
+    id: "rec-3", plant_id: "demo-3", source: "rules",
+    message: "Nivel de luz muito baixo (180 lux). Considere mover para perto de uma janela.",
+    severity: "info", acted_on: false, created_at: hoursAgo(6),
+  },
+];
+
+export function getDemoRecommendations(locale: string): Recommendation[] {
+  return locale === "en" ? RECOMMENDATIONS_EN : RECOMMENDATIONS_PT;
+}
+
+// Keep backward compat
+export const DEMO_RECOMMENDATIONS = RECOMMENDATIONS_EN;
