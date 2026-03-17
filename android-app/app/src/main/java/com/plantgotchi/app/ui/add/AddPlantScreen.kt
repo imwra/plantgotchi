@@ -43,9 +43,13 @@ import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
 import com.plantgotchi.app.R
 import com.posthog.PostHog
-import com.plantgotchi.app.model.Plant
+import com.plantgotchi.app.BuildConfig
 import com.plantgotchi.app.ui.theme.Green
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.*
 import java.util.UUID
 
 private val EMOJI_OPTIONS = listOf(
@@ -269,26 +273,31 @@ fun AddPlantScreen(
             Button(
                 onClick = {
                     if (name.isBlank()) return@Button
-                    val plantId = UUID.randomUUID().toString()
                     scope.launch {
-                        PlantgotchiApp.db.plantDao().insert(
-                            Plant(
-                                id = plantId,
-                                userId = userId,
-                                name = name.trim(),
-                                species = species.trim().ifBlank { null },
-                                emoji = selectedEmoji,
-                                moistureMin = moistureMin.toInt(),
-                                moistureMax = moistureMax.toInt(),
-                                tempMin = tempMin.toDouble(),
-                                tempMax = tempMax.toDouble(),
-                                lightPreference = lightPreference,
-                            )
-                        )
-                        onPlantAdded(plantId)
-                        val props = mutableMapOf<String, Any>("plant_id" to plantId)
-                        species.trim().ifBlank { null }?.let { props["species"] = it }
-                        PostHog.capture("plant_added", properties = props)
+                        try {
+                            val app = PlantgotchiApp.instance
+                            val response = app.httpClient.post("${BuildConfig.API_BASE_URL}/api/plants") {
+                                contentType(ContentType.Application.Json)
+                                setBody(buildJsonObject {
+                                    put("name", name.trim())
+                                    put("species", species.trim().ifBlank { null }?.let { JsonPrimitive(it) } ?: JsonNull)
+                                    put("emoji", selectedEmoji)
+                                    put("light_preference", lightPreference)
+                                    put("moisture_min", moistureMin.toInt())
+                                    put("moisture_max", moistureMax.toInt())
+                                    put("temp_min", tempMin.toInt())
+                                    put("temp_max", tempMax.toInt())
+                                }.toString())
+                            }
+                            if (response.status == HttpStatusCode.Created) {
+                                val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+                                val plantId = body["id"]?.jsonPrimitive?.content ?: return@launch
+                                onPlantAdded(plantId)
+                                PostHog.capture("plant_added", properties = mapOf("plant_id" to plantId))
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

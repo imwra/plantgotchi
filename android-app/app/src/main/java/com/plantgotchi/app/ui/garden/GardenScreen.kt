@@ -41,12 +41,16 @@ import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
 import com.plantgotchi.app.R
 import com.posthog.PostHog
+import com.plantgotchi.app.BuildConfig
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.SensorReading
 import com.plantgotchi.app.ui.theme.Green
 import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.delay
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.*
 
 /**
  * Main garden dashboard — displays a grid of plant cards.
@@ -62,12 +66,38 @@ fun GardenScreen(
     onScanClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
-    val plants by PlantgotchiApp.db.plantDao()
-        .getPlantsByUser(userId)
-        .collectAsState(initial = emptyList())
-
+    var plants by remember { mutableStateOf<List<Plant>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    suspend fun fetchPlants() {
+        try {
+            val app = PlantgotchiApp.instance
+            val response = app.httpClient.get("${BuildConfig.API_BASE_URL}/api/plants")
+            if (response.status == HttpStatusCode.OK) {
+                val json = Json.parseToJsonElement(response.bodyAsText()).jsonArray
+                plants = json.map { entry ->
+                    val p = entry.jsonObject["plant"]!!.jsonObject
+                    Plant(
+                        id = p["id"]!!.jsonPrimitive.content,
+                        userId = p["user_id"]!!.jsonPrimitive.content,
+                        name = p["name"]!!.jsonPrimitive.content,
+                        species = p["species"]?.jsonPrimitive?.contentOrNull,
+                        emoji = p["emoji"]?.jsonPrimitive?.contentOrNull ?: "\uD83C\uDF31",
+                        moistureMin = p["moisture_min"]?.jsonPrimitive?.intOrNull ?: 30,
+                        moistureMax = p["moisture_max"]?.jsonPrimitive?.intOrNull ?: 80,
+                        tempMin = p["temp_min"]?.jsonPrimitive?.doubleOrNull ?: 15.0,
+                        tempMax = p["temp_max"]?.jsonPrimitive?.doubleOrNull ?: 30.0,
+                        lightPreference = p["light_preference"]?.jsonPrimitive?.contentOrNull ?: "medium",
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    LaunchedEffect(Unit) { fetchPlants() }
 
     // Track garden view when plants change
     LaunchedEffect(plants) {
@@ -124,8 +154,7 @@ fun GardenScreen(
             onRefresh = {
                 scope.launch {
                     isRefreshing = true
-                    // In a real app, this would trigger Turso sync
-                    delay(1000)
+                    fetchPlants()
                     isRefreshing = false
                 }
             },

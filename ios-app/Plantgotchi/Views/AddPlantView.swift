@@ -223,29 +223,60 @@ struct AddPlantView: View {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         guard !trimmedName.isEmpty else { return }
 
-        let plant = Plant(
-            userId: userId,
-            name: trimmedName,
-            species: species.isEmpty ? nil : species,
-            emoji: selectedEmoji,
-            moistureMin: Int(moistureMin),
-            moistureMax: Int(moistureMax),
-            tempMin: tempMin,
-            tempMax: tempMax,
-            lightPreference: lightPreference
-        )
+        Task {
+            do {
+                let baseURL: String
+                if let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
+                   let config = NSDictionary(contentsOfFile: configPath),
+                   let url = config["APIBaseURL"] as? String, !url.isEmpty {
+                    baseURL = url
+                } else {
+                    baseURL = "http://localhost:4321"
+                }
 
-        do {
-            try AppDatabase.shared.savePlant(plant)
-            PostHogSDK.shared.capture("plant_added", properties: [
-                "plant_id": plant.id,
-                "species": plant.species ?? "",
-            ])
-            onSave?()
-            dismiss()
-        } catch {
-            errorMessage = "\(S.failedToSave): \(error.localizedDescription)"
-            showError = true
+                let body: [String: Any] = [
+                    "name": trimmedName,
+                    "species": species.isEmpty ? NSNull() : species,
+                    "emoji": selectedEmoji,
+                    "light_preference": lightPreference,
+                    "moisture_min": Int(moistureMin),
+                    "moisture_max": Int(moistureMax),
+                    "temp_min": Int(tempMin),
+                    "temp_max": Int(tempMax),
+                ]
+                let jsonData = try JSONSerialization.data(withJSONObject: body)
+
+                let client = AuthenticatedHTTPClient(baseURL: baseURL)
+                let (data, httpResponse) = try await client.request(
+                    path: "/api/plants",
+                    method: "POST",
+                    body: jsonData
+                )
+
+                guard httpResponse.statusCode == 201 else {
+                    errorMessage = S.failedToSave
+                    showError = true
+                    return
+                }
+
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let plantId = json["id"] as? String {
+                    PostHogSDK.shared.capture("plant_added", properties: [
+                        "plant_id": plantId,
+                        "species": species.isEmpty ? "" : species,
+                    ])
+                }
+
+                await MainActor.run {
+                    onSave?()
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = "\(S.failedToSave): \(error.localizedDescription)"
+                    showError = true
+                }
+            }
         }
     }
 }
