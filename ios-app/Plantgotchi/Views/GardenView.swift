@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import GRDB
 import PostHog
@@ -148,3 +149,4 @@ struct GardenView: View {
         .environmentObject(BLEManager())
         .environmentObject(ThemeManager.shared)
 }
+#endif

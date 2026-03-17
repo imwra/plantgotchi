@@ -1,7 +1,10 @@
 import SwiftUI
+#if os(iOS)
 import BackgroundTasks
+#endif
 import PostHog
 
+#if os(iOS)
 @main
 struct PlantgotchiApp: App {
     @StateObject private var bleManager = BLEManager()
@@ -52,3 +55,10 @@ struct PlantgotchiApp: App {
         }
     }
 }
+#else
+// macOS stub — app entry point is iOS only; macOS target is for SPM testing only.
+@main
+struct PlantgotchiApp {
+    static func main() {}
+}
+#endif

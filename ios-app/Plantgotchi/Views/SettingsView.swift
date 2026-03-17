@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -335,3 +336,4 @@ struct SettingsView: View {
         dismiss()
     }
 }
+#endif
