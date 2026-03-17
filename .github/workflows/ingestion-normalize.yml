@@ -1,0 +1,86 @@
+name: Plant Data Ingestion — Normalize
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: 'Comma-separated source names (leave empty for all)'
+        required: false
+        default: ''
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ingestion/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ingestion
+        run: npm ci
+
+      - name: Download Kushy dataset
+        working-directory: ingestion
+        run: |
+          mkdir -p raw/kushy
+          curl -L -o raw/kushy/latest.csv \
+            "https://raw.githubusercontent.com/kushyapp/cannabis-dataset/master/Dataset/Strains/strains-kushy_api.csv" \
+            || echo "WARNING: Kushy download failed"
+
+      - name: Download Kaggle dataset
+        working-directory: ingestion
+        run: |
+          mkdir -p raw/kaggle
+          curl -L -o raw/kaggle/latest.csv \
+            "https://raw.githubusercontent.com/kingburrito666/cannabis-strains/master/cannabis.csv" \
+            || echo "WARNING: Kaggle download failed"
+
+      - name: Archive raw downloads
+        working-directory: ingestion
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          for source in kushy kaggle; do
+            if [ -f "raw/${source}/latest.csv" ]; then
+              cp "raw/${source}/latest.csv" "raw/${source}/${DATE}.csv"
+            fi
+          done
+
+      - name: Normalize data
+        working-directory: ingestion
+        run: |
+          ARGS="${{ github.event.inputs.sources }}"
+          if [ -n "$ARGS" ]; then
+            npx tsx run.ts normalize $(echo "$ARGS" | tr ',' ' ')
+          else
+            npx tsx run.ts normalize
+          fi
+
+      - name: Create PR with normalized data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="ingestion/${DATE}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add ingestion/raw/ ingestion/staged/
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "data: plant catalog ingestion ${DATE}"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Plant data ingestion ${DATE}" \
+            --body "$(cat ingestion/staged/report.md)" \
+            --base main \
+            --label "ingestion"
