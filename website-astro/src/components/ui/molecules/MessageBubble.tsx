@@ -12,6 +12,7 @@ export interface MessageBubbleProps {
   type: 'text' | 'image';
   isMine: boolean;
   timestamp: string;
+  timestampRaw?: string;
   senderName: string;
   senderEmoji: string;
   reactions: Reaction[];
@@ -24,6 +25,7 @@ export default function MessageBubble({
   type,
   isMine,
   timestamp,
+  timestampRaw,
   senderName,
   senderEmoji,
   reactions,
@@ -44,6 +46,7 @@ export default function MessageBubble({
           type={type}
           isMine={isMine}
           timestamp={timestamp}
+          timestampRaw={timestampRaw}
           senderName={senderName}
         />
 

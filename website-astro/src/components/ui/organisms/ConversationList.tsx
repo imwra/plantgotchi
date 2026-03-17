@@ -6,6 +6,7 @@ export interface Conversation {
   name: string;
   lastMessage: string;
   lastMessageTime: string;
+  lastMessageTimeRaw?: string;
   unreadCount: number;
   isGroup: boolean;
   memberCount: number;
@@ -74,6 +75,7 @@ export default function ConversationList({ conversations, activeId, onSelect, on
                 name={conv.name}
                 lastMessage={conv.lastMessage}
                 lastMessageTime={conv.lastMessageTime}
+                lastMessageTimeRaw={conv.lastMessageTimeRaw}
                 unreadCount={conv.unreadCount}
                 isGroup={conv.isGroup}
                 isActive={conv.id === activeId}

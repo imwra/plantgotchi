@@ -4,6 +4,7 @@ import NewConversationModal, { type SearchUser } from './NewConversationModal';
 import SiteNav from './SiteNav';
 import type { Conversation } from './ConversationList';
 import type { Message } from './ConversationView';
+import { relativeTime } from '../../../lib/time-utils';
 
 // ---------------------------------------------------------------------------
 // ChatLabels
@@ -93,7 +94,8 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
           id: c.id,
           name: c.name,
           lastMessage: c.last_message ?? '',
-          lastMessageTime: c.last_message_at ?? '',
+          lastMessageTime: c.last_message_at ? relativeTime(c.last_message_at) : '',
+          lastMessageTimeRaw: c.last_message_at ?? '',
           unreadCount: c.unread_count ?? 0,
           isGroup: c.is_group ?? false,
           memberCount: c.member_count ?? 2,
@@ -135,14 +137,15 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
           content: m.content,
           type: m.type ?? 'text',
           isMine: m.is_mine ?? false,
-          timestamp: m.created_at,
+          timestamp: m.created_at ? relativeTime(m.created_at) : '',
+          timestampRaw: m.created_at ?? '',
           senderName: m.sender_name ?? '',
           senderEmoji: m.sender_emoji ?? '',
           reactions: (m.reactions ?? []).map((r: any) => ({ emoji: r.emoji, count: r.count, reacted: r.reacted })),
         }));
         setMessages(msgs);
         if (msgs.length > 0) {
-          setLastMessageTime(msgs[msgs.length - 1].timestamp);
+          setLastMessageTime(msgs[msgs.length - 1].timestampRaw);
         }
         setTypingUsers(data.typers ?? []);
       } catch {
@@ -193,13 +196,14 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
                   content: m.content,
                   type: m.type ?? 'text',
                   isMine: m.is_mine ?? false,
-                  timestamp: m.created_at,
+                  timestamp: m.created_at ? relativeTime(m.created_at) : '',
+                  timestampRaw: m.created_at ?? '',
                   senderName: m.sender_name ?? '',
                   senderEmoji: m.sender_emoji ?? '',
                   reactions: (m.reactions ?? []).map((r: any) => ({ emoji: r.emoji, count: r.count, reacted: r.reacted })),
                 }));
                 setMessages((prev) => [...prev, ...newMsgs]);
-                setLastMessageTime(newMsgs[newMsgs.length - 1].timestamp);
+                setLastMessageTime(newMsgs[newMsgs.length - 1].timestampRaw);
               }
               setTypingUsers(data.typers ?? []);
             }
@@ -239,7 +243,8 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
             content: msg.content,
             type: msg.type ?? 'text',
             isMine: true,
-            timestamp: msg.created_at,
+            timestamp: msg.created_at ? relativeTime(msg.created_at) : '',
+            timestampRaw: msg.created_at ?? '',
             senderName: userName,
             senderEmoji: msg.sender_emoji ?? '',
             reactions: [],

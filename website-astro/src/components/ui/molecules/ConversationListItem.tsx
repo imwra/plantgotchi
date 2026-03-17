@@ -1,10 +1,12 @@
 import clsx from 'clsx';
 import UnreadBadge from '../atoms/UnreadBadge';
+import { fullDateTime } from '../../../lib/time-utils';
 
 export interface ConversationListItemProps {
   name: string;
   lastMessage: string;
   lastMessageTime: string;
+  lastMessageTimeRaw?: string;
   unreadCount: number;
   isGroup: boolean;
   isActive?: boolean;
@@ -16,6 +18,7 @@ export default function ConversationListItem({
   name,
   lastMessage,
   lastMessageTime,
+  lastMessageTimeRaw,
   unreadCount,
   isGroup,
   isActive,
@@ -57,7 +60,7 @@ export default function ConversationListItem({
       </div>
 
       <div className="flex-shrink-0 flex flex-col items-end gap-1">
-        <span className="font-pixel text-pixel-xs text-text-mid">{lastMessageTime}</span>
+        <span className="font-pixel text-pixel-xs text-text-mid" title={lastMessageTimeRaw ? fullDateTime(lastMessageTimeRaw) : undefined}>{lastMessageTime}</span>
         <UnreadBadge count={unreadCount} />
       </div>
     </button>

@@ -10,6 +10,7 @@ export interface Message {
   type: 'text' | 'image';
   isMine: boolean;
   timestamp: string;
+  timestampRaw?: string;
   senderName: string;
   senderEmoji: string;
   reactions: Reaction[];
@@ -102,6 +103,7 @@ export default function ConversationView({
             type={msg.type}
             isMine={msg.isMine}
             timestamp={msg.timestamp}
+            timestampRaw={msg.timestampRaw}
             senderName={msg.senderName}
             senderEmoji={msg.senderEmoji}
             reactions={msg.reactions}
