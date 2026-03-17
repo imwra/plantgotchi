@@ -1,6 +1,5 @@
 #if os(iOS)
 import SwiftUI
-import PostHog
 
 /// Detailed view for a single plant showing sensor readings, care log,
 /// recommendations, and quick-action buttons.
@@ -47,6 +46,9 @@ struct PlantDetailView: View {
         .background(PlantgotchiTheme.background.ignoresSafeArea())
         .navigationTitle(plant?.name ?? S.plant)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            Analytics.track("screen_viewed", properties: ["screen_name": "plant_detail"])
+        }
         .task {
             await loadData()
         }
@@ -271,10 +273,12 @@ struct PlantDetailView: View {
                     recentCareLogs: careLogs
                 )
             }
-            PostHogSDK.shared.capture("recommendation_viewed", properties: [
-                "plant_id": plantId,
-                "recommendation_count": recommendations.count,
-            ])
+            if let plant = plant {
+                Analytics.track("plant_viewed", properties: ["plant_id": plant.id, "species": plant.species ?? ""])
+            }
+            for rec in recommendations {
+                Analytics.track("care_recommendation_viewed", properties: ["plant_id": plantId, "severity": rec.severity])
+            }
         } catch {
             print("[PlantDetailView] Failed to load: \(error)")
         }
@@ -288,10 +292,7 @@ struct PlantDetailView: View {
         )
         do {
             try AppDatabase.shared.addCareLog(log)
-            PostHogSDK.shared.capture("care_logged", properties: [
-                "plant_id": plantId,
-                "action": action,
-            ])
+            Analytics.track("care_logged", properties: ["plant_id": plantId, "action": action])
             Task { await loadData() }
         } catch {
             print("[PlantDetailView] Failed to log care: \(error)")

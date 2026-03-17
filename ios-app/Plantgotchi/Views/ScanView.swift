@@ -1,6 +1,5 @@
 #if os(iOS)
 import SwiftUI
-import PostHog
 
 /// BLE sensor scanning and pairing UI.
 /// Displays discovered Plantgotchi sensors with signal strength.
@@ -46,10 +45,11 @@ struct ScanView: View {
                 plantPickerSheet
             }
             .onAppear {
+                Analytics.track("screen_viewed", properties: ["screen_name": "scan"])
                 loadPlants()
                 if case .idle = bleManager.state {
                     bleManager.startScan()
-                    PostHogSDK.shared.capture("sensor_scan_started")
+                    Analytics.track("sensor_scan_started")
                 }
             }
             .onDisappear {
@@ -230,9 +230,7 @@ struct ScanView: View {
         var mappings = UserDefaults.standard.dictionary(forKey: "sensorPlantMappings") as? [String: String] ?? [:]
         mappings[sensor.id.uuidString] = plant.id
         UserDefaults.standard.set(mappings, forKey: "sensorPlantMappings")
-        PostHogSDK.shared.capture("sensor_paired", properties: [
-            "sensor_id": sensor.id.uuidString,
-        ])
+        Analytics.track("sensor_paired", properties: ["sensor_id": sensor.id.uuidString])
 
         showPlantPicker = false
         dismiss()
