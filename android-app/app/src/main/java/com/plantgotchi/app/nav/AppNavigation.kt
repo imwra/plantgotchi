@@ -108,9 +108,8 @@ fun AppNavigation() {
             AddPlantScreen(
                 userId = app.authService.userId ?: "local-user",
                 onBack = { navController.popBackStack() },
-                onPlantAdded = { plantId ->
+                onPlantAdded = { _ ->
                     navController.popBackStack()
-                    navController.navigate(Routes.plantDetail(plantId))
                 },
             )
         }

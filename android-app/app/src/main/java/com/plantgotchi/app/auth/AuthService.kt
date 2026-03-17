@@ -1,5 +1,6 @@
 package com.plantgotchi.app.auth
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -43,16 +44,24 @@ class AuthService(
     }
 
     suspend fun signIn(email: String, password: String) {
-        val response = httpClient.post("$baseURL/api/auth/sign-in/email") {
-            contentType(ContentType.Application.Json)
-            setBody(buildJsonObject {
-                put("email", email)
-                put("password", password)
-            }.toString())
+        Log.d("AuthService", "signIn: POST $baseURL/api/auth/sign-in/email")
+        val response = try {
+            httpClient.post("$baseURL/api/auth/sign-in/email") {
+                contentType(ContentType.Application.Json)
+                setBody(buildJsonObject {
+                    put("email", email)
+                    put("password", password)
+                }.toString())
+            }
+        } catch (e: Exception) {
+            Log.e("AuthService", "signIn network error: ${e.javaClass.simpleName}: ${e.message}", e)
+            throw AuthException("Sign in failed: ${e.message}")
         }
 
+        Log.d("AuthService", "signIn response: ${response.status}")
         if (response.status != HttpStatusCode.OK) {
             val body = response.bodyAsText()
+            Log.e("AuthService", "signIn error body: $body")
             throw AuthException("Sign in failed: ${parseError(body)}")
         }
 
