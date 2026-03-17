@@ -18,6 +18,7 @@
 | Action | Path | Responsibility |
 |--------|------|---------------|
 | Create | `src/lib/analytics.ts` | Analytics wrapper — track, identify, reset, captureException, log |
+| Create | `src/lib/analytics.server.ts` | Server-side analytics wrapper using posthog-node for API routes |
 | Modify | `src/layouts/BaseLayout.astro` | Add `app_version` to registered properties |
 | Modify | `src/pages/login.astro` | Update identify() to use Analytics wrapper with full traits |
 | Modify | `src/pages/signup.astro` | Update identify() to use Analytics wrapper with full traits |
@@ -50,6 +51,8 @@
 | Modify | `src/pages/api/courses/[slug]/enroll.ts` | course_enrolled |
 | Modify | `src/pages/api/courses/[slug]/modules/[moduleId]/complete.ts` | course_lesson_completed |
 | Modify | `src/pages/api/creators/me.ts` | creator_profile_created/updated |
+| Modify | `src/components/ui/organisms/SiteNav.tsx` | auth_logout + Analytics.reset() on logout |
+| Modify | `src/pages/help/[slug].astro` | help_article_viewed |
 
 ### iOS (ios-app)
 | Action | Path | Responsibility |
@@ -75,8 +78,11 @@
 | Modify | `app/src/main/java/com/plantgotchi/app/auth/AuthService.kt` | auth events + identify/reset |
 | Modify | `app/src/main/java/com/plantgotchi/app/sync/TursoSync.kt` | sync events |
 | Modify | `app/src/main/java/com/plantgotchi/app/ui/garden/GardenScreen.kt` | Use Analytics wrapper |
-| Modify | `app/src/main/java/com/plantgotchi/app/ui/garden/AddPlantScreen.kt` | Use Analytics wrapper, rename event |
+| Modify | `app/src/main/java/com/plantgotchi/app/ui/add/AddPlantScreen.kt` | Use Analytics wrapper, rename event |
 | Modify | `app/src/main/java/com/plantgotchi/app/ui/settings/SettingsScreen.kt` | Use Analytics wrapper, rename events |
+| Modify | `app/src/main/java/com/plantgotchi/app/ui/detail/PlantDetailScreen.kt` | Use Analytics wrapper, rename events |
+| Modify | `app/src/main/java/com/plantgotchi/app/ble/BLEManager.kt` | Use Analytics wrapper, rename events, rate limiting |
+| Modify | `app/src/main/java/com/plantgotchi/app/ui/scan/ScanScreen.kt` | Use Analytics wrapper |
 
 ---
 
@@ -197,6 +203,32 @@ export const Analytics = {
 };
 ```
 
+- [ ] **Step 3b: Create server-side Analytics wrapper**
+
+The client `analytics.ts` uses `posthog-js` (browser only). API routes run server-side and need `posthog-node`. Create a server wrapper that re-uses the existing `captureServerEvent` from `posthog.ts`:
+
+```typescript
+// website-astro/src/lib/analytics.server.ts
+import { captureServerEvent, getPostHogServer } from './posthog';
+
+export const ServerAnalytics = {
+  track(userId: string, event: string, properties?: Record<string, any>): void {
+    captureServerEvent(userId, event, properties);
+  },
+
+  captureException(userId: string, error: Error, context?: Record<string, any>): void {
+    captureServerEvent(userId, '$exception', {
+      $exception_type: error.constructor.name,
+      $exception_message: error.message,
+      $exception_stack_trace_raw: error.stack ?? '',
+      ...context,
+    });
+  },
+};
+```
+
+Note: The existing `src/lib/posthog.ts` is kept for its `posthog-node` client. The client-side `analytics.ts` wraps `posthog-js` for browser components. API routes use `ServerAnalytics` from `analytics.server.ts`.
+
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `cd website-astro && npx vitest run tests/lib/analytics.test.ts`
@@ -209,7 +241,7 @@ In `website-astro/src/layouts/BaseLayout.astro`, find the line that registers `{
 - [ ] **Step 6: Commit**
 
 ```bash
-git add website-astro/src/lib/analytics.ts website-astro/tests/lib/analytics.test.ts website-astro/src/layouts/BaseLayout.astro
+git add website-astro/src/lib/analytics.ts website-astro/src/lib/analytics.server.ts website-astro/tests/lib/analytics.test.ts website-astro/src/layouts/BaseLayout.astro
 git commit -m "feat(web): add Analytics wrapper and register app_version"
 ```
 
@@ -259,15 +291,22 @@ Analytics.identify(user.id, {
 Analytics.track('auth_signup', { method: 'email' });
 ```
 
-- [ ] **Step 3: Add Analytics.reset() to logout**
+- [ ] **Step 3: Add Analytics.reset() to logout in SiteNav**
 
-Find the logout handler (likely in a settings component or a logout page). Add `Analytics.reset()` and `Analytics.track('auth_logout')` before the redirect.
+In `website-astro/src/components/ui/organisms/SiteNav.tsx`, add `import { Analytics } from '../../lib/analytics';` at the top.
+
+There are two logout buttons (desktop ~line 142 and mobile ~line 212). Both have `onClick` handlers that call `/api/auth/sign-out`. In each handler, add before the `window.location.href = loginHref` line:
+
+```typescript
+Analytics.track('auth_logout');
+Analytics.reset();
+```
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add website-astro/src/pages/login.astro website-astro/src/pages/signup.astro
-git commit -m "feat(web): add user identify on login/signup and track auth events"
+git add website-astro/src/pages/login.astro website-astro/src/pages/signup.astro website-astro/src/components/ui/organisms/SiteNav.tsx
+git commit -m "feat(web): add user identify on login/signup, track auth events, reset on logout"
 ```
 
 ---
@@ -406,12 +445,20 @@ After `isAuthenticated = true` in `handleAuthResponse()` (~line 143), add:
 
 ```swift
 if let uid = userId {
+    let email = json["user"].flatMap { $0["email"] as? String } ?? ""
+    let name = json["user"].flatMap { $0["name"] as? String } ?? ""
+    let createdAt = json["user"].flatMap { $0["createdAt"] as? String } ?? ""
     Analytics.identify(userId: uid, traits: [
+        "email": email,
+        "name": name,
         "platform": "ios",
         "is_creator": false,
+        "created_at": createdAt,
     ])
 }
 ```
+
+Note: The `json` variable refers to the response parsed in `handleAuthResponse()`. The implementing agent should verify that `json["user"]` contains these fields by inspecting the actual response structure.
 
 In `signUp()` after `try handleAuthResponse(...)`, add:
 ```swift
@@ -428,13 +475,27 @@ In `signInWithApple()` after `try handleAuthResponse(...)`, add:
 Analytics.track("auth_login", properties: ["method": "apple"])
 ```
 
+Note: `signInWithApple()` always tracks `auth_login` because the server endpoint handles both new and returning Apple users. If the server response indicates a new user was created, the implementing agent may optionally use `auth_signup` instead.
+
 In `signOut()`, before `isAuthenticated = false`, add:
 ```swift
 Analytics.track("auth_logout")
 Analytics.reset()
 ```
 
-In each catch block for sign-in/sign-up, add:
+Note: `auth_login_failed` tracking is NOT added in AuthService because the auth methods throw errors to callers without catch blocks. Instead, the error tracking happens at the **view layer** — `LoginView.swift` and `SignUpView.swift` already have catch blocks. Add there:
+
+In `ios-app/Plantgotchi/Views/Auth/LoginView.swift`, in the `signIn()` catch block (~line 130):
+```swift
+Analytics.track("auth_login_failed", properties: ["method": "email", "error": error.localizedDescription])
+```
+
+In `ios-app/Plantgotchi/Views/Auth/LoginView.swift`, in the `handleAppleSignIn()` catch block (~line 153):
+```swift
+Analytics.track("auth_login_failed", properties: ["method": "apple", "error": error.localizedDescription])
+```
+
+In `ios-app/Plantgotchi/Views/Auth/SignUpView.swift`, in the `signUp()` catch block (~line 129):
 ```swift
 Analytics.track("auth_login_failed", properties: ["method": "email", "error": error.localizedDescription])
 ```
@@ -447,9 +508,14 @@ In `ios-app/Plantgotchi/PlantgotchiApp.swift`, after `_authService = StateObject
 // Re-identify returning user
 if let token = KeychainManager().getToken(),
    let userId = UserDefaults.standard.string(forKey: "authUserId") {
-    Analytics.identify(userId: userId, traits: [
-        "platform": "ios",
-    ])
+    var traits: [String: Any] = ["platform": "ios"]
+    if let email = UserDefaults.standard.string(forKey: "authUserEmail") {
+        traits["email"] = email
+    }
+    if let name = UserDefaults.standard.string(forKey: "authUserName") {
+        traits["name"] = name
+    }
+    Analytics.identify(userId: userId, traits: traits)
 }
 ```
 
@@ -461,7 +527,7 @@ Expected: All tests PASS
 - [ ] **Step 4: Commit**
 
 ```bash
-git add ios-app/Plantgotchi/Auth/AuthService.swift ios-app/Plantgotchi/PlantgotchiApp.swift
+git add ios-app/Plantgotchi/Auth/AuthService.swift ios-app/Plantgotchi/PlantgotchiApp.swift ios-app/Plantgotchi/Views/Auth/LoginView.swift ios-app/Plantgotchi/Views/Auth/SignUpView.swift
 git commit -m "feat(ios): add user identify on login/signup/launch and track auth events"
 ```
 
@@ -595,10 +661,21 @@ In `handleAuthResponse()`, after `_isAuthenticated.value = true`, add:
 
 ```kotlin
 val uid = tokenManager.getUserId()
+val email = responseJson?.optString("email") ?: ""
+val name = responseJson?.optString("name") ?: ""
+val createdAt = responseJson?.optString("createdAt") ?: ""
 if (uid != null) {
-    Analytics.identify(uid, mapOf("platform" to "android", "is_creator" to false))
+    Analytics.identify(uid, mapOf(
+        "email" to email,
+        "name" to name,
+        "platform" to "android",
+        "is_creator" to false,
+        "created_at" to createdAt,
+    ))
 }
 ```
+
+Note: The implementing agent should verify the response JSON field names.
 
 In `signUp()` after `handleAuthResponse(response)`, add:
 ```kotlin
@@ -616,7 +693,14 @@ Analytics.track("auth_logout")
 Analytics.reset()
 ```
 
-In sign-in/sign-up catch blocks, add:
+Note: `auth_login_failed` tracking goes at the **view layer** since AuthService throws exceptions to callers. Add in:
+
+In `android-app/app/src/main/java/com/plantgotchi/app/ui/auth/LoginScreen.kt`, in the sign-in error handling:
+```kotlin
+Analytics.track("auth_login_failed", mapOf("method" to "email", "error" to (e.message ?: "unknown")))
+```
+
+In `android-app/app/src/main/java/com/plantgotchi/app/ui/auth/SignUpScreen.kt`, in the sign-up error handling:
 ```kotlin
 Analytics.track("auth_login_failed", mapOf("method" to "email", "error" to (e.message ?: "unknown")))
 ```
@@ -641,7 +725,7 @@ Expected: All tests PASS
 - [ ] **Step 4: Commit**
 
 ```bash
-git add android-app/app/src/main/java/com/plantgotchi/app/auth/AuthService.kt android-app/app/src/main/java/com/plantgotchi/app/PlantgotchiApp.kt
+git add android-app/app/src/main/java/com/plantgotchi/app/auth/AuthService.kt android-app/app/src/main/java/com/plantgotchi/app/PlantgotchiApp.kt android-app/app/src/main/java/com/plantgotchi/app/ui/auth/LoginScreen.kt android-app/app/src/main/java/com/plantgotchi/app/ui/auth/SignUpScreen.kt
 git commit -m "feat(android): add user identify on login/signup/launch and track auth events"
 ```
 
@@ -711,6 +795,10 @@ Analytics.track("demo_data_loaded")
 ```swift
 Analytics.track("language_changed", properties: ["locale": newLocale])
 ```
+- Where the retro theme toggle is:
+```swift
+Analytics.track("theme_toggled", properties: ["is_retro": ThemeManager.shared.isRetro])
+```
 
 - [ ] **Step 5: ScanView — use wrapper**
 
@@ -757,6 +845,21 @@ if let last = lastReadingEventTime[sensorId], now.timeIntervalSince(last) < 60 {
 }
 ```
 
+- [ ] **Step 6b: Navigation events**
+
+In each major view's `onAppear`, add `screen_viewed`:
+- `GardenView.swift`: `Analytics.track("screen_viewed", properties: ["screen_name": "garden"])`
+- `PlantDetailView.swift`: `Analytics.track("screen_viewed", properties: ["screen_name": "plant_detail"])`
+- `SettingsView.swift`: `Analytics.track("screen_viewed", properties: ["screen_name": "settings"])`
+- `ScanView.swift`: `Analytics.track("screen_viewed", properties: ["screen_name": "scan"])`
+
+In the tab bar selection handler (likely in `ContentView.swift` or main tab view), add:
+```swift
+Analytics.track("tab_changed", properties: ["tab_name": selectedTab])
+```
+
+Note: iOS auto-captures screen views via `captureScreenViews = true`. These manual events use human-readable names and are the canonical events for dashboard queries.
+
 - [ ] **Step 7: Run iOS tests**
 
 Run: `cd ios-app && swift test 2>&1 | tail -5`
@@ -791,11 +894,16 @@ func pushReadings(...) async {
         let duration = Date().timeIntervalSince(start) * 1000
         Analytics.track("sync_completed", properties: ["direction": "push", "item_count": readings.count, "duration_ms": Int(duration)])
     } catch {
-        let duration = Date().timeIntervalSince(start) * 1000
         Analytics.track("sync_failed", properties: ["direction": "push", "error": error.localizedDescription])
         Analytics.captureException(error, context: ["operation": "pushReadings"])
+        Analytics.log(level: .error, message: "Sync push failed", context: ["method": "pushReadings", "error": error.localizedDescription])
     }
 }
+```
+
+At the start of each sync method, also add an `Analytics.log` call:
+```swift
+Analytics.log(level: .info, message: "Sync push started", context: ["method": "pushReadings"])
 ```
 
 Apply the same pattern to `pushCareLogs()`, `pullPlants()`, and `pullRecommendations()` using `direction: "push"` or `direction: "pull"` as appropriate.
@@ -807,12 +915,14 @@ In `ios-app/Plantgotchi/PlantgotchiApp.swift` init, after the PostHog setup bloc
 ```swift
 // Global exception handler
 NSSetUncaughtExceptionHandler { exception in
-    let props: [String: Any] = [
-        "$exception_type": exception.name.rawValue,
-        "$exception_message": exception.reason ?? "",
+    let error = NSError(
+        domain: exception.name.rawValue,
+        code: 0,
+        userInfo: [NSLocalizedDescriptionKey: exception.reason ?? ""]
+    )
+    Analytics.captureException(error, context: [
         "$exception_stack_trace_raw": exception.callStackSymbols.joined(separator: "\n"),
-    ]
-    PostHogSDK.shared.capture("$exception", properties: props)
+    ])
 }
 ```
 
@@ -834,8 +944,11 @@ git commit -m "feat(ios): add sync events, error tracking, and global exception 
 
 **Files:**
 - Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/garden/GardenScreen.kt`
-- Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/garden/AddPlantScreen.kt`
+- Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/add/AddPlantScreen.kt`
 - Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/settings/SettingsScreen.kt`
+- Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/detail/PlantDetailScreen.kt`
+- Modify: `android-app/app/src/main/java/com/plantgotchi/app/ble/BLEManager.kt`
+- Modify: `android-app/app/src/main/java/com/plantgotchi/app/ui/scan/ScanScreen.kt`
 
 - [ ] **Step 1: GardenScreen — replace PostHog call with Analytics**
 
@@ -868,21 +981,99 @@ Analytics.track("language_changed", mapOf("locale" to "pt-BR"))
 // and
 Analytics.track("language_changed", mapOf("locale" to "en"))
 ```
+Note: This is also a property key rename — existing code uses `"language"` as the property key, but the spec requires `"locale"`.
 - Replace `PostHog.capture("demo_mode_enabled")` (~line 363) with:
 ```kotlin
 Analytics.track("demo_data_loaded")
 ```
 - Remove `PostHog.capture("demo_mode_disabled")` (~line 367) entirely.
+- Where the theme toggle is:
+```kotlin
+Analytics.track("theme_toggled", mapOf("is_retro" to isRetro))
+```
 
-- [ ] **Step 4: Run Android tests**
+- [ ] **Step 4: PlantDetailScreen — rename events + use wrapper**
+
+In `android-app/app/src/main/java/com/plantgotchi/app/ui/detail/PlantDetailScreen.kt`:
+- Remove `import com.posthog.PostHog` (line 51)
+- Add `import com.plantgotchi.app.analytics.Analytics`
+- Replace `PostHog.capture("care_logged", ...)` calls (~lines 219, 243) with:
+```kotlin
+Analytics.track("care_logged", mapOf("plant_id" to plantId, "action" to action))
+```
+- Add `plant_viewed` in the LaunchedEffect that loads plant data:
+```kotlin
+Analytics.track("plant_viewed", mapOf("plant_id" to plantId, "species" to (plant.species ?: "")))
+```
+
+- [ ] **Step 5: BLEManager — rename events + add rate limiting**
+
+In `android-app/app/src/main/java/com/plantgotchi/app/ble/BLEManager.kt`:
+- Remove `import com.posthog.PostHog` (line 5)
+- Add `import com.plantgotchi.app.analytics.Analytics`
+- Add rate-limiting property at the top of the class:
+```kotlin
+private val lastReadingEventTime = mutableMapOf<String, Long>()
+```
+- Replace `PostHog.capture("sensor_connect_attempt", ...)` (~line 87) with:
+```kotlin
+Analytics.track("sensor_paired", mapOf("sensor_id" to device.address))
+```
+- On disconnect callback:
+```kotlin
+Analytics.track("sensor_disconnected", mapOf("sensor_id" to device.address))
+```
+- Add rate-limited sensor reading tracking where readings are received:
+```kotlin
+val sensorId = device.address
+val now = System.currentTimeMillis()
+val last = lastReadingEventTime[sensorId] ?: 0L
+if (now - last >= 60_000) {
+    lastReadingEventTime[sensorId] = now
+    Analytics.track("sensor_reading_received", mapOf(
+        "sensor_id" to sensorId,
+        "battery" to battery,
+        "moisture" to moisture,
+    ))
+}
+```
+
+- [ ] **Step 6: ScanScreen — use wrapper**
+
+In `android-app/app/src/main/java/com/plantgotchi/app/ui/scan/ScanScreen.kt`:
+- Remove `import com.posthog.PostHog` (line 56)
+- Add `import com.plantgotchi.app.analytics.Analytics`
+- Replace `PostHog.capture("sensor_scan_started")` (~line 173) with:
+```kotlin
+Analytics.track("sensor_scan_started")
+```
+- Replace `PostHog.capture("sensor_paired", ...)` (~line 230) with:
+```kotlin
+Analytics.track("sensor_paired", mapOf("sensor_id" to sensorId))
+```
+
+- [ ] **Step 6b: Navigation events**
+
+In each screen's `LaunchedEffect`, add `screen_viewed`:
+- `GardenScreen.kt`: `Analytics.track("screen_viewed", mapOf("screen_name" to "garden"))`
+- `PlantDetailScreen.kt`: `Analytics.track("screen_viewed", mapOf("screen_name" to "plant_detail"))`
+- `SettingsScreen.kt`: `Analytics.track("screen_viewed", mapOf("screen_name" to "settings"))`
+- `ScanScreen.kt`: `Analytics.track("screen_viewed", mapOf("screen_name" to "scan"))`
+
+In the bottom nav bar selection handler (likely in `AppNavigation.kt`), add:
+```kotlin
+Analytics.track("tab_changed", mapOf("tab_name" to selectedTab))
+```
+
+- [ ] **Step 7: Run Android tests**
 
 Run: `cd android-app && JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew test 2>&1 | tail -5`
 Expected: All tests PASS
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add android-app/app/src/main/java/com/plantgotchi/app/ui/
+git add android-app/app/src/main/java/com/plantgotchi/app/ui/garden/GardenScreen.kt android-app/app/src/main/java/com/plantgotchi/app/ui/add/AddPlantScreen.kt android-app/app/src/main/java/com/plantgotchi/app/ui/settings/SettingsScreen.kt android-app/app/src/main/java/com/plantgotchi/app/ui/detail/PlantDetailScreen.kt android-app/app/src/main/java/com/plantgotchi/app/ble/BLEManager.kt android-app/app/src/main/java/com/plantgotchi/app/ui/scan/ScanScreen.kt
 git commit -m "feat(android): migrate all events to Analytics wrapper with unified naming"
 ```
 
@@ -912,9 +1103,15 @@ suspend fun pushReadings(...) {
     } catch (e: Exception) {
         Analytics.track("sync_failed", mapOf("direction" to "push", "error" to (e.message ?: "")))
         Analytics.captureException(e, mapOf("operation" to "pushReadings"))
+        Analytics.log(LogLevel.ERROR, "Sync push failed", mapOf("method" to "pushReadings", "error" to (e.message ?: "")))
         throw e
     }
 }
+```
+
+At the start of each sync method, also add an `Analytics.log` call:
+```kotlin
+Analytics.log(LogLevel.INFO, "Sync push started", mapOf("method" to "pushReadings"))
 ```
 
 Apply the same pattern to all sync methods.
@@ -969,6 +1166,11 @@ In the component's `useEffect` that loads plants (or after plants are fetched), 
 Analytics.track('garden_viewed', { plant_count: plants.length });
 ```
 
+On manual refresh/pull-to-refresh:
+```typescript
+Analytics.track('garden_refreshed', { plant_count: plants.length });
+```
+
 - [ ] **Step 2: AddPlantModal — add plant_created on client side**
 
 In `AddPlantModal.tsx`, after a successful plant creation (in the onSubmit/save handler), add:
@@ -976,24 +1178,25 @@ In `AddPlantModal.tsx`, after a successful plant creation (in the onSubmit/save 
 Analytics.track('plant_created', { plant_id: newPlant.id, species: newPlant.species, emoji: newPlant.emoji });
 ```
 
-- [ ] **Step 3: API route — add plant_created server-side + error tracking**
+- [ ] **Step 3: API route — server-side error tracking**
 
-In `website-astro/src/pages/api/plants/index.ts`, in the POST handler:
+In `website-astro/src/pages/api/plants/index.ts`, add at the top:
 ```typescript
-import { Analytics } from '../../lib/analytics';
+import { ServerAnalytics } from '../../lib/analytics.server';
+```
 
-// After successful plant creation:
-// Note: Server-side uses posthog-node, so use captureServerEvent from posthog.ts instead
-// For now, client-side tracking in AddPlantModal is sufficient
-
-// In catch block:
+In the POST handler catch block:
+```typescript
 try {
   // ... existing logic ...
 } catch (error) {
-  Analytics.captureException(error instanceof Error ? error : new Error(String(error)), { endpoint: '/api/plants', method: 'POST' });
+  const userId = locals.user?.id ?? 'anonymous';
+  ServerAnalytics.captureException(userId, error instanceof Error ? error : new Error(String(error)), { endpoint: '/api/plants', method: 'POST' });
   return new Response(null, { status: 500 });
 }
 ```
+
+Note: `plant_created` is tracked client-side in AddPlantModal. Server-side only handles error tracking for mutations.
 
 - [ ] **Step 4: CareLogForm — add care_logged**
 
@@ -1002,10 +1205,31 @@ In `CareLogForm.tsx`, after successful care log submission:
 Analytics.track('care_logged', { plant_id: plantId, action: careAction });
 ```
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Add plant_viewed, plant_updated, plant_deleted on web**
+
+Find the plant detail component (likely `PlantCard.tsx` click handler or a plant detail page/modal). Add:
+```typescript
+// On plant detail view:
+Analytics.track('plant_viewed', { plant_id: plant.id, species: plant.species });
+// On plant update:
+Analytics.track('plant_updated', { plant_id: plant.id, fields_changed: Object.keys(changedFields) });
+// On plant delete:
+Analytics.track('plant_deleted', { plant_id: plant.id });
+```
+
+Note: The implementing agent should locate the exact plant detail/edit/delete UI components. Check `PlantGrid.tsx`, `PlantCard.tsx`, or any plant detail modal.
+
+- [ ] **Step 6: Add care_recommendation_viewed on web**
+
+If there is a recommendations component that displays care suggestions, add:
+```typescript
+Analytics.track('care_recommendation_viewed', { plant_id: plantId, severity });
+```
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git add website-astro/src/components/ui/organisms/GardenDashboard.tsx website-astro/src/components/ui/organisms/AddPlantModal.tsx website-astro/src/components/ui/organisms/CareLogForm.tsx website-astro/src/pages/api/plants/index.ts website-astro/src/pages/api/care-logs.ts
+git add website-astro/src/components/ui/organisms/GardenDashboard.tsx website-astro/src/components/ui/organisms/AddPlantModal.tsx website-astro/src/components/ui/organisms/CareLogForm.tsx website-astro/src/pages/api/plants/index.ts website-astro/src/pages/api/care-logs.ts website-astro/src/components/ui/organisms/PlantCard.tsx website-astro/src/components/ui/organisms/PlantGrid.tsx
 git commit -m "feat(web): add garden, plant, and care event tracking"
 ```
 
@@ -1051,6 +1275,11 @@ After file upload:
 Analytics.track('chat_file_uploaded', { conversation_id: conversationId, file_type: file.type });
 ```
 
+When user starts typing (in the typing indicator handler):
+```typescript
+Analytics.track('chat_typing_started', { conversation_id: conversationId });
+```
+
 - [ ] **Step 3: ConversationList — add read tracking**
 
 In `ConversationList.tsx`, add `import { Analytics } from '../../lib/analytics';`
@@ -1076,10 +1305,13 @@ git commit -m "feat(web): add chat event tracking"
 - Modify: `website-astro/src/components/ui/organisms/BoardView.tsx`
 - Modify: `website-astro/src/components/ui/organisms/IssueTable.tsx`
 - Modify: `website-astro/src/pages/api/projects/index.ts`
+- Modify: `website-astro/src/pages/api/projects/[id]/members.ts`
+- Modify: `website-astro/src/pages/api/projects/[id]/members/[userId].ts`
+- Modify: `website-astro/src/pages/api/projects/[id]/fields/index.ts`
 - Modify: `website-astro/src/pages/api/projects/[id]/issues/index.ts`
 - Modify: `website-astro/src/pages/api/issues/[id]/status.ts`
 
-- [ ] **Step 1: ProjectView — add project + issue events**
+- [ ] **Step 1: ProjectView — add project + issue + member events**
 
 In `ProjectView.tsx`, add `import { Analytics } from '../../lib/analytics';`
 
@@ -1093,9 +1325,24 @@ On issue creation (if inline create exists):
 Analytics.track('issue_created', { issue_id: issue.id, project_id: project.id });
 ```
 
+On issue update:
+```typescript
+Analytics.track('issue_updated', { issue_id: issue.id, fields_changed: Object.keys(changed) });
+```
+
+On issue assignment:
+```typescript
+Analytics.track('issue_assigned', { issue_id: issue.id, assignee_id: assigneeId });
+```
+
 On view switch:
 ```typescript
 Analytics.track('board_view_switched', { view_id: viewId, view_type: viewType });
+```
+
+On new view creation:
+```typescript
+Analytics.track('board_view_created', { view_id: viewId, view_type: viewType });
 ```
 
 - [ ] **Step 2: BoardView — add board + drag events**
@@ -1112,6 +1359,10 @@ On card drag:
 Analytics.track('board_card_dragged', { issue_id: issueId, old_status: oldStatus, new_status: newStatus });
 ```
 
+```typescript
+Analytics.track('issue_status_changed', { issue_id: issueId, old_status: oldStatus, new_status: newStatus });
+```
+
 - [ ] **Step 3: IssueTable — add issue_viewed**
 
 In `IssueTable.tsx`, add `import { Analytics } from '../../lib/analytics';`
@@ -1121,24 +1372,69 @@ On row click/expand:
 Analytics.track('issue_viewed', { issue_id: issue.id, project_id: projectId });
 ```
 
+On comment add:
+```typescript
+Analytics.track('issue_comment_added', { issue_id: issue.id });
+```
+
+On comment reaction:
+```typescript
+Analytics.track('issue_comment_reacted', { issue_id: issue.id, emoji });
+```
+
+On issue reorder (drag):
+```typescript
+Analytics.track('issue_reordered', { issue_id: issue.id, project_id: projectId });
+```
+
 - [ ] **Step 4: API routes — server-side mutation events**
 
 In `website-astro/src/pages/api/projects/index.ts` POST handler:
 ```typescript
-// After successful project creation, track via posthog-node:
-// (Use existing captureServerEvent if available, or add Analytics.track)
+import { ServerAnalytics } from '../../../lib/analytics.server';
+
+// After successful project creation:
+ServerAnalytics.track(locals.user.id, 'project_created', { project_id: newProject.id });
 ```
 
-In `website-astro/src/pages/api/issues/[id]/status.ts` POST handler, add:
+In `website-astro/src/pages/api/projects/[id]/members.ts` POST handler:
 ```typescript
-// After successful status update:
-// Track issue_status_changed server-side
+import { ServerAnalytics } from '../../../../lib/analytics.server';
+
+// After adding member:
+ServerAnalytics.track(locals.user.id, 'project_member_added', { project_id: params.id, member_id: newMemberId });
+```
+
+In `website-astro/src/pages/api/projects/[id]/issues/index.ts` POST handler:
+```typescript
+import { ServerAnalytics } from '../../../../../lib/analytics.server';
+
+// After issue creation:
+ServerAnalytics.track(locals.user.id, 'issue_created', { issue_id: newIssue.id, project_id: params.id });
+```
+
+In `website-astro/src/pages/api/issues/[id]/status.ts` POST handler:
+```typescript
+import { ServerAnalytics } from '../../../../lib/analytics.server';
+
+// After status update:
+ServerAnalytics.track(locals.user.id, 'issue_status_changed', { issue_id: params.id, old_status: oldStatus, new_status: newStatus });
+```
+
+In `website-astro/src/pages/api/projects/[id]/members/[userId].ts` DELETE handler:
+```typescript
+ServerAnalytics.track(locals.user.id, 'project_member_removed', { project_id: params.id, member_id: params.userId });
+```
+
+In `website-astro/src/pages/api/projects/[id]/fields/index.ts` POST handler:
+```typescript
+ServerAnalytics.track(locals.user.id, 'project_field_created', { project_id: params.id, field_type: fieldType });
 ```
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add website-astro/src/components/ui/organisms/ProjectView.tsx website-astro/src/components/ui/organisms/BoardView.tsx website-astro/src/components/ui/organisms/IssueTable.tsx website-astro/src/pages/api/projects/ website-astro/src/pages/api/issues/
+git add website-astro/src/components/ui/organisms/ProjectView.tsx website-astro/src/components/ui/organisms/BoardView.tsx website-astro/src/components/ui/organisms/IssueTable.tsx website-astro/src/pages/api/projects/ website-astro/src/pages/api/projects/\[id\]/members.ts website-astro/src/pages/api/issues/
 git commit -m "feat(web): add project, issue, and board event tracking"
 ```
 
@@ -1154,14 +1450,23 @@ git commit -m "feat(web): add project, issue, and board event tracking"
 - Modify: `website-astro/src/components/ui/organisms/CreatorDashboard.tsx`
 - Modify: `website-astro/src/components/ui/organisms/CreatorProfileForm.tsx`
 - Modify: `website-astro/src/components/ui/organisms/AdminPanel.tsx`
+- Modify: `website-astro/src/pages/api/courses/index.ts`
 - Modify: `website-astro/src/pages/api/courses/[slug]/enroll.ts`
 - Modify: `website-astro/src/pages/api/courses/[slug]/modules/[moduleId]/complete.ts`
 - Modify: `website-astro/src/pages/api/creators/me.ts`
+- Modify: `website-astro/src/pages/help/[slug].astro`
 
 - [ ] **Step 1: CourseCatalog — add catalog viewed**
 
 ```typescript
 Analytics.track('course_catalog_viewed');
+```
+
+- [ ] **Step 1b: CourseCatalog — add course search**
+
+In `CourseCatalog.tsx`, on search submit:
+```typescript
+Analytics.track('course_searched', { search_query: query });
 ```
 
 - [ ] **Step 2: CourseLandingPage — add landing viewed**
@@ -1192,6 +1497,11 @@ On video play:
 Analytics.track('course_video_played', { course_id: courseId, module_id: moduleId });
 ```
 
+On progress view:
+```typescript
+Analytics.track('course_progress_viewed', { course_id: courseId, progress_pct: progressPercent });
+```
+
 - [ ] **Step 4: CourseEditor — add creator events**
 
 On course save/publish:
@@ -1199,11 +1509,26 @@ On course save/publish:
 Analytics.track('creator_course_edited', { course_id: courseId, course_slug: courseSlug });
 ```
 
+On course creation (first save):
+```typescript
+Analytics.track('creator_course_created', { course_id: courseId, course_slug: courseSlug });
+```
+
+On publish:
+```typescript
+Analytics.track('creator_course_published', { course_id: courseId, course_slug: courseSlug });
+```
+
 On phase/module/block creation:
 ```typescript
 Analytics.track('creator_phase_created', { course_id: courseId, phase_id: phaseId });
 Analytics.track('creator_module_created', { course_id: courseId, module_id: moduleId });
 Analytics.track('creator_block_created', { course_id: courseId, block_type: blockType });
+```
+
+On block update:
+```typescript
+Analytics.track('creator_block_updated', { course_id: courseId, block_id: blockId, block_type: blockType });
 ```
 
 - [ ] **Step 5: CreatorDashboard + ProfileForm**
@@ -1225,22 +1550,94 @@ In `AdminPanel.tsx` on mount and tab change:
 Analytics.track('admin_panel_viewed', { tab: activeTab });
 ```
 
+On user detail view:
+```typescript
+Analytics.track('admin_user_viewed', { target_user_id: userId });
+```
+
+On migration run:
+```typescript
+Analytics.track('admin_migration_run');
+```
+
+On data seed:
+```typescript
+Analytics.track('admin_data_seeded');
+```
+
+Note: Web `theme_toggled` and `settings_changed` events should be added when a web settings page/component exists. Currently theme toggling may be inline in SiteNav or another component — the implementing agent should search for theme toggle handlers.
+
+- [ ] **Step 6b: Help + Catalog pages**
+
+In `website-astro/src/pages/help/[slug].astro`, add in the `<script>` tag:
+```typescript
+import { Analytics } from '../../lib/analytics';
+Analytics.track('help_article_viewed', { article_slug: Astro.params.slug });
+```
+
+In `GardenDashboard.tsx` or a plant catalog component, on catalog search:
+```typescript
+Analytics.track('catalog_searched', { search_query: query });
+```
+
+On catalog plant detail:
+```typescript
+Analytics.track('catalog_plant_viewed', { catalog_id: catalogId });
+```
+
 - [ ] **Step 7: API routes — server-side course events**
 
 In `website-astro/src/pages/api/courses/[slug]/enroll.ts` POST handler:
 ```typescript
-// After successful enrollment, track course_enrolled server-side
+import { ServerAnalytics } from '../../../../lib/analytics.server';
+
+// After successful enrollment:
+ServerAnalytics.track(locals.user.id, 'course_enrolled', { course_id: course.id, course_slug: params.slug });
 ```
 
 In `website-astro/src/pages/api/courses/[slug]/modules/[moduleId]/complete.ts` POST handler:
 ```typescript
-// After successful completion, track course_lesson_completed server-side
+import { ServerAnalytics } from '../../../../../../lib/analytics.server';
+
+// After successful completion:
+ServerAnalytics.track(locals.user.id, 'course_lesson_completed', { course_id: courseId, module_id: params.moduleId });
 ```
+
+In `website-astro/src/pages/api/creators/me.ts` POST/PUT handler:
+```typescript
+import { ServerAnalytics } from '../../../lib/analytics.server';
+
+// After profile create/update:
+ServerAnalytics.track(locals.user.id, isNew ? 'creator_profile_created' : 'creator_profile_updated', { creator_id: creatorId });
+```
+
+In `website-astro/src/pages/api/courses/index.ts` POST handler:
+```typescript
+import { ServerAnalytics } from '../../../lib/analytics.server';
+
+// After course creation:
+ServerAnalytics.track(locals.user.id, 'creator_course_created', { course_id: newCourse.id, course_slug: newCourse.slug });
+```
+
+- [ ] **Step 7b: API request tracking for mutations**
+
+The spec defines `api_request_completed` and `api_request_failed` events for POST/PUT/DELETE requests. Rather than instrumenting each API route individually, add tracking in a shared API utility or middleware.
+
+If the web app has a shared fetch wrapper or API client used by components, add there:
+```typescript
+// After successful mutation (POST/PUT/DELETE):
+Analytics.track('api_request_completed', { endpoint, method, status_code: response.status, duration_ms: Date.now() - start });
+
+// On mutation failure:
+Analytics.track('api_request_failed', { endpoint, method, status_code: response.status, error: errorMessage, duration_ms: Date.now() - start });
+```
+
+Note: Only track mutations, not GET requests. If no shared client exists, the implementing agent should add these calls alongside the mutation-specific events in each API route's server-side handler using `ServerAnalytics.track()`.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add website-astro/src/components/ui/organisms/ website-astro/src/pages/api/courses/ website-astro/src/pages/api/creators/
+git add website-astro/src/components/ui/organisms/ website-astro/src/pages/api/courses/ website-astro/src/pages/api/creators/ website-astro/src/pages/help/
 git commit -m "feat(web): add creator, course, and admin event tracking"
 ```
 
