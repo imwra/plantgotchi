@@ -439,7 +439,7 @@ export default function GardenDashboard({
               </div>
               <DetailSection
                 plant={selectedPlant}
-                onRefresh={fetchPlants}
+                onRefresh={handleManualRefresh}
                 demoMode={demoMode}
                 labels={labels}
                 locale={locale}
@@ -462,7 +462,7 @@ export default function GardenDashboard({
             <DetailSection
               plant={selectedPlant}
               onClose={() => setShowDetail(false)}
-              onRefresh={fetchPlants}
+              onRefresh={handleManualRefresh}
               demoMode={demoMode}
               labels={labels}
               locale={locale}
