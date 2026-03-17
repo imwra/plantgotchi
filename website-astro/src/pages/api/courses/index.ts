@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../../lib/auth";
 import { getCreatorByUserId, listPublishedCourses, listCreatorCourses, createCourse } from "../../../lib/db/lms-queries";
+import { ServerAnalytics } from "../../../lib/analytics.server";
 
 export const GET: APIRoute = async ({ request, url }) => {
   const session = await getSession(request);
@@ -34,5 +35,6 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const course = await createCourse(creator.id, title, description, price_cents, currency);
+  ServerAnalytics.track(session.user.id, 'creator_course_created', { course_id: course.id, course_slug: course.slug });
   return new Response(JSON.stringify(course), { status: 201, headers: { "Content-Type": "application/json" } });
 };

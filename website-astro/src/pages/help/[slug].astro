@@ -21,3 +21,11 @@ try {
     </>
   ))}
 </HelpLayout>
+
+<div id="help-article-data" data-slug={slug} style="display:none"></div>
+<script>
+  import { Analytics } from '../../lib/analytics';
+  const el = document.getElementById('help-article-data');
+  const articleSlug = el?.dataset.slug ?? '';
+  Analytics.track('help_article_viewed', { article_slug: articleSlug });
+</script>

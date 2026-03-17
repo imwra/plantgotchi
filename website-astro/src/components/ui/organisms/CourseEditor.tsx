@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ContentBlockEditor from '../molecules/ContentBlockEditor';
+import { Analytics } from '../../../lib/analytics';
 
 interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
 interface Module { id: string; title: string; is_preview: number; blocks: Block[] }
@@ -40,9 +41,18 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     setSaving(true);
     if (isNew) {
       const res = await fetch('/api/courses', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, description, price_cents: priceCents }) });
-      if (res.ok) { const data = await res.json(); window.location.href = `/creator/courses/${data.slug}/edit`; }
+      if (res.ok) {
+        const data = await res.json();
+        Analytics.track('creator_course_created', { course_id: data.id, course_slug: data.slug });
+        window.location.href = `/creator/courses/${data.slug}/edit`;
+      }
     } else {
+      const prevStatus = course?.status;
       await fetch(`/api/courses/${slug}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, description, price_cents: priceCents, status }) });
+      Analytics.track('creator_course_edited', { course_id: course!.id, course_slug: slug! });
+      if (status === 'published' && prevStatus !== 'published') {
+        Analytics.track('creator_course_published', { course_id: course!.id, course_slug: slug! });
+      }
     }
     setSaving(false);
   };
@@ -50,7 +60,12 @@ export default function CourseEditor({ slug }: { slug?: string }) {
   const addPhase = async () => {
     if (!slug) return;
     const res = await fetch(`/api/courses/${slug}/phases`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'New Phase' }) });
-    if (res.ok) { const phase = await res.json(); setPhases(prev => [...prev, { ...phase, modules: [] }]); setActivePhaseId(phase.id); }
+    if (res.ok) {
+      const phase = await res.json();
+      Analytics.track('creator_phase_created', { course_id: course!.id, phase_id: phase.id });
+      setPhases(prev => [...prev, { ...phase, modules: [] }]);
+      setActivePhaseId(phase.id);
+    }
   };
 
   const addModule = async (phaseId: string) => {
@@ -58,6 +73,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     const res = await fetch(`/api/courses/${slug}/phases/${phaseId}/modules`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'New Module' }) });
     if (res.ok) {
       const mod = await res.json();
+      Analytics.track('creator_module_created', { course_id: course!.id, module_id: mod.id });
       setPhases(prev => prev.map(p => p.id === phaseId ? { ...p, modules: [...p.modules, { ...mod, blocks: [] }] } : p));
       setActiveModuleId(mod.id);
     }
@@ -71,6 +87,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     const res = await fetch(`/api/courses/${slug}/phases/${phase.id}/modules/${moduleId}/blocks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ block_type: blockType, content: defaultContent }) });
     if (res.ok) {
       const block = await res.json();
+      Analytics.track('creator_block_created', { course_id: course!.id, block_type: blockType });
       setPhases(prev => prev.map(p => ({ ...p, modules: p.modules.map(m => m.id === moduleId ? { ...m, blocks: [...m.blocks, block] } : m) })));
     }
   };
@@ -80,7 +97,9 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     const phase = phases.find(p => p.modules.some(m => m.blocks.some(b => b.id === blockId)));
     const mod = phase?.modules.find(m => m.blocks.some(b => b.id === blockId));
     if (!phase || !mod) return;
+    const block = mod.blocks.find(b => b.id === blockId);
     await fetch(`/api/courses/${slug}/phases/${phase.id}/modules/${mod.id}/blocks/${blockId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) });
+    Analytics.track('creator_block_updated', { course_id: course!.id, block_id: blockId, block_type: block?.block_type });
     setPhases(prev => prev.map(p => ({ ...p, modules: p.modules.map(m => ({ ...m, blocks: m.blocks.map(b => b.id === blockId ? { ...b, content } : b) })) })));
   };
 

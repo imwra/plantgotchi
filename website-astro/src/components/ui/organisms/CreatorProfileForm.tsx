@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '../../../lib/analytics';
 
 export default function CreatorProfileForm({ mode = 'create' }: { mode?: 'create' | 'edit' }) {
   const [displayName, setDisplayName] = useState('');
@@ -17,6 +18,9 @@ export default function CreatorProfileForm({ mode = 'create' }: { mode?: 'create
       : await fetch('/api/creators/me', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ display_name: displayName, bio }) });
 
     if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const isNewProfile = mode === 'create';
+      Analytics.track(isNewProfile ? 'creator_profile_created' : 'creator_profile_updated', { creator_id: data.id });
       window.location.href = '/creator/dashboard';
     } else {
       const data = await res.json().catch(() => ({}));

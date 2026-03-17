@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Badge } from '../ui/atoms';
 import UserDetailModal from "./UserDetailModal";
+import { Analytics } from '../../lib/analytics';
 
 interface AdminUser {
   id: string;
@@ -64,7 +65,7 @@ export default function UsersTab() {
               {users.map((user) => (
                 <tr
                   key={user.id}
-                  onClick={() => setSelectedUserId(user.id)}
+                  onClick={() => { setSelectedUserId(user.id); Analytics.track('admin_user_viewed', { target_user_id: user.id }); }}
                   className="border-b border-bg-warm/50 hover:bg-bg/40 cursor-pointer transition"
                 >
                   <td className="px-4 py-2 font-medium">{user.email}</td>

@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../../lib/auth";
 import { getCreatorByUserId, updateCreatorProfile } from "../../../lib/db/lms-queries";
+import { ServerAnalytics } from "../../../lib/analytics.server";
 
 export const PATCH: APIRoute = async ({ request }) => {
   const session = await getSession(request);
@@ -11,7 +12,8 @@ export const PATCH: APIRoute = async ({ request }) => {
 
   const body = await request.json();
   await updateCreatorProfile(creator.id, body);
-  return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json" } });
+  ServerAnalytics.track(session.user.id, 'creator_profile_updated', { creator_id: creator.id });
+  return new Response(JSON.stringify({ success: true, id: creator.id }), { headers: { "Content-Type": "application/json" } });
 };
 
 export const GET: APIRoute = async ({ request }) => {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import CourseCard from '../molecules/CourseCard';
+import { Analytics } from '../../../lib/analytics';
 
 interface CatalogCourse {
   id: string; title: string; slug: string; description: string | null;
@@ -12,6 +13,7 @@ export default function CourseCatalog() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    Analytics.track('course_catalog_viewed');
     fetch('/api/courses')
       .then(r => r.json())
       .then(data => { setCourses(data); setLoading(false); })

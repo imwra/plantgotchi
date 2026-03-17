@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../../../../../lib/auth";
 import { getCourseBySlug, getEnrollment, getModule, completeModule } from "../../../../../../lib/db/lms-queries";
+import { ServerAnalytics } from "../../../../../../lib/analytics.server";
 
 export const POST: APIRoute = async ({ request, params }) => {
   const session = await getSession(request);
@@ -27,5 +28,6 @@ export const POST: APIRoute = async ({ request, params }) => {
   const quizAnswers = body.quiz_answers ? JSON.stringify(body.quiz_answers) : undefined;
 
   const completion = await completeModule(moduleId, session.user.id, quizAnswers);
+  ServerAnalytics.track(session.user.id, 'course_lesson_completed', { course_id: course.id, module_id: params.moduleId });
   return new Response(JSON.stringify(completion), { status: 201, headers: { "Content-Type": "application/json" } });
 };

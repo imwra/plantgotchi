@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import CoursePriceBadge from '../atoms/CoursePriceBadge';
 import PhaseAccordion from '../molecules/PhaseAccordion';
+import { Analytics } from '../../../lib/analytics';
 
 interface CourseDetail {
   id: string; title: string; slug: string; description: string | null;
@@ -18,7 +19,10 @@ export default function CourseLandingPage({ slug }: { slug: string }) {
   useEffect(() => {
     fetch(`/api/courses/${slug}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(setCourse)
+      .then(data => {
+        setCourse(data);
+        Analytics.track('course_landing_viewed', { course_id: data.id, course_slug: data.slug, is_free: data.price_cents === 0 });
+      })
       .catch(() => setCourse(null))
       .finally(() => setLoading(false));
   }, [slug]);

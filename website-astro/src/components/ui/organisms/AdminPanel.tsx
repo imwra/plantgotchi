@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SiteNav from './SiteNav';
 import OverviewTab from '../../admin/OverviewTab';
 import UsersTab from '../../admin/UsersTab';
 import PlantsTab from '../../admin/PlantsTab';
 import ActivityTab from '../../admin/ActivityTab';
+import { Analytics } from '../../../lib/analytics';
 
 // ---------------------------------------------------------------------------
 // Tab types
@@ -30,6 +31,10 @@ export interface AdminPanelProps {
 
 export default function AdminPanel({ userName, locale, navLabels }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+
+  useEffect(() => {
+    Analytics.track('admin_panel_viewed', { tab: activeTab });
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-bg text-text">
