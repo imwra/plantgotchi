@@ -1,14 +1,21 @@
 import type { APIRoute } from "astro";
 
-export const GET: APIRoute = async ({ locals }) => {
-  const runtime = (locals as any).runtime;
-  return new Response(JSON.stringify({
-    hasTursoUrl: !!import.meta.env.TURSO_URL,
-    tursoUrlPrefix: import.meta.env.TURSO_URL?.substring(0, 15) || "NOT_SET",
-    hasAuthSecret: !!import.meta.env.BETTER_AUTH_SECRET,
-    runtimeEnvKeys: runtime?.env ? Object.keys(runtime.env) : "no_runtime",
-    runtimeTursoUrl: runtime?.env?.TURSO_URL?.substring(0, 15) || "NOT_IN_RUNTIME",
-  }), {
-    headers: { "Content-Type": "application/json" },
-  });
+export const GET: APIRoute = async () => {
+  try {
+    const tursoUrl = import.meta.env.TURSO_URL || "";
+    const hasSecret = !!import.meta.env.BETTER_AUTH_SECRET;
+
+    return new Response(JSON.stringify({
+      tursoUrlSet: tursoUrl.length > 0,
+      tursoUrlStart: tursoUrl.substring(0, 20),
+      authSecretSet: hasSecret,
+    }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (e: any) {
+    return new Response(JSON.stringify({ error: e.message, stack: e.stack?.substring(0, 500) }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 };
