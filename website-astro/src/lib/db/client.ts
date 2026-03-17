@@ -9,11 +9,10 @@ export function getDb(): Client {
   const authToken = import.meta.env.TURSO_AUTH_TOKEN;
 
   if (!url) {
-    console.warn("TURSO_URL not set, using in-memory SQLite");
-    db = createClient({ url: ":memory:" });
-  } else {
-    db = createClient({ url, authToken });
+    throw new Error("TURSO_URL environment variable is not set");
   }
+
+  db = createClient({ url, authToken });
 
   return db;
 }
