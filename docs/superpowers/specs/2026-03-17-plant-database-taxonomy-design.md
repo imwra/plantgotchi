@@ -214,6 +214,49 @@ Each source gets an **adapter** with:
 3. **Merger** — deduplicates against existing catalog entries (match on normalized `name` + `breeder` columns; if breeder is null, match on name + subcategory)
 4. **Source tracker** — updates `plant_source_mappings` with external IDs and `last_synced`
 
+### Ingestion workflow (GitHub Actions)
+
+The entire pipeline runs as a GitHub Action — zero infrastructure cost. Free for public repos, 2,000 min/month for private repos.
+
+**Directory structure:**
+
+```
+ingestion/
+├── adapters/           # One adapter per source (fetcher + normalizer)
+│   ├── kushy.ts
+│   ├── kaggle-strains.ts
+│   ├── otreeba.ts
+│   └── ...
+├── core/
+│   ├── merger.ts       # Dedup + merge logic
+│   ├── reporter.ts     # Summary generation
+│   └── turso-client.ts # Write to Turso
+├── raw/                # Git-tracked archive of raw downloads
+│   ├── kushy/
+│   │   └── 2026-03-17.csv
+│   ├── kaggle/
+│   │   └── 2026-03-17.csv
+│   └── ...
+└── staged/             # Normalized data ready for review
+    └── 2026-03-17-kushy.json
+```
+
+**Workflow steps:**
+
+1. **Download** — GitHub Action runs on a cron schedule (monthly for Tier 1). Each adapter fetches raw data from its source.
+2. **Archive** — Raw downloads get committed to `ingestion/raw/{source}/{date}` in the repo. This gives us a git history of what each source looked like at each sync point.
+3. **Normalize** — Each adapter transforms raw data into our `plant_catalog` schema, outputting to `ingestion/staged/`.
+4. **Diff & report** — The merger compares staged data against what's currently in Turso. Generates a summary: X new strains, Y updated, Z conflicts needing manual review.
+5. **Review gate** — The Action creates a PR with the raw data archive + a summary comment showing what will change. A human reviews and approves.
+6. **Merge to Turso** — On PR merge, a second Action pushes the staged data to Turso. Dedup runs, source mappings update, `last_synced` refreshes in `data_sources`.
+7. **Report** — Job summary posted to the PR: final counts, any warnings, source health status.
+
+**Review gate rationale:** We start with human review on every sync until we trust the pipeline. Once stable, individual sources can be flipped to fully automated (skip the PR, push directly on cron). The `data_sources.notes` field tracks which sources are trusted for auto-merge.
+
+**Failure handling:**
+- If a source fetch fails (site down, API changed), the Action logs the failure, marks `data_sources.status = 'degraded'`, and continues with other sources.
+- If dedup produces ambiguous matches (multiple candidates), those entries are flagged in the PR for manual resolution rather than auto-merged.
+
 ### Source registry: `data_sources` table
 
 | Column | Type | Purpose |
