@@ -62,6 +62,18 @@ struct PlantgotchiApp: App {
             PostHogSDK.shared.register(["platform": "ios", "app_version": "1.0.0"])
         }
 
+        // Global exception handler
+        NSSetUncaughtExceptionHandler { exception in
+            let error = NSError(
+                domain: exception.name.rawValue,
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: exception.reason ?? ""]
+            )
+            Analytics.captureException(error, context: [
+                "$exception_stack_trace_raw": exception.callStackSymbols.joined(separator: "\n"),
+            ])
+        }
+
         // Register background task for Claude API analysis
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: BackgroundAgent.taskIdentifier,
