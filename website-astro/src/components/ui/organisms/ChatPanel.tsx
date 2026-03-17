@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import ConversationList, { type Conversation } from './ConversationList';
 import ConversationView, { type Message } from './ConversationView';
+import { DEFAULT_CHAT_LABELS, type ChatLabels } from './ChatApp';
 
 export interface ChatPanelProps {
   conversations: Conversation[];
@@ -10,6 +11,7 @@ export interface ChatPanelProps {
   onSend?: (message: string) => void;
   onNewConversation?: () => void;
   typingUsers?: string[];
+  labels?: ChatLabels;
 }
 
 export default function ChatPanel({
@@ -20,6 +22,7 @@ export default function ChatPanel({
   onSend,
   onNewConversation,
   typingUsers = [],
+  labels = DEFAULT_CHAT_LABELS,
 }: ChatPanelProps) {
   const activeConversation = conversations.find((c) => c.id === activeConversationId);
 
@@ -37,6 +40,13 @@ export default function ChatPanel({
           activeId={activeConversationId}
           onSelect={onSelectConversation}
           onNewConversation={onNewConversation}
+          labels={{
+            heading: labels.heading,
+            newMessage: labels.newMessage,
+            searchPlaceholder: labels.searchPlaceholder,
+            noConversations: labels.noConversations,
+            noConversationsDesc: labels.noConversationsDesc,
+          }}
         />
       </div>
 
@@ -55,12 +65,22 @@ export default function ChatPanel({
             typingUsers={typingUsers}
             onSend={onSend}
             onBack={() => onSelectConversation?.('')}
+            labels={{
+              inputPlaceholder: labels.inputPlaceholder,
+              members: labels.members,
+              typing: labels.typing,
+              typingMultiple: labels.typingMultiple,
+              today: labels.today,
+              yesterday: labels.yesterday,
+              loadingMessages: labels.loadingMessages,
+              sendImage: labels.sendImage,
+            }}
           />
         ) : (
           <div className="flex flex-col items-center justify-center h-full bg-bg text-center px-4">
             <span className="text-4xl mb-3">🌿</span>
-            <p className="font-pixel text-pixel-sm text-text-mid">Select a conversation</p>
-            <p className="text-xs text-text-mid mt-1">Choose a chat from the list to start messaging</p>
+            <p className="font-pixel text-pixel-sm text-text-mid">{labels.selectConversation}</p>
+            <p className="text-xs text-text-mid mt-1">{labels.selectConversationDesc}</p>
           </div>
         )}
       </div>

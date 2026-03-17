@@ -103,5 +103,7 @@
   "chat.cancel": "Cancelar",
   "chat.addMembers": "Adicionar Membros",
   "chat.loadingMessages": "Carregando mensagens...",
-  "chat.sendImage": "Enviar Imagem"
+  "chat.sendImage": "Enviar Imagem",
+  "chat.selectConversation": "Selecione uma conversa",
+  "chat.selectConversationDesc": "Escolha um chat da lista para comecar a conversar"
 }

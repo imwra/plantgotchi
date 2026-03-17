@@ -5,13 +5,71 @@ import SiteNav from './SiteNav';
 import type { Conversation } from './ConversationList';
 import type { Message } from './ConversationView';
 
+// ---------------------------------------------------------------------------
+// ChatLabels
+// ---------------------------------------------------------------------------
+
+export interface ChatLabels {
+  heading: string;
+  newMessage: string;
+  searchPlaceholder: string;
+  noConversations: string;
+  noConversationsDesc: string;
+  inputPlaceholder: string;
+  members: string;
+  typing: string;
+  typingMultiple: string;
+  today: string;
+  yesterday: string;
+  you: string;
+  dmTab: string;
+  groupTab: string;
+  groupName: string;
+  searchUsers: string;
+  create: string;
+  cancel: string;
+  addMembers: string;
+  loadingMessages: string;
+  sendImage: string;
+  selectConversation: string;
+  selectConversationDesc: string;
+}
+
+export const DEFAULT_CHAT_LABELS: ChatLabels = {
+  heading: 'CHAT',
+  newMessage: 'New Message',
+  searchPlaceholder: 'Search...',
+  noConversations: 'No conversations yet',
+  noConversationsDesc: 'Start a conversation with another plant lover!',
+  inputPlaceholder: 'Type a message...',
+  members: 'members',
+  typing: 'is typing...',
+  typingMultiple: 'are typing...',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  you: 'You',
+  dmTab: 'Direct Message',
+  groupTab: 'Group',
+  groupName: 'Group Name',
+  searchUsers: 'Search users...',
+  create: 'Create',
+  cancel: 'Cancel',
+  addMembers: 'Add Members',
+  loadingMessages: 'Loading messages...',
+  sendImage: 'Send Image',
+  selectConversation: 'Select a conversation',
+  selectConversationDesc: 'Choose a chat from the list to start messaging',
+};
+
 export interface ChatAppProps {
   userName: string;
   locale?: string;
   navLabels?: Record<string, string>;
+  chatLabels?: ChatLabels;
 }
 
-export default function ChatApp({ userName, locale, navLabels }: ChatAppProps) {
+export default function ChatApp({ userName, locale, navLabels, chatLabels }: ChatAppProps) {
+  const labels = chatLabels ?? DEFAULT_CHAT_LABELS;
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -326,7 +384,7 @@ export default function ChatApp({ userName, locale, navLabels }: ChatAppProps) {
         {loading && (
           <div className="text-center py-12">
             <div className="text-3xl mb-4 animate-pulse">💬</div>
-            <p className="font-pixel text-pixel-sm text-text-light">Loading...</p>
+            <p className="font-pixel text-pixel-sm text-text-light">{labels.loadingMessages}</p>
           </div>
         )}
 
@@ -348,6 +406,7 @@ export default function ChatApp({ userName, locale, navLabels }: ChatAppProps) {
               onSend={handleSend}
               onNewConversation={() => setShowNewConversation(true)}
               typingUsers={typingUsers}
+              labels={labels}
             />
           </div>
         )}
@@ -364,6 +423,16 @@ export default function ChatApp({ userName, locale, navLabels }: ChatAppProps) {
           onCreateGroup={handleCreateGroup}
           searchResults={searchResults}
           onSearch={handleSearchUsers}
+          labels={{
+            newMessage: labels.newMessage,
+            dmTab: labels.dmTab,
+            groupTab: labels.groupTab,
+            groupName: labels.groupName,
+            searchUsers: labels.searchUsers,
+            create: labels.create,
+            cancel: labels.cancel,
+            addMembers: labels.addMembers,
+          }}
         />
       )}
     </div>

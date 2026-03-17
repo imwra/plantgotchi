@@ -11,23 +11,40 @@ export interface Conversation {
   memberCount: number;
 }
 
+export interface ConversationListLabels {
+  heading: string;
+  newMessage: string;
+  searchPlaceholder: string;
+  noConversations: string;
+  noConversationsDesc: string;
+}
+
+const DEFAULT_LABELS: ConversationListLabels = {
+  heading: 'CHAT',
+  newMessage: 'New Message',
+  searchPlaceholder: 'Search...',
+  noConversations: 'No conversations yet',
+  noConversationsDesc: 'Start a chat with fellow plant lovers!',
+};
+
 export interface ConversationListProps {
   conversations: Conversation[];
   activeId?: string;
   onSelect?: (id: string) => void;
   onNewConversation?: () => void;
+  labels?: ConversationListLabels;
 }
 
-export default function ConversationList({ conversations, activeId, onSelect, onNewConversation }: ConversationListProps) {
+export default function ConversationList({ conversations, activeId, onSelect, onNewConversation, labels = DEFAULT_LABELS }: ConversationListProps) {
   return (
     <div className="flex flex-col h-full bg-white border-r border-text-mid/20">
       <div className="flex items-center justify-between px-4 py-3 border-b border-text-mid/20">
-        <h2 className="font-pixel text-pixel-sm text-text">CHAT</h2>
+        <h2 className="font-pixel text-pixel-sm text-text">{labels.heading}</h2>
         <button
           type="button"
           onClick={onNewConversation}
           className="w-8 h-8 flex items-center justify-center rounded hover:bg-primary-pale transition-colors cursor-pointer"
-          aria-label="New conversation"
+          aria-label={labels.newMessage}
         >
           ✏️
         </button>
@@ -36,7 +53,7 @@ export default function ConversationList({ conversations, activeId, onSelect, on
       <div className="px-3 py-2 border-b border-text-mid/20">
         <input
           type="text"
-          placeholder="Buscar conversas..."
+          placeholder={labels.searchPlaceholder}
           className="w-full px-3 py-1.5 font-pixel text-pixel-xs bg-bg rounded-md border border-text-mid/20 outline-none focus:border-primary/50"
           readOnly
         />
@@ -46,8 +63,8 @@ export default function ConversationList({ conversations, activeId, onSelect, on
         {conversations.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full px-4 text-center">
             <span className="text-3xl mb-3">🌱</span>
-            <p className="font-pixel text-pixel-sm text-text-mid">No conversations yet</p>
-            <p className="text-xs text-text-mid mt-1">Start a chat with fellow plant lovers!</p>
+            <p className="font-pixel text-pixel-sm text-text-mid">{labels.noConversations}</p>
+            <p className="text-xs text-text-mid mt-1">{labels.noConversationsDesc}</p>
           </div>
         ) : (
           <div className="divide-y divide-text-mid/10">

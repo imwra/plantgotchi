@@ -7,12 +7,35 @@ export interface SearchUser {
   emoji: string;
 }
 
+export interface NewConversationModalLabels {
+  newMessage: string;
+  dmTab: string;
+  groupTab: string;
+  groupName: string;
+  searchUsers: string;
+  create: string;
+  cancel: string;
+  addMembers: string;
+}
+
+const DEFAULT_LABELS: NewConversationModalLabels = {
+  newMessage: 'New Message',
+  dmTab: 'Direct Message',
+  groupTab: 'Group',
+  groupName: 'Group Name',
+  searchUsers: 'Search users...',
+  create: 'Create',
+  cancel: 'Cancel',
+  addMembers: 'Add Members',
+};
+
 export interface NewConversationModalProps {
   onClose: () => void;
   onCreateDM?: (userId: string) => void;
   onCreateGroup?: (name: string, memberIds: string[]) => void;
   searchResults: SearchUser[];
   onSearch?: (query: string) => void;
+  labels?: NewConversationModalLabels;
 }
 
 export default function NewConversationModal({
@@ -21,6 +44,7 @@ export default function NewConversationModal({
   onCreateGroup,
   searchResults,
   onSearch,
+  labels = DEFAULT_LABELS,
 }: NewConversationModalProps) {
   const [activeTab, setActiveTab] = useState<'dm' | 'group'>('dm');
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,12 +81,12 @@ export default function NewConversationModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="pixel-border bg-white rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b border-text-mid/20">
-          <h2 className="font-pixel text-[11px] text-text">NEW CONVERSATION</h2>
+          <h2 className="font-pixel text-[11px] text-text">{labels.newMessage.toUpperCase()}</h2>
           <button
             type="button"
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-md bg-bg border border-text-mid/20 font-pixel text-[10px] text-text-mid hover:text-text hover:bg-brown-pale cursor-pointer transition-colors"
-            aria-label="Close"
+            aria-label={labels.cancel}
           >
             ✕
           </button>
@@ -79,7 +103,7 @@ export default function NewConversationModal({
                 : 'text-text-mid hover:text-text',
             )}
           >
-            DIRECT MESSAGE
+            {labels.dmTab.toUpperCase()}
           </button>
           <button
             type="button"
@@ -91,7 +115,7 @@ export default function NewConversationModal({
                 : 'text-text-mid hover:text-text',
             )}
           >
-            GROUP
+            {labels.groupTab.toUpperCase()}
           </button>
         </div>
 
@@ -102,7 +126,7 @@ export default function NewConversationModal({
                 type="text"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                placeholder="Group name..."
+                placeholder={`${labels.groupName}...`}
                 className="w-full pixel-border px-3 py-2 text-sm bg-white outline-none mb-2"
               />
               {selectedMembers.length > 0 && (
@@ -131,7 +155,7 @@ export default function NewConversationModal({
             type="text"
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search users..."
+            placeholder={labels.searchUsers}
             className="w-full pixel-border px-3 py-2 font-pixel text-pixel-sm bg-white outline-none mb-3"
           />
 
@@ -180,7 +204,7 @@ export default function NewConversationModal({
                   : 'bg-text-mid/20 text-text-mid cursor-not-allowed',
               )}
             >
-              CREATE GROUP
+              {labels.create.toUpperCase()}
             </button>
           </div>
         )}

@@ -15,6 +15,28 @@ export interface Message {
   reactions: Reaction[];
 }
 
+export interface ConversationViewLabels {
+  inputPlaceholder: string;
+  members: string;
+  typing: string;
+  typingMultiple: string;
+  today: string;
+  yesterday: string;
+  loadingMessages: string;
+  sendImage: string;
+}
+
+const DEFAULT_LABELS: ConversationViewLabels = {
+  inputPlaceholder: 'Type a message...',
+  members: 'members',
+  typing: 'is typing...',
+  typingMultiple: 'are typing...',
+  today: 'Today',
+  yesterday: 'Yesterday',
+  loadingMessages: 'Loading messages...',
+  sendImage: 'Send Image',
+};
+
 export interface ConversationViewProps {
   messages: Message[];
   conversationName: string;
@@ -24,6 +46,7 @@ export interface ConversationViewProps {
   onSend?: (message: string) => void;
   onReact?: (messageId: string) => void;
   onBack?: () => void;
+  labels?: ConversationViewLabels;
 }
 
 export default function ConversationView({
@@ -35,6 +58,7 @@ export default function ConversationView({
   onSend,
   onReact,
   onBack,
+  labels = DEFAULT_LABELS,
 }: ConversationViewProps) {
   const [inputValue, setInputValue] = useState('');
 
@@ -61,14 +85,14 @@ export default function ConversationView({
         <div className="flex-1 min-w-0">
           <h2 className="font-pixel text-pixel-sm text-text truncate">{conversationName}</h2>
           {isGroup && memberCount && (
-            <span className="font-pixel text-pixel-xs text-text-mid">{memberCount} members</span>
+            <span className="font-pixel text-pixel-xs text-text-mid">{memberCount} {labels.members}</span>
           )}
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
         <div className="text-center">
-          <span className="font-pixel text-pixel-xs text-text-mid bg-white px-2 py-1 rounded">Today</span>
+          <span className="font-pixel text-pixel-xs text-text-mid bg-white px-2 py-1 rounded">{labels.today}</span>
         </div>
 
         {messages.map((msg) => (
@@ -89,7 +113,7 @@ export default function ConversationView({
           <div className="flex items-center gap-2">
             <TypingDots />
             <span className="font-pixel text-pixel-xs text-text-mid">
-              {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+              {typingUsers.join(', ')} {typingUsers.length === 1 ? labels.typing : labels.typingMultiple}
             </span>
           </div>
         )}
@@ -99,6 +123,7 @@ export default function ConversationView({
         value={inputValue}
         onChange={setInputValue}
         onSend={handleSend}
+        placeholder={labels.inputPlaceholder}
       />
     </div>
   );
