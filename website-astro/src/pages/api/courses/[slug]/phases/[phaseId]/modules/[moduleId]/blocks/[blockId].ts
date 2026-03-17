@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
-import { getSession } from "../../../../../../../../lib/auth";
-import { getCourseBySlug, getCreatorByUserId, updateContentBlock, deleteContentBlock } from "../../../../../../../../lib/db/lms-queries";
+import { getSession } from "../../../../../../../../../lib/auth";
+import { getCourseBySlug, getCreatorByUserId, updateContentBlock, deleteContentBlock } from "../../../../../../../../../lib/db/lms-queries";
 
 export const PATCH: APIRoute = async ({ request, params }) => {
   const session = await getSession(request);
