@@ -8,6 +8,7 @@ import CareLogForm from "./CareLogForm";
 import ReadingForm from "./ReadingForm";
 import RecommendationsList from "./RecommendationsList";
 import CareHistory from "./CareHistory";
+import { DEMO_PLANTS, DEMO_RECOMMENDATIONS } from "../lib/demo-data";
 
 const PIXEL_FONT = `"Press Start 2P", monospace`;
 
@@ -209,12 +210,18 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
   );
 }
 
-function DetailPanel({ plant, onClose, onRefresh }: { plant: PlantView | undefined; onClose?: () => void; onRefresh: () => void }) {
+function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView | undefined; onClose?: () => void; onRefresh: () => void; demoMode?: boolean }) {
   const [careLogs, setCareLogs] = useState<CareLog[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
   useEffect(() => {
     if (!plant) return;
+    if (demoMode) {
+      const demoEntry = DEMO_PLANTS.find(d => d.plant.id === plant.id);
+      setCareLogs(demoEntry?.recentCareLogs ?? []);
+      setRecommendations(DEMO_RECOMMENDATIONS.filter(r => r.plant_id === plant.id));
+      return;
+    }
     const fetchDetails = async () => {
       const [logsRes, recsRes] = await Promise.all([
         fetch(`/api/care-logs?plantId=${plant.id}&limit=10`),
@@ -224,10 +231,11 @@ function DetailPanel({ plant, onClose, onRefresh }: { plant: PlantView | undefin
       if (recsRes.ok) setRecommendations(await recsRes.json());
     };
     fetchDetails();
-  }, [plant?.id]);
+  }, [plant?.id, demoMode]);
 
   const refreshDetails = async () => {
     if (!plant) return;
+    if (demoMode) return;
     onRefresh();
     const [logsRes, recsRes] = await Promise.all([
       fetch(`/api/care-logs?plantId=${plant.id}&limit=10`),
@@ -320,20 +328,24 @@ function DetailPanel({ plant, onClose, onRefresh }: { plant: PlantView | undefin
       )}
 
       {/* Reading Form */}
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-          📊 LOG READING
+      {!demoMode && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
+            📊 LOG READING
+          </div>
+          <ReadingForm plantId={plant.id} onSubmitted={refreshDetails} />
         </div>
-        <ReadingForm plantId={plant.id} onSubmitted={refreshDetails} />
-      </div>
+      )}
 
       {/* Care Log Form */}
-      <div style={{ marginBottom: 14 }}>
-        <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
-          🌱 LOG CARE
+      {!demoMode && (
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textMid, marginBottom: 8 }}>
+            🌱 LOG CARE
+          </div>
+          <CareLogForm plantId={plant.id} onLogged={refreshDetails} />
         </div>
-        <CareLogForm plantId={plant.id} onLogged={refreshDetails} />
-      </div>
+      )}
 
       {/* Care History */}
       <div>
@@ -348,9 +360,11 @@ function DetailPanel({ plant, onClose, onRefresh }: { plant: PlantView | undefin
 
 interface GardenDashboardProps {
   userName?: string;
+  demoMode?: boolean;
+  demoBannerText?: string;
 }
 
-export default function GardenDashboard({ userName }: GardenDashboardProps) {
+export default function GardenDashboard({ userName, demoMode, demoBannerText }: GardenDashboardProps) {
   const [plants, setPlants] = useState<PlantView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -362,6 +376,12 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
   const selectedPlant = plants.find(p => p.id === selectedId);
 
   const fetchPlants = async () => {
+    if (demoMode) {
+      const views = DEMO_PLANTS.map((d) => toPlantView(d.plant, d.latestReading, d.recentCareLogs));
+      setPlants(views);
+      setLoading(false);
+      return;
+    }
     try {
       const res = await fetch("/api/plants");
       if (!res.ok) throw new Error("Failed to load plants");
@@ -395,6 +415,19 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
       fontFamily: PIXEL_FONT, color: COLORS.text,
     }}>
       <SiteNav userName={userName} />
+      {demoMode && (
+        <div style={{
+          background: COLORS.sunPale,
+          borderBottom: `2px solid ${COLORS.sun}`,
+          padding: "6px 16px",
+          textAlign: "center",
+          fontFamily: PIXEL_FONT,
+          fontSize: 8,
+          color: COLORS.text,
+        }}>
+          {demoBannerText || "Demo Mode \u2014 data is not saved"}
+        </div>
+      )}
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
 @keyframes wilt { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(2px) rotate(-6deg)} }
@@ -428,17 +461,19 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <button
-              onClick={() => setShowAddModal(true)}
-              style={{
-                fontFamily: PIXEL_FONT, fontSize: 7, background: COLORS.primary,
-                color: COLORS.white, border: `1.5px solid ${COLORS.primaryDark}`,
-                borderRadius: 6, padding: "6px 12px", cursor: "pointer",
-                boxShadow: `1px 1px 0 ${COLORS.primaryDark}`,
-              }}
-            >
-              + ADD
-            </button>
+            {!demoMode && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                style={{
+                  fontFamily: PIXEL_FONT, fontSize: 7, background: COLORS.primary,
+                  color: COLORS.white, border: `1.5px solid ${COLORS.primaryDark}`,
+                  borderRadius: 6, padding: "6px 12px", cursor: "pointer",
+                  boxShadow: `1px 1px 0 ${COLORS.primaryDark}`,
+                }}
+              >
+                + ADD
+              </button>
+            )}
             <div style={{
               fontSize: 9, color: COLORS.textMid,
               background: COLORS.bgCard, padding: "4px 10px", borderRadius: 6,
@@ -521,7 +556,7 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
               <div style={{ fontFamily: PIXEL_FONT, fontSize: 7, color: COLORS.textLight, marginBottom: 10 }}>
                 PLANT DETAILS
               </div>
-              <DetailPanel plant={selectedPlant} onRefresh={fetchPlants} />
+              <DetailPanel plant={selectedPlant} onRefresh={fetchPlants} demoMode={demoMode} />
             </div>
           </div>
         )}
@@ -539,13 +574,13 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
             overflowY: "auto", padding: "0 12px 24px", animation: "slideUp 0.25s ease",
           }}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: COLORS.borderLight, margin: "8px auto 12px" }} />
-            <DetailPanel plant={selectedPlant} onClose={() => setShowDetail(false)} onRefresh={fetchPlants} />
+            <DetailPanel plant={selectedPlant} onClose={() => setShowDetail(false)} onRefresh={fetchPlants} demoMode={demoMode} />
           </div>
         </div>
       )}
 
       {/* Add Plant Modal */}
-      {showAddModal && <AddPlantModal onClose={() => setShowAddModal(false)} onCreated={fetchPlants} />}
+      {showAddModal && !demoMode && <AddPlantModal onClose={() => setShowAddModal(false)} onCreated={fetchPlants} />}
 
       <div style={{
         textAlign: "center", padding: "16px 16px 20px",

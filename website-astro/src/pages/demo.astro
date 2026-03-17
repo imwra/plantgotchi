@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import GardenDashboard from "../components/GardenDashboard";
+import { getLocaleFromPath, useTranslations } from "../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={t("demo.title")}>
+  <GardenDashboard client:load userName="Demo" demoMode={true} demoBannerText={t("demo.banner")} />
+</BaseLayout>

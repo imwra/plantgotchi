@@ -42,5 +42,7 @@
   "help.breadcrumb.help": "Help",
   "help.sidebar.title": "Help Topics",
   "mocks.title": "HTML Mockups",
-  "mocks.subtitle": "Interactive HTML/CSS replicas of the Plantgotchi dashboard"
+  "mocks.subtitle": "Interactive HTML/CSS replicas of the Plantgotchi dashboard",
+  "demo.banner": "Demo Mode \u2014 data is not saved",
+  "demo.title": "Garden Demo - Plantgotchi"
 }
