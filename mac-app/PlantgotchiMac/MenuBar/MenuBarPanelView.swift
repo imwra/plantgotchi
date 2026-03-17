@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MenuBarPanelView: View {
+    @Environment(\.openWindow) private var openWindow
     @ObservedObject var controller: MenuBarSceneController
 
     var body: some View {
@@ -13,10 +14,17 @@ struct MenuBarPanelView: View {
                     Text(viewModel.attentionSummary)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                    Text(viewModel.updatedText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     Button("Refresh") {
                         controller.refresh()
                     }
                     .buttonStyle(.borderedProminent)
+                    Button("Open Garden") {
+                        openWindow(id: "garden")
+                    }
+                    .buttonStyle(.bordered)
                 }
                 .padding(16)
                 .frame(width: 240)
@@ -29,6 +37,10 @@ struct MenuBarPanelView: View {
                         .foregroundStyle(.secondary)
                     Button("Refresh") {
                         controller.refresh()
+                    }
+                    .buttonStyle(.bordered)
+                    Button("Open Garden") {
+                        openWindow(id: "garden")
                     }
                     .buttonStyle(.bordered)
                 }

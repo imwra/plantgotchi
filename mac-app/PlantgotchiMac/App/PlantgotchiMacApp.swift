@@ -1,9 +1,18 @@
 import SwiftUI
+import PlantgotchiCore
 
 @main
 struct PlantgotchiMacApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
-    @StateObject private var menuBarController = MenuBarSceneController()
+    @StateObject private var menuBarController: MenuBarSceneController
+
+    init() {
+        let controller = MenuBarSceneController()
+        _menuBarController = StateObject(wrappedValue: controller)
+        AppDelegate.refreshHandler = {
+            controller.refresh()
+        }
+    }
 
     var body: some Scene {
         MenuBarExtra {
@@ -12,10 +21,13 @@ struct PlantgotchiMacApp: App {
             MenuBarStatusView(snapshot: menuBarController.snapshot)
         }
 
-        WindowGroup("Garden") {
-            Text("Mac garden shell")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        WindowGroup("Garden", id: "garden") {
+            GardenWindowView(snapshot: menuBarController.snapshot ?? fallbackSnapshot)
         }
         .defaultSize(width: 1100, height: 760)
+    }
+
+    private var fallbackSnapshot: GardenSnapshot {
+        MenuBarPanelViewModel.makeSnapshot(vitality: .medium, attentionCount: 0)
     }
 }

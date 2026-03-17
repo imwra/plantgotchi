@@ -20,6 +20,20 @@
                ReferencedContainer = "container:PlantgotchiMac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "43AF7D423F99DC5362FE29A9"
+               BuildableName = "PlantgotchiWidgetsTests.xctest"
+               BlueprintName = "PlantgotchiWidgetsTests"
+               ReferencedContainer = "container:PlantgotchiMac.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -28,6 +42,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "43AF7D423F99DC5362FE29A9"
+               BuildableName = "PlantgotchiWidgetsTests.xctest"
+               BlueprintName = "PlantgotchiWidgetsTests"
+               ReferencedContainer = "container:PlantgotchiMac.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
