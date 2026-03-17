@@ -8,6 +8,7 @@ export interface SiteNavProps {
     home: string;
     garden: string;
     chat?: string;
+    projects?: string;
     help: string;
     admin: string;
     login: string;
@@ -18,6 +19,7 @@ export interface SiteNavProps {
     langCurrentPtbr: string;
     langCurrentEn: string;
   };
+  isAdmin?: boolean;
   currentPath?: string;
 }
 
@@ -40,6 +42,7 @@ export default function SiteNav({
   userName,
   locale = 'pt-br',
   labels = DEFAULT_LABELS,
+  isAdmin,
   currentPath = '/',
 }: SiteNavProps) {
   const [open, setOpen] = useState(false);
@@ -49,6 +52,7 @@ export default function SiteNav({
     { label: labels.home, href: `${prefix}/` },
     { label: labels.garden, href: `${prefix}/garden` },
     { label: labels.chat || 'Chat', href: `${prefix}/chat` },
+    ...(isAdmin || labels.projects ? [{ label: labels.projects || 'Projects', href: `${prefix}/projects` }] : []),
     { label: labels.help, href: `${prefix}/help` },
     { label: labels.admin, href: `${prefix}/admin` },
   ];
