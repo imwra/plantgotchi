@@ -106,6 +106,7 @@ fun AppNavigation() {
 
         composable(Routes.ADD_PLANT) {
             AddPlantScreen(
+                userId = app.authService.userId ?: "local-user",
                 onBack = { navController.popBackStack() },
                 onPlantAdded = { plantId ->
                     navController.popBackStack()

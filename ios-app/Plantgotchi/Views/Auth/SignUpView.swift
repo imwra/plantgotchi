@@ -4,8 +4,6 @@ import AuthenticationServices
 
 struct SignUpView: View {
     @EnvironmentObject private var authService: AuthService
-    @EnvironmentObject private var themeManager: ThemeManager
-
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
@@ -102,9 +100,7 @@ struct SignUpView: View {
                     } onCompletion: { result in
                         handleAppleSignIn(result)
                     }
-                    .signInWithAppleButtonStyle(
-                        themeManager.isDarkMode ? .white : .black
-                    )
+                    .signInWithAppleButtonStyle(.black)
                     .frame(height: 48)
                     .cornerRadius(12)
                     .padding(.horizontal, 24)

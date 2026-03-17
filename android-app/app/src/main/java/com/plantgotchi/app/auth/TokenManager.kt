@@ -5,6 +5,14 @@ import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 
+interface TokenStore {
+    fun getToken(): String?
+    fun saveToken(token: String)
+    fun clearToken()
+    fun getUserId(): String?
+    fun saveUserId(id: String)
+}
+
 class TokenManager private constructor(private val prefs: SharedPreferences) : TokenStore {
 
     override fun saveToken(token: String) {
@@ -27,14 +35,6 @@ class TokenManager private constructor(private val prefs: SharedPreferences) : T
     override fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
 
     val isAuthenticated: Boolean get() = getToken() != null
-
-    interface TokenStore {
-        fun getToken(): String?
-        fun saveToken(token: String)
-        fun clearToken()
-        fun getUserId(): String?
-        fun saveUserId(id: String)
-    }
 
     companion object {
         private const val KEY_TOKEN = "auth_bearer_token"
