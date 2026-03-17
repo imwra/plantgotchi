@@ -20,6 +20,7 @@ android {
 
         buildConfigField("String", "POSTHOG_API_KEY", "\"${project.findProperty("POSTHOG_API_KEY") ?: ""}\"")
         buildConfigField("String", "POSTHOG_HOST", "\"${project.findProperty("POSTHOG_HOST") ?: "https://us.i.posthog.com"}\"")
+        buildConfigField("String", "API_BASE_URL", "\"${project.findProperty("API_BASE_URL") ?: "http://10.0.2.2:4321"}\"")
     }
 
     buildTypes {
@@ -92,6 +93,9 @@ dependencies {
 
     // DataStore Preferences (for settings)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Encrypted SharedPreferences (for auth token storage)
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
     // Core KTX + AppCompat (for per-app locale support)
     implementation("androidx.core:core-ktx:1.15.0")
