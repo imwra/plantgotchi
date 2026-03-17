@@ -42,7 +42,7 @@ const htmlLang = locale === "pt-br" ? "pt-BR" : "en";
           persistence: 'localStorage+cookie',
         });
 
-        posthog.register({ platform: 'web' });
+        posthog.register({ platform: 'web', app_version: '1.0.0' });
       }
     </script>
   </head>
