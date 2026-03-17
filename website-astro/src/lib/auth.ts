@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { admin } from "better-auth/plugins";
+import { admin, bearer } from "better-auth/plugins";
 import { LibsqlDialect } from "@libsql/kysely-libsql";
 import { Kysely } from "kysely";
 import { getDb } from "./db/client";
@@ -22,8 +22,16 @@ export const auth = betterAuth({
       maxAge: 60 * 5,
     },
   },
+  socialProviders: {
+    apple: {
+      clientId: import.meta.env.APPLE_CLIENT_ID,
+      clientSecret: import.meta.env.APPLE_CLIENT_SECRET,
+      appBundleIdentifier: import.meta.env.APPLE_BUNDLE_ID,
+    },
+  },
   plugins: [
     admin(),
+    bearer(),
   ],
 });
 

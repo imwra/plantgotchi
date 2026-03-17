@@ -1,21 +1,37 @@
 import SwiftUI
+#if os(iOS)
 import BackgroundTasks
+#endif
 import PostHog
 
+#if os(iOS)
 @main
 struct PlantgotchiApp: App {
     @StateObject private var bleManager = BLEManager()
     @ObservedObject private var themeManager = ThemeManager.shared
     @ObservedObject private var localeManager = LocaleManager.shared
+    @StateObject private var authService: AuthService
 
     init() {
         // Initialize the database on launch
         _ = AppDatabase.shared
 
+        // Read base URL from Config.plist, default to localhost for dev
+        let baseURL: String
+        if let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
+           let config = NSDictionary(contentsOfFile: configPath),
+           let url = config["APIBaseURL"] as? String, !url.isEmpty {
+            baseURL = url
+        } else {
+            baseURL = "http://localhost:4321"
+        }
+
+        _authService = StateObject(wrappedValue: AuthService(baseURL: baseURL))
+
         // Load demo data on first launch
         if !UserDefaults.standard.bool(forKey: "demoDataSeeded")
             && !UserDefaults.standard.bool(forKey: "demoModeExplicitlyOff") {
-            let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
+            let userId = UserDefaults.standard.string(forKey: "authUserId") ?? "default-user"
             try? AppDatabase.shared.loadDemoData(userId: userId)
             UserDefaults.standard.set(true, forKey: "demoDataSeeded")
         }
@@ -45,10 +61,24 @@ struct PlantgotchiApp: App {
 
     var body: some Scene {
         WindowGroup {
-            GardenView()
-                .environmentObject(bleManager)
-                .environmentObject(themeManager)
-                .environmentObject(localeManager)
+            Group {
+                if authService.isAuthenticated {
+                    GardenView()
+                } else {
+                    LoginView()
+                }
+            }
+            .environmentObject(bleManager)
+            .environmentObject(themeManager)
+            .environmentObject(localeManager)
+            .environmentObject(authService)
         }
     }
 }
+#else
+// macOS stub — app entry point is iOS only; macOS target is for SPM testing only.
+@main
+struct PlantgotchiApp {
+    static func main() {}
+}
+#endif

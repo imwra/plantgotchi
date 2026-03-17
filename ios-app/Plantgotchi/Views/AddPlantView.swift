@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -251,3 +252,4 @@ struct AddPlantView: View {
 #Preview {
     AddPlantView()
 }
+#endif
