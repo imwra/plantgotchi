@@ -74,6 +74,11 @@ class PlantgotchiApp : Application() {
             PostHog.register("platform", "android")
             PostHog.register("app_version", "1.0.0")
         }
+
+        val userId = tokenManager.getUserId()
+        if (tokenManager.getToken() != null && userId != null) {
+            com.plantgotchi.app.analytics.Analytics.identify(userId, mapOf("platform" to "android"))
+        }
     }
 
     private fun seedDemoDataIfNeeded() {
