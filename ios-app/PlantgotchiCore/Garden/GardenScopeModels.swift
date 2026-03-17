@@ -1,4 +1,4 @@
-public struct PlantScopeInput: Equatable {
+public struct PlantScopeInput: Codable, Equatable {
     public let id: String
     public let name: String
     public let moistureScore: Double?
@@ -23,13 +23,13 @@ public struct PlantScopeInput: Equatable {
     }
 }
 
-public enum AttentionState: Equatable {
+public enum AttentionState: String, Codable, Equatable {
     case healthy
     case needsAttention
     case unknown
 }
 
-public struct PlantScope: Equatable, Identifiable {
+public struct PlantScope: Codable, Equatable, Identifiable {
     public let id: String
     public let name: String
     public let vitality: GardenSnapshot.VitalityLevel
@@ -48,7 +48,7 @@ public struct PlantScope: Equatable, Identifiable {
     }
 }
 
-public struct SubsetScope: Equatable, Identifiable {
+public struct SubsetScope: Codable, Equatable, Identifiable {
     public let id: String
     public let name: String
     public let vitality: GardenSnapshot.VitalityLevel

@@ -1,7 +1,7 @@
 import Foundation
 
-public struct GardenSnapshot: Equatable {
-    public struct GroupScope: Equatable {
+public struct GardenSnapshot: Codable, Equatable {
+    public struct GroupScope: Codable, Equatable {
         public var vitality: VitalityLevel
         public var attentionCount: Int
         public var unknownCount: Int
@@ -19,7 +19,7 @@ public struct GardenSnapshot: Equatable {
         public static let empty = GroupScope(vitality: .medium)
     }
 
-    public enum VitalityLevel: String, Equatable {
+    public enum VitalityLevel: String, Codable, Equatable {
         case low
         case medium
         case high
