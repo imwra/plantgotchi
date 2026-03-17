@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import GRDB
 import PostHog
@@ -9,6 +10,7 @@ struct GardenView: View {
     @EnvironmentObject private var bleManager: BLEManager
     @EnvironmentObject private var themeManager: ThemeManager
     @ObservedObject private var localeManager = LocaleManager.shared
+    @EnvironmentObject private var authService: AuthService
     @State private var plants: [Plant] = []
     @State private var plantViews: [PlantView] = []
     @State private var isLoading = false
@@ -16,8 +18,7 @@ struct GardenView: View {
     @State private var showScan = false
     @State private var showSettings = false
 
-    /// In a real app, this would come from authentication.
-    private let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
+    private var userId: String { authService.userId ?? "default-user" }
 
     private let columns = [
         GridItem(.flexible(), spacing: PlantgotchiTheme.spacing),
@@ -148,3 +149,4 @@ struct GardenView: View {
         .environmentObject(BLEManager())
         .environmentObject(ThemeManager.shared)
 }
+#endif

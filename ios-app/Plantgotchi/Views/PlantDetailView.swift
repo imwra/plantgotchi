@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -392,3 +393,4 @@ struct ActionButton: View {
         }
     }
 }
+#endif

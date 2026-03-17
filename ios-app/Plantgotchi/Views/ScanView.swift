@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -237,3 +238,4 @@ struct ScanView: View {
         dismiss()
     }
 }
+#endif
