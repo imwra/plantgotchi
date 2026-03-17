@@ -18,15 +18,15 @@ export default function CourseCatalog() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-gray-400">Loading courses...</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">Loading courses...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-bg via-bg-warm to-bg p-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-3xl font-bold text-white">Courses</h1>
-        <p className="mb-8 text-gray-400">Learn plant care from expert growers</p>
+        <h1 className="mb-2 font-pixel text-pixel-xl text-text">Courses</h1>
+        <p className="mb-8 text-sm text-text-mid">Learn plant care from expert growers</p>
         {courses.length === 0 ? (
-          <p className="text-gray-500">No courses available yet.</p>
+          <p className="text-sm text-text-light">No courses available yet.</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map(c => (

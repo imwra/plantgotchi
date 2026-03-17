@@ -93,38 +93,38 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     setPhases(prev => prev.map(p => ({ ...p, modules: p.modules.map(m => ({ ...m, blocks: m.blocks.filter(b => b.id !== blockId) })) })));
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-gray-400">Loading...</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">Loading...</div>;
 
   const activePhase = phases.find(p => p.id === activePhaseId);
   const activeModule = phases.flatMap(p => p.modules).find(m => m.id === activeModuleId);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-bg via-bg-warm to-bg p-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
-          <a href="/creator/dashboard" className="text-sm text-gray-500 hover:text-gray-300">&larr; Dashboard</a>
+          <a href="/creator/dashboard" className="text-sm text-text-light hover:text-text-mid">&larr; Dashboard</a>
           <div className="flex gap-2">
             {!isNew && (
-              <select value={status} onChange={e => setStatus(e.target.value)} className="rounded border border-gray-600 bg-gray-900 px-2 py-1 text-sm text-white">
+              <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-md border border-border-light bg-bg-warm px-2 py-1 text-sm text-text focus:border-border-accent focus:outline-none">
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
               </select>
             )}
-            <button onClick={saveCourse} disabled={saving} className="rounded bg-green-600 px-4 py-1 text-sm font-bold text-white hover:bg-green-500 disabled:opacity-50">
+            <button onClick={saveCourse} disabled={saving} className="rounded-md border-2 border-primary-dark bg-primary px-4 py-1 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-50 transition-colors">
               {saving ? 'Saving...' : isNew ? 'Create Course' : 'Save'}
             </button>
           </div>
         </div>
 
         {/* Course metadata */}
-        <div className="mb-6 rounded-lg border border-gray-700 bg-gray-800/50 p-4 space-y-3">
-          <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded border border-gray-600 bg-gray-900 p-2 text-lg font-bold text-white" placeholder="Course Title" />
-          <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full rounded border border-gray-600 bg-gray-900 p-2 text-sm text-white" rows={3} placeholder="Course description..." />
+        <div className="mb-6 rounded-xl border border-border bg-bg-card p-4 space-y-3 shadow-sm">
+          <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 font-pixel text-pixel-sm text-text focus:border-border-accent focus:outline-none" placeholder="Course Title" />
+          <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" rows={3} placeholder="Course description..." />
           <div className="flex gap-4">
             <label className="block">
-              <span className="text-xs text-gray-400">Price (cents)</span>
-              <input type="number" value={priceCents} onChange={e => setPriceCents(Number(e.target.value))} className="block w-32 rounded border border-gray-600 bg-gray-900 p-2 text-sm text-white" min={0} />
+              <span className="text-xs text-text-mid">Price (cents)</span>
+              <input type="number" value={priceCents} onChange={e => setPriceCents(Number(e.target.value))} className="block w-32 rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" min={0} />
             </label>
           </div>
         </div>
@@ -134,22 +134,22 @@ export default function CourseEditor({ slug }: { slug?: string }) {
             {/* Phases sidebar */}
             <div className="w-56 shrink-0 space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-gray-400">Phases</h3>
-                <button onClick={addPhase} className="text-xs text-green-400 hover:text-green-300">+ Add</button>
+                <h3 className="font-pixel text-pixel-xs text-text-mid">Phases</h3>
+                <button onClick={addPhase} className="font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">+ Add</button>
               </div>
               {phases.map(phase => (
                 <div key={phase.id}>
-                  <button onClick={() => { setActivePhaseId(phase.id); setActiveModuleId(null); }} className={`w-full rounded px-2 py-1 text-left text-sm ${activePhaseId === phase.id ? 'bg-gray-700 text-white' : 'text-gray-400 hover:bg-gray-800'}`}>
+                  <button onClick={() => { setActivePhaseId(phase.id); setActiveModuleId(null); }} className={`w-full rounded-md px-2 py-1 text-left text-sm transition-colors ${activePhaseId === phase.id ? 'bg-bg-card border border-border text-text shadow-sm' : 'text-text-mid hover:bg-bg-card-hover'}`}>
                     {phase.title}
                   </button>
                   {activePhaseId === phase.id && (
                     <div className="ml-3 mt-1 space-y-1">
                       {phase.modules.map(mod => (
-                        <button key={mod.id} onClick={() => setActiveModuleId(mod.id)} className={`w-full rounded px-2 py-1 text-left text-xs ${activeModuleId === mod.id ? 'bg-green-900/30 text-green-300' : 'text-gray-500 hover:text-gray-300'}`}>
+                        <button key={mod.id} onClick={() => setActiveModuleId(mod.id)} className={`w-full rounded-md px-2 py-1 text-left text-xs transition-colors ${activeModuleId === mod.id ? 'bg-primary-pale text-primary' : 'text-text-light hover:text-text-mid'}`}>
                           {mod.title}
                         </button>
                       ))}
-                      <button onClick={() => addModule(phase.id)} className="w-full px-2 py-1 text-left text-xs text-green-400 hover:text-green-300">+ Module</button>
+                      <button onClick={() => addModule(phase.id)} className="w-full px-2 py-1 text-left font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">+ Module</button>
                     </div>
                   )}
                 </div>
@@ -160,20 +160,20 @@ export default function CourseEditor({ slug }: { slug?: string }) {
             <div className="flex-1">
               {activeModule ? (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-white">{activeModule.title}</h3>
+                  <h3 className="font-pixel text-pixel-lg text-text">{activeModule.title}</h3>
                   {activeModule.blocks.sort((a, b) => a.sort_order - b.sort_order).map(block => (
                     <ContentBlockEditor key={block.id} blockType={block.block_type} content={block.content} onChange={(c) => updateBlock(block.id, c)} onDelete={() => deleteBlock(block.id)} />
                   ))}
                   <div className="flex gap-2">
-                    <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded border border-gray-600 px-3 py-1 text-xs text-gray-400 hover:border-gray-500">+ Text</button>
-                    <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded border border-gray-600 px-3 py-1 text-xs text-gray-400 hover:border-gray-500">+ Video</button>
-                    <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded border border-gray-600 px-3 py-1 text-xs text-gray-400 hover:border-gray-500">+ Quiz</button>
+                    <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Text</button>
+                    <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Video</button>
+                    <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Quiz</button>
                   </div>
                 </div>
               ) : activePhase ? (
-                <p className="text-gray-500">Select a module or create one to edit content.</p>
+                <p className="text-sm text-text-light">Select a module or create one to edit content.</p>
               ) : (
-                <p className="text-gray-500">Add a phase to start building your course.</p>
+                <p className="text-sm text-text-light">Add a phase to start building your course.</p>
               )}
             </div>
           </div>
