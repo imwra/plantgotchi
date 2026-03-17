@@ -134,6 +134,26 @@
     "allPlantsDesc": "The garden dashboard shows every plant in your home with live sensor data. Tap any plant to see detailed charts, care history, and time-lapse photos.",
     "tryDemo": "Try the Live Demo"
   },
+  "dashboardMockup": {
+    "title": "Home Garden Monitor",
+    "plantsCount": "6 plants",
+    "happyCount": "3 happy",
+    "sensorsCount": "4 sensors",
+    "needsWater": "Do we need water?",
+    "allPlants": "All Plants",
+    "plantDetail": "Plant Details",
+    "overview": "Overview",
+    "sensors": "Sensors",
+    "history": "History",
+    "lastWatered": "Last watered",
+    "daysAgo": "2 days ago",
+    "nextWater": "Next water",
+    "tomorrow": "Tomorrow",
+    "weekTrend": "7-day trend",
+    "statusHappy": "happy",
+    "statusThirsty": "thirsty",
+    "statusNeedsLight": "needs light"
+  },
   "iosScreens": {
     "title": "Designed for iOS",
     "subtitle": "A native app experience crafted for plant lovers. Every screen designed to make plant care feel like play.",

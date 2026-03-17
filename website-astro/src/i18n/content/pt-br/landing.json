@@ -134,6 +134,26 @@
     "allPlantsDesc": "O dashboard do jardim mostra cada planta da sua casa com dados ao vivo dos sensores. Toque em qualquer planta para ver graficos detalhados, historico de cuidados e fotos time-lapse.",
     "tryDemo": "Experimente a Demo"
   },
+  "dashboardMockup": {
+    "title": "Monitor do Jardim",
+    "plantsCount": "6 plantas",
+    "happyCount": "3 felizes",
+    "sensorsCount": "4 sensores",
+    "needsWater": "Precisamos regar?",
+    "allPlants": "Todas as Plantas",
+    "plantDetail": "Detalhes da Planta",
+    "overview": "Visao Geral",
+    "sensors": "Sensores",
+    "history": "Historico",
+    "lastWatered": "Ultima rega",
+    "daysAgo": "2 dias atras",
+    "nextWater": "Proxima rega",
+    "tomorrow": "Amanha",
+    "weekTrend": "Tendencia 7 dias",
+    "statusHappy": "feliz",
+    "statusThirsty": "com sede",
+    "statusNeedsLight": "precisa de luz"
+  },
   "iosScreens": {
     "title": "Projetado para iOS",
     "subtitle": "Uma experiencia de app nativa feita para amantes de plantas. Cada tela projetada para tornar o cuidado com plantas divertido.",
