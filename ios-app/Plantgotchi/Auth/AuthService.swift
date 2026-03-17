@@ -50,6 +50,7 @@ final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_signup", properties: ["method": "email"])
     }
 
     func signIn(email: String, password: String) async throws {
@@ -75,6 +76,7 @@ final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_login", properties: ["method": "email"])
     }
 
     // MARK: - Sign in with Apple
@@ -105,13 +107,18 @@ final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_login", properties: ["method": "apple"])
     }
 
     // MARK: - Sign Out
 
     func signOut() {
+        Analytics.track("auth_logout")
+        Analytics.reset()
         try? keychain.deleteToken()
         UserDefaults.standard.removeObject(forKey: "authUserId")
+        UserDefaults.standard.removeObject(forKey: "authUserEmail")
+        UserDefaults.standard.removeObject(forKey: "authUserName")
         isAuthenticated = false
         userId = nil
     }
@@ -138,6 +145,25 @@ final class AuthService: ObservableObject {
            let id = user["id"] as? String {
             userId = id
             UserDefaults.standard.set(id, forKey: "authUserId")
+
+            let email = user["email"] as? String ?? ""
+            let name = user["name"] as? String ?? ""
+            let createdAt = user["createdAt"] as? String ?? ""
+            if !email.isEmpty {
+                UserDefaults.standard.set(email, forKey: "authUserEmail")
+            }
+            if !name.isEmpty {
+                UserDefaults.standard.set(name, forKey: "authUserName")
+            }
+
+            var traits: [String: Any] = [
+                "platform": "ios",
+                "is_creator": false,
+            ]
+            if !email.isEmpty { traits["email"] = email }
+            if !name.isEmpty { traits["name"] = name }
+            if !createdAt.isEmpty { traits["created_at"] = createdAt }
+            Analytics.identify(userId: id, traits: traits)
         }
 
         isAuthenticated = true

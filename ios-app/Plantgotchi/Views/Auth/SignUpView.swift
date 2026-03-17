@@ -127,6 +127,7 @@ struct SignUpView: View {
                 try await authService.signUp(email: email, password: password, name: name)
             } catch {
                 errorMessage = error.localizedDescription
+                Analytics.track("auth_login_failed", properties: ["method": "email", "error": error.localizedDescription])
             }
             isLoading = false
         }
