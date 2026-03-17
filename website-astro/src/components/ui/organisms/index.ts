@@ -9,3 +9,4 @@ export { default as ConversationList } from './ConversationList';
 export { default as ConversationView } from './ConversationView';
 export { default as ChatPanel } from './ChatPanel';
 export { default as NewConversationModal } from './NewConversationModal';
+export { default as BoardView } from './BoardView';
