@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import AdminPanel from "../components/ui/organisms/AdminPanel";
+import ChatApp from "../components/ui/organisms/ChatApp";
 import { getSession } from "../lib/auth";
 import { getLocaleFromPath, useTranslations } from "../i18n";
 
@@ -12,16 +12,11 @@ if (!session) {
   return Astro.redirect(locale === "en" ? "/en/login" : "/login");
 }
 
-// Only allow admin users
-if ((session.user as any).role !== "admin") {
-  return Astro.redirect(locale === "en" ? "/en/garden" : "/garden");
-}
-
 const userName = session.user.name || session.user.email;
 ---
 
-<BaseLayout title={t("admin.title")}>
-  <AdminPanel
+<BaseLayout title={t("chat.title")}>
+  <ChatApp
     client:load
     userName={userName}
     locale={locale}

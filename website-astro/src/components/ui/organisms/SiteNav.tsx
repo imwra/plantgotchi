@@ -7,6 +7,7 @@ export interface SiteNavProps {
   labels?: {
     home: string;
     garden: string;
+    chat?: string;
     help: string;
     admin: string;
     login: string;
@@ -23,6 +24,7 @@ export interface SiteNavProps {
 const DEFAULT_LABELS = {
   home: 'Home',
   garden: 'Garden',
+  chat: 'Chat',
   help: 'Help',
   admin: 'Admin',
   login: 'Login',
@@ -46,6 +48,7 @@ export default function SiteNav({
   const navLinks = [
     { label: labels.home, href: `${prefix}/` },
     { label: labels.garden, href: `${prefix}/garden` },
+    { label: labels.chat || 'Chat', href: `${prefix}/chat` },
     { label: labels.help, href: `${prefix}/help` },
     { label: labels.admin, href: `${prefix}/admin` },
   ];
