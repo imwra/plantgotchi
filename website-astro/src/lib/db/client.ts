@@ -1,4 +1,4 @@
-import { createClient, type Client } from "@libsql/client/http";
+import { createClient, type Client } from "@libsql/client";
 
 let db: Client | null = null;
 

@@ -16,5 +16,12 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        // Force all @libsql/client imports (including from @libsql/kysely-libsql)
+        // to use the web/fetch-based implementation instead of Node.js https
+        "@libsql/client": new URL("./node_modules/@libsql/client/lib-esm/web.js", import.meta.url).pathname,
+      },
+    },
   },
 });
