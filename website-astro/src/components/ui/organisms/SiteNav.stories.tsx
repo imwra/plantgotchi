@@ -17,6 +17,16 @@ export const LoggedIn: Story = {
     userName: 'Willa',
     locale: 'pt-br',
     currentPath: '/garden',
+    isCreator: false,
+  },
+};
+
+export const LoggedInCreator: Story = {
+  args: {
+    userName: 'Willa',
+    locale: 'pt-br',
+    currentPath: '/garden',
+    isCreator: true,
   },
 };
 
