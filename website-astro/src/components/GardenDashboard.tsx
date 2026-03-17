@@ -60,10 +60,8 @@ function HPBar({ value, max = 100 }: { value: number; max?: number }) {
         border: `1.5px solid ${COLORS.borderLight}`,
       }}>
         {Array.from({ length: segments }).map((_, i) => (
-          <div key={i} style={{
-            width: 8, height: 10, borderRadius: 1,
+          <div key={i} className="bar-segment" style={{
             background: i < filled ? color : "#e8e0d0",
-            transition: "background 0.3s",
           }} />
         ))}
       </div>
@@ -96,8 +94,7 @@ function MoistureBar({ value }: { value: number | null }) {
         border: `1.5px solid ${COLORS.borderLight}`,
       }}>
         {Array.from({ length: segments }).map((_, i) => (
-          <div key={i} style={{
-            width: 8, height: 10, borderRadius: 1,
+          <div key={i} className="bar-segment" style={{
             background: i < filled ? color : "#e8e0d0",
           }} />
         ))}
@@ -136,10 +133,11 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      className="plant-card"
       style={{
         background: isSelected ? COLORS.bgCardHover : COLORS.bgCard,
         border: `2px solid ${isSelected ? COLORS.borderAccent : hovered ? COLORS.brownLight : COLORS.borderLight}`,
-        borderRadius: 10, padding: 14, cursor: "pointer",
+        borderRadius: 10, cursor: "pointer",
         transition: "all 0.2s ease",
         boxShadow: isSelected
           ? `0 4px 16px ${COLORS.shadowMd}, 0 0 0 3px ${COLORS.primaryPale}`
@@ -166,8 +164,8 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-        <div style={{
-          fontSize: 34, lineHeight: 1,
+        <div className="plant-emoji" style={{
+          lineHeight: 1,
           animation: plant.status === "happy" ? "bounce 2.5s ease-in-out infinite"
             : plant.status === "thirsty" ? "wilt 2s ease-in-out infinite" : "none",
           filter: plant.status === "thirsty" ? "saturate(0.7)" : "none",
@@ -310,7 +308,7 @@ function DetailPanel({ plant, onClose, onRefresh, demoMode }: { plant: PlantView
             <div style={{ fontFamily: PIXEL_FONT, fontSize: 6, color: COLORS.textLight, marginBottom: 5 }}>
               {stat.icon} {stat.label}
             </div>
-            <div style={{ fontFamily: PIXEL_FONT, fontSize: 13, color: stat.color }}>
+            <div className="stat-value" style={{ fontFamily: PIXEL_FONT, color: stat.color }}>
               {stat.value}
             </div>
           </div>
@@ -436,8 +434,28 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText }: 
 @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
 *{box-sizing:border-box} body{margin:0}
-.plant-grid{display:grid;grid-template-columns:1fr;gap:10px}
-@media(min-width:480px){.plant-grid{grid-template-columns:1fr 1fr;gap:12px}}
+.dash-container{max-width:960px;margin:0 auto;padding:14px 12px 24px}
+@media(min-width:480px){.dash-container{padding:14px 16px 24px}}
+.dash-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+@media(max-width:480px){.dash-header{flex-direction:column;gap:6px}}
+.dash-title{font-size:13px}
+@media(min-width:480px){.dash-title{font-size:15px}}
+.dash-tags{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
+.dash-tags::-webkit-scrollbar{display:none}
+@media(min-width:480px){.dash-tags{flex-wrap:wrap;overflow-x:visible;gap:8px}}
+.plant-grid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:400px){.plant-grid{grid-template-columns:1fr 1fr;gap:10px}}
+@media(min-width:768px){.plant-grid{grid-template-columns:1fr 1fr 1fr;gap:12px}}
+@media(min-width:820px){.plant-grid{grid-template-columns:1fr 1fr;gap:12px}}
+.plant-card{padding:10px}
+@media(min-width:480px){.plant-card{padding:14px}}
+.plant-emoji{font-size:28px}
+@media(min-width:480px){.plant-emoji{font-size:34px}}
+.bar-segment{width:6px;height:8px;border-radius:1px;transition:background 0.3s}
+@media(min-width:480px){.bar-segment{width:8px;height:10px}}
+.stat-value{font-size:11px}
+@media(min-width:480px){.stat-value{font-size:13px}}
+.detail-mobile-sheet{padding:0 12px 24px;padding-bottom:env(safe-area-inset-bottom, 24px)}
 .main-layout{display:flex;flex-direction:column;gap:16px}
 @media(min-width:820px){.main-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}}
 .detail-desktop{display:none}
@@ -445,15 +463,14 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText }: 
 .detail-mobile-overlay{display:flex}
 @media(min-width:820px){.detail-mobile-overlay{display:none!important}}`}</style>
 
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "14px 16px 24px" }}>
+      <div className="dash-container">
         {/* Header */}
-        <div style={{
-          display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+        <div className="dash-header" style={{
           marginBottom: 14, paddingBottom: 12,
           borderBottom: `2px solid ${COLORS.borderLight}`,
         }}>
           <div>
-            <div style={{ fontSize: 15, color: COLORS.primaryDark, letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="dash-title" style={{ color: COLORS.primaryDark, letterSpacing: 1, display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ fontSize: 22 }}>🌱</span> PLANTGOTCHI
             </div>
             <div style={{ fontSize: 6, color: COLORS.textLight, marginTop: 4, letterSpacing: 0.5 }}>
@@ -485,7 +502,7 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText }: 
         </div>
 
         {/* Tags */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        <div className="dash-tags" style={{ marginBottom: 16 }}>
           {[
             { label: `${plants.length} PLANTS`, bg: COLORS.primaryPale, color: COLORS.primaryDark, icon: "🌿" },
             { label: `${happyCount} HAPPY`, bg: COLORS.primaryPale, color: COLORS.primary, icon: "♥" },
@@ -569,9 +586,9 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText }: 
           background: "rgba(60,50,30,0.3)", backdropFilter: "blur(4px)",
           alignItems: "flex-end", justifyContent: "center",
         }} onClick={e => { if (e.target === e.currentTarget) setShowDetail(false); }}>
-          <div style={{
+          <div className="detail-mobile-sheet" style={{
             width: "100%", maxWidth: 480, maxHeight: "85vh",
-            overflowY: "auto", padding: "0 12px 24px", animation: "slideUp 0.25s ease",
+            overflowY: "auto", animation: "slideUp 0.25s ease",
           }}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: COLORS.borderLight, margin: "8px auto 12px" }} />
             <DetailPanel plant={selectedPlant} onClose={() => setShowDetail(false)} onRefresh={fetchPlants} demoMode={demoMode} />
