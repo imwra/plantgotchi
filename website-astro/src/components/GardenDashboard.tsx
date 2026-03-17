@@ -109,7 +109,8 @@ function MoistureBar({ value }: { value: number | null }) {
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; color: string; bg: string; icon: string }> = {
     happy: { label: "HAPPY", color: COLORS.primary, bg: COLORS.primaryPale, icon: "♥" },
-    thirsty: { label: "THIRSTY!", color: COLORS.danger, bg: COLORS.dangerPale, icon: "💧" },
+    stressed: { label: "STRESSED", color: COLORS.sun, bg: COLORS.sunPale, icon: "⚠" },
+    critical: { label: "CRITICAL!", color: COLORS.danger, bg: COLORS.dangerPale, icon: "💀" },
     unknown: { label: "NO DATA", color: COLORS.brown, bg: COLORS.brownPale, icon: "?" },
   };
   const c = config[status] || config.unknown;
@@ -119,7 +120,7 @@ function StatusBadge({ status }: { status: string }) {
       fontFamily: PIXEL_FONT, fontSize: 7, color: c.color,
       background: c.bg, padding: "3px 8px", borderRadius: 4,
       border: `1.5px solid ${c.color}33`,
-      animation: status === "thirsty" ? "pulse 2s ease-in-out infinite" : "none",
+      animation: status === "critical" ? "pulse 2s ease-in-out infinite" : "none",
       whiteSpace: "nowrap",
     }}>
       {c.icon} {c.label}
@@ -168,8 +169,8 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
         <div style={{
           fontSize: 34, lineHeight: 1,
           animation: plant.status === "happy" ? "bounce 2.5s ease-in-out infinite"
-            : plant.status === "thirsty" ? "wilt 2s ease-in-out infinite" : "none",
-          filter: plant.status === "thirsty" ? "saturate(0.7)" : "none",
+            : plant.status === "critical" || plant.status === "stressed" ? "wilt 2s ease-in-out infinite" : "none",
+          filter: plant.status === "critical" || plant.status === "stressed" ? "saturate(0.7)" : "none",
         }}>
           {plant.emoji}
         </div>
@@ -386,7 +387,7 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
   }, []);
 
   const happyCount = plants.filter(p => p.status === "happy").length;
-  const alertCount = plants.filter(p => p.status === "thirsty").length;
+  const alertCount = plants.filter(p => p.status === "critical" || p.status === "stressed").length;
 
   return (
     <div style={{
@@ -454,7 +455,7 @@ export default function GardenDashboard({ userName }: GardenDashboardProps) {
           {[
             { label: `${plants.length} PLANTS`, bg: COLORS.primaryPale, color: COLORS.primaryDark, icon: "🌿" },
             { label: `${happyCount} HAPPY`, bg: COLORS.primaryPale, color: COLORS.primary, icon: "♥" },
-            ...(alertCount > 0 ? [{ label: `${alertCount} NEED WATER`, bg: COLORS.dangerPale, color: COLORS.danger, icon: "⚠️" }] : []),
+            ...(alertCount > 0 ? [{ label: `${alertCount} NEED CARE`, bg: COLORS.dangerPale, color: COLORS.danger, icon: "⚠️" }] : []),
           ].map(t => (
             <div key={t.label} style={{
               fontFamily: PIXEL_FONT, fontSize: 7, background: t.bg, color: t.color,

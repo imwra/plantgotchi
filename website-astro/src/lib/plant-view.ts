@@ -1,4 +1,5 @@
 import type { Plant, SensorReading, CareLog } from "./db/queries";
+import { computeHPBreakdown, type HPBreakdown } from "./hp";
 
 export interface PlantView {
   id: string;
@@ -10,8 +11,9 @@ export interface PlantView {
   light: number | null;
   lightLabel: string;
   lastWatered: string | null;
-  status: "happy" | "thirsty" | "unknown";
+  status: "happy" | "stressed" | "critical" | "unknown";
   hp: number;
+  hpBreakdown: HPBreakdown;
   moistureMin: number;
   moistureMax: number;
   tempMin: number;
@@ -25,54 +27,6 @@ export function getLightLabel(light: number | null): string {
   return "high";
 }
 
-export function computeHP(
-  moisture: number | null,
-  temp: number | null,
-  moistureMin: number,
-  moistureMax: number,
-  tempMin: number,
-  tempMax: number
-): number {
-  const scores: number[] = [];
-
-  if (moisture !== null) {
-    const mid = (moistureMin + moistureMax) / 2;
-    const half = (moistureMax - moistureMin) / 2;
-    const score = Math.max(0, Math.min(100, 100 - (Math.abs(moisture - mid) / half) * 100));
-    scores.push(score);
-  }
-
-  if (temp !== null) {
-    const mid = (tempMin + tempMax) / 2;
-    const half = (tempMax - tempMin) / 2;
-    const score = Math.max(0, Math.min(100, 100 - (Math.abs(temp - mid) / half) * 100));
-    scores.push(score);
-  }
-
-  if (scores.length === 0) return 50;
-  return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
-}
-
-export function computeStatus(
-  moisture: number | null,
-  temp: number | null,
-  moistureMin: number,
-  moistureMax: number,
-  tempMin: number,
-  tempMax: number
-): "happy" | "thirsty" | "unknown" {
-  if (moisture === null && temp === null) return "unknown";
-
-  if (moisture !== null && (moisture < moistureMin || moisture > moistureMax)) {
-    return "thirsty";
-  }
-  if (temp !== null && (temp < tempMin || temp > tempMax)) {
-    return "thirsty";
-  }
-
-  return "happy";
-}
-
 export function toPlantView(
   plant: Plant,
   latestReading: SensorReading | null,
@@ -84,6 +38,25 @@ export function toPlantView(
 
   const waterLog = recentCareLogs.find((log) => log.action === "water");
 
+  // Count water events in last 14 days
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  const waterEventsLast14Days = recentCareLogs.filter(
+    (log) => log.action === "water" && new Date(log.created_at) >= fourteenDaysAgo
+  ).length;
+
+  const breakdown = computeHPBreakdown({
+    moisture,
+    temperature: temp,
+    light,
+    moistureMin: plant.moisture_min,
+    moistureMax: plant.moisture_max,
+    tempMin: plant.temp_min,
+    tempMax: plant.temp_max,
+    lightPreference: plant.light_preference,
+    waterEventsLast14Days,
+  });
+
   return {
     id: plant.id,
     name: plant.name,
@@ -94,8 +67,9 @@ export function toPlantView(
     light,
     lightLabel: getLightLabel(light),
     lastWatered: waterLog?.created_at ?? null,
-    status: computeStatus(moisture, temp, plant.moisture_min, plant.moisture_max, plant.temp_min, plant.temp_max),
-    hp: computeHP(moisture, temp, plant.moisture_min, plant.moisture_max, plant.temp_min, plant.temp_max),
+    status: breakdown.status,
+    hp: breakdown.hp,
+    hpBreakdown: breakdown,
     moistureMin: plant.moisture_min,
     moistureMax: plant.moisture_max,
     tempMin: plant.temp_min,

@@ -5,14 +5,16 @@ import UsersTab from "./UsersTab";
 import PlantsTab from "./PlantsTab";
 import ActivityTab from "./ActivityTab";
 import AdminDashboard from "../AdminDashboard";
+import HPSystemTab from "./HPSystemTab";
 
-type Tab = "overview" | "users" | "plants" | "activity" | "launch-tracker";
+type Tab = "overview" | "users" | "plants" | "activity" | "hp-system" | "launch-tracker";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "users", label: "Users" },
   { id: "plants", label: "Plants" },
   { id: "activity", label: "Activity" },
+  { id: "hp-system", label: "HP System" },
   { id: "launch-tracker", label: "Launch Tracker" },
 ];
 
@@ -64,6 +66,7 @@ export default function AdminPanel({ userName }: AdminPanelProps) {
         {activeTab === "users" && <UsersTab />}
         {activeTab === "plants" && <PlantsTab />}
         {activeTab === "activity" && <ActivityTab />}
+        {activeTab === "hp-system" && <HPSystemTab />}
         {activeTab === "launch-tracker" && <AdminDashboard embedded />}
       </main>
     </div>

@@ -172,6 +172,53 @@ export async function getRecentActivity(limit = 50): Promise<ActivityItem[]> {
   return result.rows as unknown as ActivityItem[];
 }
 
+export interface AdminPlantHP {
+  id: string;
+  name: string;
+  species: string | null;
+  emoji: string;
+  ownerEmail: string;
+  moisture: number | null;
+  temperature: number | null;
+  light: number | null;
+  moistureMin: number;
+  moistureMax: number;
+  tempMin: number;
+  tempMax: number;
+  lightPreference: string;
+  waterEventsLast14Days: number;
+}
+
+export async function getAllPlantsForHP(): Promise<AdminPlantHP[]> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: `SELECT p.id, p.name, p.species, p.emoji,
+            p.moisture_min as moistureMin, p.moisture_max as moistureMax,
+            p.temp_min as tempMin, p.temp_max as tempMax,
+            p.light_preference as lightPreference,
+            u.email as ownerEmail,
+            sr.moisture, sr.temperature, sr.light,
+            COALESCE(wc.waterCount, 0) as waterEventsLast14Days
+          FROM plants p
+          JOIN user u ON p.user_id = u.id
+          LEFT JOIN (
+            SELECT plant_id, moisture, temperature, light,
+              ROW_NUMBER() OVER (PARTITION BY plant_id ORDER BY timestamp DESC) as rn
+            FROM sensor_readings
+          ) sr ON sr.plant_id = p.id AND sr.rn = 1
+          LEFT JOIN (
+            SELECT plant_id, COUNT(*) as waterCount
+            FROM care_logs
+            WHERE action = 'water' AND created_at >= datetime('now', '-14 days')
+            GROUP BY plant_id
+          ) wc ON wc.plant_id = p.id
+          ORDER BY p.name`,
+    args: [],
+  });
+
+  return result.rows as unknown as AdminPlantHP[];
+}
+
 export async function getUserDetail(userId: string): Promise<UserDetail | null> {
   const db = getDb();
   const [userResult, plantsResult, careResult, readingsResult] = await Promise.all([
