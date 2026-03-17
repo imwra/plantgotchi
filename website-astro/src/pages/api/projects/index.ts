@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { requireAdmin } from "../../../lib/admin-guard";
 import { listProjects, createProject } from "../../../lib/db/project-queries";
+import { ServerAnalytics } from "../../../lib/analytics.server";
 
 export const GET: APIRoute = async ({ request, url }) => {
   const auth = await requireAdmin(request);
@@ -25,6 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const id = await createProject(body.name, body.description || "", auth.userId);
+  ServerAnalytics.track(auth.userId, 'project_created', { project_id: id });
   return new Response(JSON.stringify({ id }), {
     status: 201,
     headers: { "Content-Type": "application/json" },

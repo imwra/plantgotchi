@@ -5,6 +5,7 @@ import BoardView from './BoardView';
 import ViewTabs from '../molecules/ViewTabs';
 import { useProjectViews } from '../../hooks/useProjectViews';
 import { useAutoSaveView } from '../../hooks/useAutoSaveView';
+import { Analytics } from '../../lib/analytics';
 
 interface FieldDef {
   id: string;
@@ -123,6 +124,12 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
   }, [projectId]);
 
   useEffect(() => {
+    if (project) {
+      Analytics.track('project_viewed', { project_id: project.id, member_count: project.members?.length ?? 0 });
+    }
+  }, [project?.id]);
+
+  useEffect(() => {
     fetchBoardIssues();
   }, [fetchBoardIssues]);
 
@@ -152,11 +159,15 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
 
   const handleAddIssue = async () => {
     if (!newIssueTitle.trim()) return;
-    await fetch(`/api/projects/${projectId}/issues`, {
+    const res = await fetch(`/api/projects/${projectId}/issues`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: newIssueTitle }),
     });
+    if (res.ok) {
+      const data = await res.json();
+      Analytics.track('issue_created', { issue_id: data.id, project_id: projectId });
+    }
     setNewIssueTitle('');
     setShowNewIssue(false);
     fetchProject();
@@ -224,6 +235,7 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title }),
       });
+      Analytics.track('issue_updated', { issue_id: issueId, fields_changed: ['title'] });
     } catch {
       fetchBoardIssues();
     }
@@ -236,6 +248,7 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ [fieldId]: value }),
       });
+      Analytics.track('issue_updated', { issue_id: issueId, fields_changed: [fieldId] });
     } catch {
       // silent
     }
@@ -243,7 +256,10 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
 
   // View management
   const handleCreateView = async (name: string) => {
-    await createView(name, viewType, viewConfig);
+    const newView = await createView(name, viewType, viewConfig);
+    if (newView) {
+      Analytics.track('board_view_created', { view_id: newView.id, view_type: viewType });
+    }
   };
 
   const handleRenameView = async (viewId: string, name: string) => {
@@ -446,7 +462,7 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
           <div className="flex items-center gap-4 h-10">
             {/* View type switcher */}
             <button
-              onClick={() => setViewType('table')}
+              onClick={() => { setViewType('table'); Analytics.track('board_view_switched', { view_id: activeView?.id ?? null, view_type: 'table' }); }}
               className={`font-pixel text-[10px] px-2 py-2 cursor-pointer ${
                 viewType === 'table'
                   ? 'text-primary-dark border-b-2 border-primary'
@@ -456,7 +472,7 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
               {labels.viewTable || 'Table'}
             </button>
             <button
-              onClick={() => setViewType('board')}
+              onClick={() => { setViewType('board'); Analytics.track('board_view_switched', { view_id: activeView?.id ?? null, view_type: 'board' }); }}
               className={`font-pixel text-[10px] px-2 py-2 cursor-pointer ${
                 viewType === 'board'
                   ? 'text-primary-dark border-b-2 border-primary'
@@ -568,6 +584,9 @@ export default function ProjectView({ projectId, userName, locale = 'pt-br', nav
             locale={locale}
             onTitleUpdate={handleTitleUpdate}
             onFieldUpdate={handleFieldUpdate}
+            onAssigneeUpdate={(issueId, userId) => {
+              if (userId) Analytics.track('issue_assigned', { issue_id: issueId, assignee_id: userId });
+            }}
             users={users}
           />
         )}

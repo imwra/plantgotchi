@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -19,6 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import BoardCard from '../molecules/BoardCard';
 import BoardColumn from '../molecules/BoardColumn';
+import { Analytics } from '../../lib/analytics';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -126,6 +127,10 @@ export default function BoardView({
 }: BoardViewProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [localIssues, setLocalIssues] = useState(issues);
+
+  useEffect(() => {
+    Analytics.track('board_viewed', { view_id: projectId, view_type: 'board' });
+  }, [projectId]);
 
   // Keep localIssues in sync with prop changes
   useMemo(() => {
@@ -241,6 +246,8 @@ export default function BoardView({
         : originalIssue.fieldValues.find(f => f.field_id === boardField)?.value || '';
 
       if (originalCol !== overCol) {
+        Analytics.track('board_card_dragged', { issue_id: active.id as string, old_status: originalCol, new_status: overCol });
+        Analytics.track('issue_status_changed', { issue_id: active.id as string, old_status: originalCol, new_status: overCol });
         onStatusChange?.(active.id as string, overCol);
       }
     }

@@ -5,6 +5,7 @@ import InlineEditor from '../atoms/InlineEditor';
 import FieldDropdown from '../atoms/FieldDropdown';
 import DatePicker from '../atoms/DatePicker';
 import UserPicker from '../atoms/UserPicker';
+import { Analytics } from '../../lib/analytics';
 
 interface FieldDef {
   id: string;
@@ -271,7 +272,7 @@ export default function IssueTable({
   const renderEditableRow = (issue: IssueData, isSubIssue: boolean) => {
     const prefix = locale === 'en' ? '/en' : '';
     return (
-      <tr key={issue.id} className="border-b border-bg-warm hover:bg-bg-warm/50 transition-colors">
+      <tr key={issue.id} className="border-b border-bg-warm hover:bg-bg-warm/50 transition-colors" onClick={() => Analytics.track('issue_viewed', { issue_id: issue.id, project_id: projectId })}>
         <td className={`px-3 py-2 ${isSubIssue ? 'pl-8' : ''}`}>
           <IssueStatusButton
             issueId={issue.id}
