@@ -111,5 +111,68 @@
     { "section": "SENSORES", "items": ["Intervalo de sincronizacao: 15 min", "Brilho do LED", "Agenda de sono"] },
     { "section": "CONTA", "items": ["Perfil", "Exportar dados"] }
   ],
-  "photoLabels": ["Hoje", "3 dias atras", "1 semana atras", "2 semanas atras"]
+  "photoLabels": ["Hoje", "3 dias atras", "1 semana atras", "2 semanas atras"],
+  "appPreview": {
+    "subtitle": "Suas plantas, reimaginadas como amigos pixelados.",
+    "phoneMockup": {
+      "hp": "HP",
+      "moisture": "UMIDADE",
+      "sevenDayMoisture": "UMIDADE 7 DIAS",
+      "water": "REGAR",
+      "photo": "FOTO",
+      "history": "HISTORICO"
+    }
+  },
+  "digitalGarden": {
+    "title": "Seu Jardim Digital",
+    "subtitle": "Cada planta da sua casa, monitorada em um dashboard lindo. Veja quem esta prosperando e quem precisa de agua.",
+    "desktopView": "VISAO DESKTOP",
+    "mobileView": "VISAO MOBILE",
+    "desktopAlt": "Dashboard Jardim Plantgotchi - Visao desktop mostrando 6 plantas com dados ao vivo, barras de HP, niveis de umidade e painel de detalhes",
+    "mobileAlt": "Dashboard Jardim Plantgotchi - Visao mobile com cards de plantas, barras de HP e indicadores de umidade",
+    "allPlantsTitle": "Todas as suas plantas, uma visao",
+    "allPlantsDesc": "O dashboard do jardim mostra cada planta da sua casa com dados ao vivo dos sensores. Toque em qualquer planta para ver graficos detalhados, historico de cuidados e fotos time-lapse.",
+    "tryDemo": "Experimente a Demo"
+  },
+  "iosScreens": {
+    "title": "Projetado para iOS",
+    "subtitle": "Uma experiencia de app nativa feita para amantes de plantas. Cada tela projetada para tornar o cuidado com plantas divertido.",
+    "myGarden": "Meu Jardim",
+    "morePlants": "+2 plantas",
+    "tabLabels": ["Jardim", "Camera", "Alertas", "Mais"],
+    "back": "Voltar",
+    "screenLabels": ["Jardim", "Detalhe da Planta", "Fotos", "Notificacoes", "Parear Sensor", "Configuracoes"],
+    "photoTimeline": "Linha do Tempo de Fotos",
+    "playTimelapse": "Reproduzir Time-lapse",
+    "alerts": "Alertas",
+    "addSensor": "Adicionar Sensor",
+    "scanning": "Procurando sensores...",
+    "pair": "Parear",
+    "pairingInstructions": "Coloque o sensor no modo de pareamento (segure o botao por 3s)",
+    "settings": "Configuracoes",
+    "comingSoon": "Em breve 2026",
+    "downloadAppStore": "Baixe na App Store",
+    "nativeApp": "App iOS nativo. Feito com SwiftUI."
+  },
+  "bundlesSection": {
+    "subtitle": "Economize mais comprando em pacote.",
+    "bestValue": "MELHOR VALOR",
+    "preOrder": "Pre-pedido"
+  },
+  "openSourceSection": {
+    "forkedFrom": "Fork do",
+    "byRbaron": "por rbaron. Esquematicos, firmware e cases sao todos abertos.",
+    "license": "LICENCA"
+  },
+  "footerSection": {
+    "stayInLoop": "Fique por dentro",
+    "stayInLoopDesc": "Receba atualizacoes sobre datas de lancamento, novos sensores e dicas de cuidados com plantas.",
+    "join": "Entrar",
+    "emailPlaceholder": "voce@email.com",
+    "emailAriaLabel": "Endereco de e-mail",
+    "linksTitle": "Links",
+    "linkItems": ["Como Funciona", "Produtos", "Precos", "App"],
+    "followUs": "Siga-nos",
+    "socialLinks": ["GitHub", "Twitter", "Discord"]
+  }
 }

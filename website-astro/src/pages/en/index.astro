@@ -516,7 +516,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           {content.sections.appExperience}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
-          Your plants, reimagined as pixel pals.
+          {content.appPreview.subtitle}
         </p>
 
         <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
@@ -548,7 +548,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mb-2">
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="pixel-font text-[6px] text-pixel-gray">HP</span>
+                  <span class="pixel-font text-[6px] text-pixel-gray">{content.appPreview.phoneMockup.hp}</span>
                   <span class="pixel-font text-[6px] text-green-plant">92%</span>
                 </div>
                 <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
@@ -557,7 +557,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mb-2">
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="pixel-font text-[6px] text-pixel-gray">MOISTURE</span>
+                  <span class="pixel-font text-[6px] text-pixel-gray">{content.appPreview.phoneMockup.moisture}</span>
                   <span class="pixel-font text-[6px] text-accent-blue">67%</span>
                 </div>
                 <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
@@ -565,7 +565,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 </div>
               </div>
               <div class="bg-cream rounded-lg p-2 mb-2 pixel-border">
-                <span class="pixel-font text-[5px] text-pixel-gray block mb-1">7-DAY MOISTURE</span>
+                <span class="pixel-font text-[5px] text-pixel-gray block mb-1">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
                 <div class="flex items-end gap-0.5 h-6">
                   {MOISTURE_CHART.map((v) => (
                     <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
@@ -573,9 +573,9 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 </div>
               </div>
               <div class="flex gap-1.5">
-                <div class="flex-1 bg-accent-blue text-cream text-center py-1 rounded-sm pixel-font text-[5px]">WATER</div>
-                <div class="flex-1 bg-accent-orange text-cream text-center py-1 rounded-sm pixel-font text-[5px]">PHOTO</div>
-                <div class="flex-1 bg-green-plant text-cream text-center py-1 rounded-sm pixel-font text-[5px]">HISTORY</div>
+                <div class="flex-1 bg-accent-blue text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.water}</div>
+                <div class="flex-1 bg-accent-orange text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.photo}</div>
+                <div class="flex-1 bg-green-plant text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.history}</div>
               </div>
             </div>
           </div>
@@ -596,18 +596,18 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <section id="garden" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
       <div class="max-w-6xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          Your Digital Garden
+          {content.digitalGarden.title}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
-          Every plant in your home, monitored in one beautiful dashboard. See who&rsquo;s thriving and who needs a drink.
+          {content.digitalGarden.subtitle}
         </p>
 
         <div class="mb-10">
-          <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">DESKTOP VIEW</div>
+          <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.desktopView}</div>
           <div class="rounded-xl overflow-hidden pixel-border shadow-lg">
             <img
               src="/garden-desktop.png"
-              alt="Plantgotchi Garden Dashboard - Desktop view showing 6 plants with live sensor data, HP bars, moisture levels, and detail panel"
+              alt={content.digitalGarden.desktopAlt}
               class="w-full h-auto block"
             />
           </div>
@@ -615,13 +615,13 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-14">
           <div class="w-56 sm:w-64 shrink-0">
-            <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">MOBILE VIEW</div>
+            <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.mobileView}</div>
             <div class="border-4 border-pixel-black rounded-[24px] bg-pixel-black p-1.5 shadow-lg">
               <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg relative z-10"></div>
               <div class="rounded-[18px] overflow-hidden -mt-1.5">
                 <img
                   src="/garden-mobile.png"
-                  alt="Plantgotchi Garden Dashboard - Mobile view with plant cards, HP bars, and moisture indicators"
+                  alt={content.digitalGarden.mobileAlt}
                   class="w-full h-auto block"
                 />
               </div>
@@ -630,10 +630,9 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           </div>
 
           <div class="max-w-sm text-center sm:text-left">
-            <h3 class="pixel-font text-xs text-green-dark mb-3">All your plants, one view</h3>
+            <h3 class="pixel-font text-xs text-green-dark mb-3">{content.digitalGarden.allPlantsTitle}</h3>
             <p class="text-sm text-pixel-gray mb-4">
-              The garden dashboard shows every plant in your home with live sensor data.
-              Tap any plant to see detailed charts, care history, and time-lapse photos.
+              {content.digitalGarden.allPlantsDesc}
             </p>
             <div class="space-y-2">
               {content.gardenFeatures.map((item: string) => (
@@ -648,7 +647,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               href={`${prefix}/garden`}
               class="inline-block mt-6 pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
             >
-              Try the Live Demo
+              {content.digitalGarden.tryDemo}
             </a>
           </div>
         </div>
@@ -659,10 +658,10 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <section id="screens" class="py-16 sm:py-24">
       <div class="max-w-6xl mx-auto px-4">
         <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
-          Designed for iOS
+          {content.iosScreens.title}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
-          A native app experience crafted for plant lovers. Every screen designed to make plant care feel like play.
+          {content.iosScreens.subtitle}
         </p>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
@@ -673,7 +672,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-1">My Garden</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-1">{content.iosScreens.myGarden}</div>
                   <div class="grid grid-cols-2 gap-1">
                     {GARDEN_PLANTS.slice(0, 4).map((p) => (
                       <div class="bg-cream-dark rounded p-1 text-center">
@@ -691,10 +690,10 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                     ))}
                   </div>
                   <div class="mt-1 text-center">
-                    <span class="pixel-font text-[3px] text-pixel-gray">+2 more plants</span>
+                    <span class="pixel-font text-[3px] text-pixel-gray">{content.iosScreens.morePlants}</span>
                   </div>
                   <div class="flex justify-around mt-2 pt-1 border-t border-pixel-gray/20">
-                    {["Garden", "Camera", "Alerts", "More"].map((label, i) => (
+                    {content.iosScreens.tabLabels.map((label: string, i: number) => (
                       <span class={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{label}</span>
                     ))}
                   </div>
@@ -702,7 +701,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Garden</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[0]}</p>
           </div>
 
           <!-- 2: Plant Detail -->
@@ -711,7 +710,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; Back</div>
+                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; {content.iosScreens.back}</div>
                   <div class="flex items-end justify-center gap-1 h-8 mb-1">
                     <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[-15deg]"></div>
                     <div class="w-1.5 h-6 bg-green-dark"></div>
@@ -734,7 +733,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                     ))}
                   </div>
                   <div class="bg-cream-dark rounded p-1 mt-2">
-                    <span class="pixel-font text-[3px] text-pixel-gray">7-DAY MOISTURE</span>
+                    <span class="pixel-font text-[3px] text-pixel-gray">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
                     <div class="flex items-end gap-px h-4 mt-0.5">
                       {DETAIL_CHART.map((v) => (
                         <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
@@ -745,7 +744,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Plant Detail</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[1]}</p>
           </div>
 
           <!-- 3: Photo Timeline -->
@@ -754,8 +753,8 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; Back</div>
-                  <div class="pixel-font text-[5px] text-green-dark mb-1">Photo Timeline</div>
+                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; {content.iosScreens.back}</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-1">{content.iosScreens.photoTimeline}</div>
                   <div class="space-y-1">
                     {content.photoLabels.map((date: string, i: number) => (
                       <div>
@@ -773,13 +772,13 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                     ))}
                   </div>
                   <div class="mt-1">
-                    <span class="pixel-font text-[3px] text-accent-blue text-center block">&#9654; Play Time-lapse</span>
+                    <span class="pixel-font text-[3px] text-accent-blue text-center block">&#9654; {content.iosScreens.playTimelapse}</span>
                   </div>
                 </div>
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Photos</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[2]}</p>
           </div>
 
           <!-- 4: Notifications -->
@@ -788,7 +787,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2">Alerts</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-2">{content.iosScreens.alerts}</div>
                   <div class="space-y-1.5">
                     {content.notifications.map((n: any, ni: number) => (
                       <div class="flex gap-1.5 items-start bg-cream-dark rounded p-1">
@@ -807,7 +806,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Notifications</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[3]}</p>
           </div>
 
           <!-- 5: Sensor Pairing -->
@@ -816,7 +815,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2 text-center">Add Sensor</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-2 text-center">{content.iosScreens.addSensor}</div>
                   <div class="flex justify-center mb-2">
                     <div class="w-12 h-12 rounded-full border-2 border-green-plant/30 flex items-center justify-center relative">
                       <div class="w-8 h-8 rounded-full border-2 border-green-plant/50 flex items-center justify-center">
@@ -826,22 +825,22 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                       </div>
                     </div>
                   </div>
-                  <p class="pixel-font text-[4px] text-center text-pixel-gray mb-2">Scanning for sensors...</p>
+                  <p class="pixel-font text-[4px] text-center text-pixel-gray mb-2">{content.iosScreens.scanning}</p>
                   <div class="space-y-1">
                     {FOUND_SENSORS.map((sensor, i) => (
                       <div class="flex items-center gap-1.5 bg-cream-dark rounded p-1.5">
                         <div class={`w-2 h-2 rounded-full ${i === 0 ? "bg-green-plant animate-pulse-glow" : "bg-pixel-gray/30"}`}></div>
                         <span class="pixel-font text-[3.5px] text-pixel-black flex-1">{sensor}</span>
-                        <span class="pixel-font text-[3px] text-cream bg-green-plant px-1.5 py-0.5 rounded">Pair</span>
+                        <span class="pixel-font text-[3px] text-cream bg-green-plant px-1.5 py-0.5 rounded">{content.iosScreens.pair}</span>
                       </div>
                     ))}
                   </div>
-                  <p class="text-[3px] text-pixel-gray text-center mt-2">Place sensor in pairing mode (hold button 3s)</p>
+                  <p class="text-[3px] text-pixel-gray text-center mt-2">{content.iosScreens.pairingInstructions}</p>
                 </div>
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Pair Sensor</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[4]}</p>
           </div>
 
           <!-- 6: Settings -->
@@ -850,7 +849,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
               <div class="bg-cream rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2">Settings</div>
+                  <div class="pixel-font text-[5px] text-green-dark mb-2">{content.iosScreens.settings}</div>
                   <div class="space-y-1">
                     {content.settingsGroups.map((group: any) => (
                       <div>
@@ -872,7 +871,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </div>
               <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">Settings</p>
+            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[5]}</p>
           </div>
         </div>
 
@@ -885,11 +884,11 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
               </svg>
             </div>
             <div>
-              <span class="pixel-font text-[6px] text-cream/60 block">Coming 2026</span>
-              <span class="pixel-font text-[9px] text-cream">Download on the App Store</span>
+              <span class="pixel-font text-[6px] text-cream/60 block">{content.iosScreens.comingSoon}</span>
+              <span class="pixel-font text-[9px] text-cream">{content.iosScreens.downloadAppStore}</span>
             </div>
           </div>
-          <p class="text-xs text-pixel-gray">Native iOS app. Built with SwiftUI.</p>
+          <p class="text-xs text-pixel-gray">{content.iosScreens.nativeApp}</p>
         </div>
       </div>
     </section>
@@ -901,7 +900,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           {content.sections.preOrderBundles}
         </h2>
         <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
-          Save more when you bundle.
+          {content.bundlesSection.subtitle}
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -913,7 +912,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             >
               {i === 1 && (
                 <span class="pixel-font text-[7px] bg-green-plant text-cream px-2 py-0.5 -mt-3 mb-1">
-                  BEST VALUE
+                  {content.bundlesSection.bestValue}
                 </span>
               )}
               <h3 class="pixel-font text-[10px] text-pixel-black">{b.name}</h3>
@@ -923,7 +922,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 href="#"
                 class="mt-auto pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
               >
-                Pre-order
+                {content.bundlesSection.preOrder}
               </a>
             </div>
           ))}
@@ -939,7 +938,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             {content.openSource.title}
           </h2>
           <p class="text-sm text-pixel-gray mb-4 max-w-md mx-auto">
-            Forked from{" "}
+            {content.openSourceSection.forkedFrom}{" "}
             <a
               href="https://github.com/rbaron/b-parasite"
               target="_blank"
@@ -948,10 +947,10 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             >
               b-parasite
             </a>{" "}
-            by rbaron. Schematics, firmware, and enclosures are all open.
+            {content.openSourceSection.byRbaron}
           </p>
           <div class="inline-flex items-center gap-2 bg-cream px-4 py-2 rounded-full pixel-border">
-            <span class="pixel-font text-[7px] text-pixel-gray">LICENSE</span>
+            <span class="pixel-font text-[7px] text-pixel-gray">{content.openSourceSection.license}</span>
             <span class="pixel-font text-[8px] text-green-dark">CC BY-SA 4.0</span>
           </div>
         </div>
@@ -963,40 +962,39 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
       <div class="max-w-5xl mx-auto px-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div>
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">Stay in the loop</h3>
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.stayInLoop}</h3>
             <p class="text-sm text-cream/60 mb-4">
-              Get updates on launch dates, new sensors, and plant care tips.
+              {content.footerSection.stayInLoopDesc}
             </p>
             <form class="flex gap-2">
               <input
                 type="email"
-                placeholder="you@email.com"
-                aria-label="Email address"
+                placeholder={content.footerSection.emailPlaceholder}
+                aria-label={content.footerSection.emailAriaLabel}
                 class="flex-1 bg-pixel-gray/30 text-cream text-sm px-3 py-2 rounded-sm border border-pixel-gray/40 placeholder:text-cream/30 focus:outline-none focus:border-green-plant"
               />
               <button
                 type="submit"
                 class="pixel-font text-[8px] bg-green-plant text-cream px-4 py-2 hover:bg-green-dark transition-colors"
               >
-                Join
+                {content.footerSection.join}
               </button>
             </form>
           </div>
 
           <div class="sm:text-center">
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">Links</h3>
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.linksTitle}</h3>
             <ul class="space-y-2 text-sm text-cream/60">
-              <li><a href="#how-it-works" class="hover:text-cream transition-colors">How It Works</a></li>
-              <li><a href="#products" class="hover:text-cream transition-colors">Products</a></li>
-              <li><a href="#pricing" class="hover:text-cream transition-colors">Pricing</a></li>
-              <li><a href="#app" class="hover:text-cream transition-colors">App</a></li>
+              {[["#how-it-works", content.footerSection.linkItems[0]], ["#products", content.footerSection.linkItems[1]], ["#pricing", content.footerSection.linkItems[2]], ["#app", content.footerSection.linkItems[3]]].map(([href, label]: string[]) => (
+                <li><a href={href} class="hover:text-cream transition-colors">{label}</a></li>
+              ))}
             </ul>
           </div>
 
           <div class="sm:text-right">
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">Follow us</h3>
+            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.followUs}</h3>
             <div class="flex sm:justify-end gap-4">
-              {["GitHub", "Twitter", "Discord"].map((s) => (
+              {content.footerSection.socialLinks.map((s: string) => (
                 <a
                   href="#"
                   class="text-sm text-cream/60 hover:text-cream transition-colors"

@@ -111,5 +111,68 @@
     { "section": "SENSORS", "items": ["Sync interval: 15 min", "LED brightness", "Sleep schedule"] },
     { "section": "ACCOUNT", "items": ["Profile", "Export data"] }
   ],
-  "photoLabels": ["Today", "3 days ago", "1 week ago", "2 weeks ago"]
+  "photoLabels": ["Today", "3 days ago", "1 week ago", "2 weeks ago"],
+  "appPreview": {
+    "subtitle": "Your plants, reimagined as pixel pals.",
+    "phoneMockup": {
+      "hp": "HP",
+      "moisture": "MOISTURE",
+      "sevenDayMoisture": "7-DAY MOISTURE",
+      "water": "WATER",
+      "photo": "PHOTO",
+      "history": "HISTORY"
+    }
+  },
+  "digitalGarden": {
+    "title": "Your Digital Garden",
+    "subtitle": "Every plant in your home, monitored in one beautiful dashboard. See who's thriving and who needs a drink.",
+    "desktopView": "DESKTOP VIEW",
+    "mobileView": "MOBILE VIEW",
+    "desktopAlt": "Plantgotchi Garden Dashboard - Desktop view showing 6 plants with live sensor data, HP bars, moisture levels, and detail panel",
+    "mobileAlt": "Plantgotchi Garden Dashboard - Mobile view with plant cards, HP bars, and moisture indicators",
+    "allPlantsTitle": "All your plants, one view",
+    "allPlantsDesc": "The garden dashboard shows every plant in your home with live sensor data. Tap any plant to see detailed charts, care history, and time-lapse photos.",
+    "tryDemo": "Try the Live Demo"
+  },
+  "iosScreens": {
+    "title": "Designed for iOS",
+    "subtitle": "A native app experience crafted for plant lovers. Every screen designed to make plant care feel like play.",
+    "myGarden": "My Garden",
+    "morePlants": "+2 more plants",
+    "tabLabels": ["Garden", "Camera", "Alerts", "More"],
+    "back": "Back",
+    "screenLabels": ["Garden", "Plant Detail", "Photos", "Notifications", "Pair Sensor", "Settings"],
+    "photoTimeline": "Photo Timeline",
+    "playTimelapse": "Play Time-lapse",
+    "alerts": "Alerts",
+    "addSensor": "Add Sensor",
+    "scanning": "Scanning for sensors...",
+    "pair": "Pair",
+    "pairingInstructions": "Place sensor in pairing mode (hold button 3s)",
+    "settings": "Settings",
+    "comingSoon": "Coming 2026",
+    "downloadAppStore": "Download on the App Store",
+    "nativeApp": "Native iOS app. Built with SwiftUI."
+  },
+  "bundlesSection": {
+    "subtitle": "Save more when you bundle.",
+    "bestValue": "BEST VALUE",
+    "preOrder": "Pre-order"
+  },
+  "openSourceSection": {
+    "forkedFrom": "Forked from",
+    "byRbaron": "by rbaron. Schematics, firmware, and enclosures are all open.",
+    "license": "LICENSE"
+  },
+  "footerSection": {
+    "stayInLoop": "Stay in the loop",
+    "stayInLoopDesc": "Get updates on launch dates, new sensors, and plant care tips.",
+    "join": "Join",
+    "emailPlaceholder": "you@email.com",
+    "emailAriaLabel": "Email address",
+    "linksTitle": "Links",
+    "linkItems": ["How It Works", "Products", "Pricing", "App"],
+    "followUs": "Follow us",
+    "socialLinks": ["GitHub", "Twitter", "Discord"]
+  }
 }
