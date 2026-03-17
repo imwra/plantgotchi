@@ -37,7 +37,7 @@ export default function ConversationList({ conversations, activeId, onSelect, on
         <input
           type="text"
           placeholder="Buscar conversas..."
-          className="w-full px-3 py-1.5 text-sm bg-bg rounded-md border border-text-mid/20 outline-none focus:border-primary/50"
+          className="w-full px-3 py-1.5 font-pixel text-pixel-xs bg-bg rounded-md border border-text-mid/20 outline-none focus:border-primary/50"
           readOnly
         />
       </div>

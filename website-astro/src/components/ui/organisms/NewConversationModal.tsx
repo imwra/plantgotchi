@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export interface SearchUser {
   id: string;
@@ -44,15 +44,24 @@ export default function NewConversationModal({
     setSelectedMembers((prev) => prev.filter((m) => m.id !== userId));
   };
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="pixel-border bg-white rounded-lg w-full max-w-md mx-4 max-h-[80vh] flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b border-text-mid/20">
-          <h2 className="font-pixel text-pixel-sm text-text">NEW CONVERSATION</h2>
+          <h2 className="font-pixel text-[11px] text-text">NEW CONVERSATION</h2>
           <button
             type="button"
             onClick={onClose}
-            className="font-pixel text-pixel-sm text-text-mid hover:text-text cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center rounded-md bg-bg border border-text-mid/20 font-pixel text-[10px] text-text-mid hover:text-text hover:bg-brown-pale cursor-pointer transition-colors"
             aria-label="Close"
           >
             ✕
@@ -64,7 +73,7 @@ export default function NewConversationModal({
             type="button"
             onClick={() => setActiveTab('dm')}
             className={clsx(
-              'flex-1 py-2 font-pixel text-pixel-xs text-center transition-colors cursor-pointer',
+              'flex-1 py-2.5 font-pixel text-pixel-sm text-center transition-colors cursor-pointer',
               activeTab === 'dm'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-text-mid hover:text-text',
@@ -76,7 +85,7 @@ export default function NewConversationModal({
             type="button"
             onClick={() => setActiveTab('group')}
             className={clsx(
-              'flex-1 py-2 font-pixel text-pixel-xs text-center transition-colors cursor-pointer',
+              'flex-1 py-2.5 font-pixel text-pixel-sm text-center transition-colors cursor-pointer',
               activeTab === 'group'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-text-mid hover:text-text',
@@ -123,7 +132,7 @@ export default function NewConversationModal({
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search users..."
-            className="w-full pixel-border px-3 py-2 text-sm bg-white outline-none mb-3"
+            className="w-full pixel-border px-3 py-2 font-pixel text-pixel-sm bg-white outline-none mb-3"
           />
 
           <div className="space-y-1">

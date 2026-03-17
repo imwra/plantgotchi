@@ -319,12 +319,8 @@ export default function ChatApp({ userName, locale, navLabels }: ChatAppProps) {
       />
 
       <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-3.5 pb-6">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-3.5 pb-3 border-b-2 border-border-light">
-          <div className="font-pixel text-[13px] sm:text-[15px] text-primary-dark tracking-wide">
-            CHAT
-          </div>
-        </div>
+        {/* spacer */}
+        <div className="h-2" />
 
         {/* Loading */}
         {loading && (
