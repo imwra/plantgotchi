@@ -69,9 +69,8 @@ class AuthService(
         val jsonObj = json.parseToJsonElement(body).jsonObject
 
         val token = jsonObj["token"]?.jsonPrimitive?.content
-        if (token != null) {
-            tokenManager.saveToken(token)
-        }
+            ?: throw AuthException("Auth response missing token")
+        tokenManager.saveToken(token)
 
         val user = jsonObj["user"]?.jsonObject
         val id = user?.get("id")?.jsonPrimitive?.content

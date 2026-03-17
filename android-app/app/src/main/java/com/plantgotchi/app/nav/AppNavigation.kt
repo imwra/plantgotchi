@@ -75,6 +75,7 @@ fun AppNavigation() {
 
         composable(Routes.GARDEN) {
             GardenScreen(
+                userId = app.authService.userId ?: "local-user",
                 onPlantClick = { plantId ->
                     navController.navigate(Routes.plantDetail(plantId))
                 },
