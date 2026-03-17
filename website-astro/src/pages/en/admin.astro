@@ -21,5 +21,23 @@ const userName = session.user.name || session.user.email;
 ---
 
 <BaseLayout title={t("admin.title")}>
-  <AdminPanel client:load userName={userName} />
+  <AdminPanel
+    client:load
+    userName={userName}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+  />
 </BaseLayout>

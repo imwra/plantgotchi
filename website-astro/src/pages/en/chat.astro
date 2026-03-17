@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ChatApp from "../../components/ui/organisms/ChatApp";
+import { getSession } from "../../lib/auth";
+import { getLocaleFromPath, useTranslations } from "../../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const session = await getSession(Astro.request);
+if (!session) {
+  return Astro.redirect(locale === "en" ? "/en/login" : "/login");
+}
+
+const userName = session.user.name || session.user.email;
+const userId = session.user.id;
+---
+
+<BaseLayout title={t("chat.title")}>
+  <ChatApp
+    client:load
+    userName={userName}
+    userId={userId}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+    chatLabels={{
+      heading: t("chat.heading"),
+      newMessage: t("chat.newMessage"),
+      searchPlaceholder: t("chat.searchPlaceholder"),
+      noConversations: t("chat.noConversations"),
+      noConversationsDesc: t("chat.noConversationsDesc"),
+      inputPlaceholder: t("chat.inputPlaceholder"),
+      members: t("chat.members"),
+      typing: t("chat.typing"),
+      typingMultiple: t("chat.typingMultiple"),
+      today: t("chat.today"),
+      yesterday: t("chat.yesterday"),
+      you: t("chat.you"),
+      dmTab: t("chat.dmTab"),
+      groupTab: t("chat.groupTab"),
+      groupName: t("chat.groupName"),
+      searchUsers: t("chat.searchUsers"),
+      create: t("chat.create"),
+      cancel: t("chat.cancel"),
+      addMembers: t("chat.addMembers"),
+      loadingMessages: t("chat.loadingMessages"),
+      sendImage: t("chat.sendImage"),
+      selectConversation: t("chat.selectConversation"),
+      selectConversationDesc: t("chat.selectConversationDesc"),
+    }}
+  />
+</BaseLayout>

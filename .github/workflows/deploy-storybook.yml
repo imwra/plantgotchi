@@ -1,0 +1,41 @@
+name: Deploy Storybook
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website-astro/src/components/**'
+      - 'website-astro/.storybook/**'
+      - 'website-astro/src/styles/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: website-astro/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: website-astro
+
+      - name: Build Storybook
+        run: npx storybook build -o storybook-static
+        working-directory: website-astro
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy storybook-static --project-name=plantgotchi-storybook --commit-dirty=true
+          workingDirectory: website-astro

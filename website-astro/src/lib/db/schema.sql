@@ -163,3 +163,59 @@ CREATE INDEX IF NOT EXISTS idx_rel_from ON plant_relationships(from_plant_id);
 CREATE INDEX IF NOT EXISTS idx_rel_to ON plant_relationships(to_plant_id);
 CREATE INDEX IF NOT EXISTS idx_source_plant ON plant_source_mappings(plant_id);
 CREATE INDEX IF NOT EXISTS idx_stages_plant ON plant_stages(plant_id, started_at DESC);
+
+-- Chat: Conversations (DMs and groups)
+CREATE TABLE IF NOT EXISTS conversations (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL CHECK (type IN ('dm', 'group')),
+  name TEXT,
+  created_by TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Chat: Conversation members
+CREATE TABLE IF NOT EXISTS conversation_members (
+  id TEXT PRIMARY KEY,
+  conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member')),
+  joined_at TEXT DEFAULT (datetime('now')),
+  last_read_at TEXT DEFAULT (datetime('now')),
+  UNIQUE(conversation_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_conv_members_user ON conversation_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_conv_members_conv ON conversation_members(conversation_id);
+
+-- Chat: Messages
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  sender_id TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'text' CHECK (type IN ('text', 'image')),
+  content TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_messages_conv_time ON messages(conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+
+-- Chat: Reactions
+CREATE TABLE IF NOT EXISTS reactions (
+  id TEXT PRIMARY KEY,
+  message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
+  emoji TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  UNIQUE(message_id, user_id, emoji)
+);
+
+-- Chat: Typing indicators
+CREATE TABLE IF NOT EXISTS typing_indicators (
+  conversation_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  updated_at TEXT DEFAULT (datetime('now')),
+  PRIMARY KEY (conversation_id, user_id)
+);

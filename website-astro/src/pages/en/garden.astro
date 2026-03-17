@@ -16,5 +16,61 @@ const userName = session.user.name || session.user.email;
 ---
 
 <BaseLayout title={t("garden.title")}>
-  <GardenDashboard client:load userName={userName} />
+  <GardenDashboard
+    client:load
+    userName={userName}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+    dashLabels={{
+      subtitle: t("dash.subtitle"),
+      plants: t("dash.plants"),
+      happy: t("dash.happy"),
+      needWater: t("dash.needWater"),
+      allPlants: t("dash.allPlants"),
+      plantDetails: t("dash.plantDetails"),
+      tapPlant: t("dash.tapPlant"),
+      hp: t("dash.hp"),
+      moisture: t("dash.moisture"),
+      temp: t("dash.temp"),
+      light: t("dash.light"),
+      health: t("dash.health"),
+      watered: t("dash.watered"),
+      noData: t("dash.noData"),
+      statusHappy: t("dash.statusHappy"),
+      statusThirsty: t("dash.statusThirsty"),
+      recommendations: t("dash.recommendations"),
+      careHistory: t("dash.careHistory"),
+      logReading: t("dash.logReading"),
+      logCare: t("dash.logCare"),
+      loading: t("dash.loading"),
+      noPlantsYet: t("dash.noPlantsYet"),
+      addFirstPlant: t("dash.addFirstPlant"),
+      add: t("dash.add"),
+      footer: t("dash.footer"),
+      noLogsYet: t("dash.noLogsYet"),
+      dismiss: t("dash.dismiss"),
+      careWater: t("dash.careWater"),
+      careFertilize: t("dash.careFertilize"),
+      carePrune: t("dash.carePrune"),
+      careRepot: t("dash.careRepot"),
+      careMist: t("dash.careMist"),
+      carePestTreatment: t("dash.carePestTreatment"),
+      severityInfo: t("dash.severityInfo"),
+      severityWarning: t("dash.severityWarning"),
+      severityUrgent: t("dash.severityUrgent"),
+    }}
+  />
 </BaseLayout>

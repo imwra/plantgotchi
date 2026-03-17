@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Badge } from '../ui/atoms';
 import UserDetailModal from "./UserDetailModal";
 
 interface AdminUser {
@@ -69,13 +70,7 @@ export default function UsersTab() {
                   <td className="px-4 py-2 font-medium">{user.email}</td>
                   <td className="px-4 py-2 text-text-mid">{user.name || "—"}</td>
                   <td className="px-4 py-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                      user.role === "admin"
-                        ? "bg-water/20 text-water"
-                        : "bg-bg-warm text-text-mid"
-                    }`}>
-                      {user.role}
-                    </span>
+                    <Badge label={user.role} variant={user.role === 'admin' ? 'info' : 'neutral'} />
                   </td>
                   <td className="px-4 py-2">{user.plantCount}</td>
                   <td className="px-4 py-2 text-text-mid text-xs">

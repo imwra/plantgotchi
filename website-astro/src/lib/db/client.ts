@@ -13,6 +13,7 @@ export function getDb(): Client {
   }
 
   db = createClient({ url, authToken });
+  db.execute("PRAGMA foreign_keys = ON");
 
   return db;
 }

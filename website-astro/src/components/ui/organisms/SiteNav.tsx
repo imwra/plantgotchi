@@ -7,6 +7,8 @@ export interface SiteNavProps {
   labels?: {
     home: string;
     garden: string;
+    chat?: string;
+    projects?: string;
     help: string;
     admin: string;
     login: string;
@@ -17,12 +19,14 @@ export interface SiteNavProps {
     langCurrentPtbr: string;
     langCurrentEn: string;
   };
+  isAdmin?: boolean;
   currentPath?: string;
 }
 
 const DEFAULT_LABELS = {
   home: 'Home',
   garden: 'Garden',
+  chat: 'Chat',
   help: 'Help',
   admin: 'Admin',
   login: 'Login',
@@ -38,6 +42,7 @@ export default function SiteNav({
   userName,
   locale = 'pt-br',
   labels = DEFAULT_LABELS,
+  isAdmin,
   currentPath = '/',
 }: SiteNavProps) {
   const [open, setOpen] = useState(false);
@@ -46,6 +51,8 @@ export default function SiteNav({
   const navLinks = [
     { label: labels.home, href: `${prefix}/` },
     { label: labels.garden, href: `${prefix}/garden` },
+    { label: labels.chat || 'Chat', href: `${prefix}/chat` },
+    ...(isAdmin || labels.projects ? [{ label: labels.projects || 'Projects', href: `${prefix}/projects` }] : []),
     { label: labels.help, href: `${prefix}/help` },
     { label: labels.admin, href: `${prefix}/admin` },
   ];
@@ -65,7 +72,7 @@ export default function SiteNav({
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-text-mid hover:text-primary-dark transition-colors"
+              className="font-pixel text-pixel-md text-text-mid hover:text-primary-dark transition-colors"
             >
               {l.label}
             </a>
