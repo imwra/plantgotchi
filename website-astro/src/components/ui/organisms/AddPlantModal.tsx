@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '../../../lib/analytics';
 import { PixelButton } from '../atoms';
 
 const PLANT_EMOJIS = ['\uD83C\uDF3F', '\uD83C\uDF31', '\uD83E\uDEB4', '\uD83C\uDF35', '\uD83C\uDF3B', '\uD83C\uDF3A', '\uD83C\uDF38', '\uD83C\uDF40', '\uD83C\uDF3E', '\uD83C\uDF8B', '\uD83C\uDF8D', '\uD83C\uDF34'];
@@ -47,6 +48,9 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to create plant');
       }
+
+      const newPlant = await res.json().catch(() => ({}));
+      Analytics.track('plant_created', { plant_id: newPlant.id, species: newPlant.species, emoji: newPlant.emoji });
 
       onCreated();
       onClose();

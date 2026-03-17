@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import posthog from 'posthog-js';
+import { useState, useEffect, useRef } from 'react';
+import { Analytics } from '../../../lib/analytics';
 import { toPlantView, type PlantView } from '../../../lib/plant-view';
 import type { Plant, SensorReading, CareLog, Recommendation } from '../../../lib/db/queries';
 import { DEMO_PLANTS, getDemoPlants, getDemoRecommendations } from '../../../lib/demo-data';
@@ -114,6 +114,7 @@ function DetailSection({
 }) {
   const [careLogs, setCareLogs] = useState<CareLog[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const trackedRecsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!plant) return;
@@ -134,6 +135,17 @@ function DetailSection({
     };
     fetchDetails();
   }, [plant?.id, demoMode, locale]);
+
+  useEffect(() => {
+    if (!plant) return;
+    const active = recommendations.filter((r) => !r.acted_on);
+    active.forEach((rec) => {
+      if (!trackedRecsRef.current.has(rec.id)) {
+        trackedRecsRef.current.add(rec.id);
+        Analytics.track('care_recommendation_viewed', { plant_id: plant.id, severity: rec.severity });
+      }
+    });
+  }, [recommendations, plant?.id]);
 
   const refreshDetails = async () => {
     if (!plant) return;
@@ -291,12 +303,17 @@ export default function GardenDashboard({
           toPlantView(item.plant, item.latestReading, item.recentCareLogs),
       );
       setPlants(views);
-      posthog.capture('garden_viewed', { plant_count: views.length });
+      Analytics.track('garden_viewed', { plant_count: views.length });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error loading plants');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleManualRefresh = async () => {
+    await fetchPlants();
+    Analytics.track('garden_refreshed', { plant_count: plants.length });
   };
 
   useEffect(() => {
@@ -409,6 +426,8 @@ export default function GardenDashboard({
                 onSelect={(id) => {
                   setSelectedId(id);
                   setShowDetail(true);
+                  const plant = plants.find((p) => p.id === id);
+                  if (plant) Analytics.track('plant_viewed', { plant_id: plant.id, species: plant.species });
                 }}
               />
             </div>
