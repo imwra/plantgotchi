@@ -25,7 +25,7 @@ export default function ConversationListItem({
   memberCount,
   onClick,
 }: ConversationListItemProps) {
-  const avatarContent = isGroup ? '💬' : name.charAt(0).toUpperCase();
+  const avatarContent = isGroup ? '💬' : (name || '?').charAt(0).toUpperCase();
 
   return (
     <button

@@ -92,12 +92,12 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
       setConversations(
         data.map((c: any) => ({
           id: c.id,
-          name: c.name,
+          name: c.name ?? 'Chat',
           lastMessage: c.last_message ?? '',
           lastMessageTime: c.last_message_at ? relativeTime(c.last_message_at) : '',
           lastMessageTimeRaw: c.last_message_at ?? '',
           unreadCount: c.unread_count ?? 0,
-          isGroup: c.is_group ?? false,
+          isGroup: c.type === 'group',
           memberCount: c.member_count ?? 2,
         })),
       );

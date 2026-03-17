@@ -69,7 +69,14 @@ export async function getUserConversations(userId: string): Promise<Conversation
   const db = getDb();
   const result = await db.execute({
     sql: `SELECT
-            c.id, c.type, c.name, c.created_by, c.created_at, c.updated_at,
+            c.id, c.type,
+            CASE WHEN c.type = 'dm' THEN (
+              SELECT u.name FROM conversation_members ocm
+              JOIN "user" u ON u.id = ocm.user_id
+              WHERE ocm.conversation_id = c.id AND ocm.user_id != ?
+              LIMIT 1
+            ) ELSE c.name END AS name,
+            c.created_by, c.created_at, c.updated_at,
             m.content AS last_message,
             m.created_at AS last_message_at,
             m.sender_id AS last_sender_id,
@@ -86,7 +93,7 @@ export async function getUserConversations(userId: string): Promise<Conversation
             ORDER BY m2.created_at DESC LIMIT 1
           )
           ORDER BY COALESCE(m.created_at, c.updated_at) DESC`,
-    args: [userId],
+    args: [userId, userId],
   });
   return result.rows as unknown as ConversationWithPreview[];
 }
