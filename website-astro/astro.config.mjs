@@ -20,8 +20,10 @@ export default defineConfig({
       alias: {
         // Force @libsql/client to use fetch-based HTTP client (no WebSocket/Node deps)
         "@libsql/client": new URL("./node_modules/@libsql/client/lib-esm/http.js", import.meta.url).pathname,
-        // Replace node-fetch with global fetch (available in Cloudflare Workers)
+        // Replace node-fetch and cross-fetch with global fetch (available in Cloudflare Workers)
         "node-fetch": new URL("./src/lib/fetch-shim.ts", import.meta.url).pathname,
+        "cross-fetch": new URL("./src/lib/fetch-shim.ts", import.meta.url).pathname,
+        "cross-fetch/polyfill": new URL("./src/lib/fetch-shim.ts", import.meta.url).pathname,
       },
     },
   },
