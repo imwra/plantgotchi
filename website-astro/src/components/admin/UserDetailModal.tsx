@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Badge } from '../ui/atoms';
 
 interface UserDetail {
   id: string;
@@ -94,7 +95,7 @@ export default function UserDetailModal({ userId, onClose }: { userId: string; o
                     <div key={log.id} className="flex items-center gap-2 text-xs py-1 border-b border-bg-warm/30">
                       <span className="text-text-mid">{new Date(log.createdAt).toLocaleDateString()}</span>
                       <span className="font-medium">{log.plantName}</span>
-                      <span className="px-1.5 py-0.5 bg-primary/10 text-primary-dark rounded text-[10px]">{log.action}</span>
+                      <Badge label={log.action} variant="success" />
                       {log.notes && <span className="text-text-mid truncate">{log.notes}</span>}
                     </div>
                   ))}

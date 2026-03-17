@@ -4,7 +4,7 @@ import OverviewTab from '../../admin/OverviewTab';
 import UsersTab from '../../admin/UsersTab';
 import PlantsTab from '../../admin/PlantsTab';
 import ActivityTab from '../../admin/ActivityTab';
-import { PhaseCard, TaskRow } from '../molecules';
+import { PhaseCard, TaskRow, StatCard } from '../molecules';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -252,16 +252,13 @@ function LaunchTrackerTab() {
       {/* Summary */}
       <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
-          { label: 'Total', value: stats.total, color: 'bg-text text-bg' },
-          { label: 'Done', value: stats.done, color: 'bg-primary text-white' },
-          { label: 'In Progress', value: stats.inProgress, color: 'bg-water text-white' },
-          { label: 'Blocked', value: stats.blocked, color: 'bg-danger text-white' },
-          { label: 'Todo', value: stats.todo, color: 'bg-bg-warm text-text' },
+          { label: 'Total', value: stats.total, variant: 'neutral' as const, icon: '📋' },
+          { label: 'Done', value: stats.done, variant: 'primary' as const, icon: '✅' },
+          { label: 'In Progress', value: stats.inProgress, variant: 'water' as const, icon: '🔄' },
+          { label: 'Blocked', value: stats.blocked, variant: 'danger' as const, icon: '🚫' },
+          { label: 'Todo', value: stats.todo, variant: 'sun' as const, icon: '📝' },
         ].map((s) => (
-          <div key={s.label} className={`${s.color} rounded-xl px-4 py-3 text-center shadow-sm`}>
-            <div className="text-2xl font-bold">{s.value}</div>
-            <div className="text-[10px] uppercase tracking-wider mt-1 opacity-80">{s.label}</div>
-          </div>
+          <StatCard key={s.label} label={s.label} value={s.value} variant={s.variant} icon={s.icon} />
         ))}
       </section>
 
@@ -357,14 +354,21 @@ function LaunchTrackerTab() {
 
 export interface AdminPanelProps {
   userName?: string;
+  locale?: string;
+  navLabels?: Record<string, string>;
 }
 
-export default function AdminPanel({ userName }: AdminPanelProps) {
+export default function AdminPanel({ userName, locale, navLabels }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>('overview');
 
   return (
     <div className="min-h-screen bg-bg text-text">
-      <SiteNav userName={userName} />
+      <SiteNav
+        userName={userName}
+        locale={locale as 'pt-br' | 'en'}
+        labels={navLabels as any}
+        currentPath={typeof window !== 'undefined' ? window.location.pathname : '/'}
+      />
 
       {/* Header */}
       <header className="bg-primary-dark text-bg shadow-lg">

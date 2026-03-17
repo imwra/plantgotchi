@@ -65,7 +65,7 @@ export default function SiteNav({
             <a
               key={l.href}
               href={l.href}
-              className="text-sm text-text-mid hover:text-primary-dark transition-colors"
+              className="font-pixel text-pixel-md text-text-mid hover:text-primary-dark transition-colors"
             >
               {l.label}
             </a>

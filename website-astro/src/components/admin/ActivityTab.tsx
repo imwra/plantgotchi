@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Badge } from '../ui/atoms';
 
 interface ActivityItem {
   id: string;
@@ -43,13 +44,7 @@ export default function ActivityTab() {
         {activity.map((item) => (
           <div key={`${item.type}-${item.id}`} className="px-4 py-3 flex items-start gap-3 hover:bg-bg/30 transition">
             {/* Type icon */}
-            <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-              item.type === "care_log"
-                ? "bg-primary/20 text-primary-dark"
-                : "bg-water/20 text-water"
-            }`}>
-              {item.type === "care_log" ? "CARE" : "READING"}
-            </span>
+            <Badge label={item.type === 'care_log' ? 'CARE' : 'READING'} variant={item.type === 'care_log' ? 'success' : 'info'} />
 
             {/* Content */}
             <div className="flex-1 min-w-0">

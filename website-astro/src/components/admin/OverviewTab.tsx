@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { StatCard } from '../ui/molecules';
 
 interface Stats {
   totalUsers: number;
@@ -29,25 +30,20 @@ export default function OverviewTab() {
   if (error) return <p className="text-sm text-danger">{error}</p>;
   if (!stats) return null;
 
-  const cards = [
-    { label: "Total Users", value: stats.totalUsers, color: "bg-water text-white" },
-    { label: "Total Plants", value: stats.totalPlants, color: "bg-primary text-white" },
-    { label: "Sensor Readings", value: stats.totalReadings, color: "bg-brown text-white" },
-    { label: "Care Logs", value: stats.totalCareLogs, color: "bg-primary-dark text-bg" },
-    { label: "Pending Recs", value: stats.pendingRecommendations, color: "bg-orange text-white" },
-    { label: "Readings Today", value: stats.readingsToday, color: "bg-text text-bg" },
+  const cards: Array<{ label: string; value: number; variant: 'primary' | 'water' | 'danger' | 'sun' | 'neutral'; icon: string }> = [
+    { label: "Total Users", value: stats.totalUsers, variant: "water", icon: "👤" },
+    { label: "Total Plants", value: stats.totalPlants, variant: "primary", icon: "🌿" },
+    { label: "Sensor Readings", value: stats.totalReadings, variant: "neutral", icon: "📊" },
+    { label: "Care Logs", value: stats.totalCareLogs, variant: "primary", icon: "📋" },
+    { label: "Pending Recs", value: stats.pendingRecommendations, variant: "danger", icon: "⚠️" },
+    { label: "Readings Today", value: stats.readingsToday, variant: "neutral", icon: "📈" },
   ];
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {cards.map((card) => (
-          <div key={card.label} className={`${card.color} rounded-xl px-4 py-3 text-center shadow-sm`}>
-            <div className="text-2xl font-bold">{card.value}</div>
-            <div className="text-[10px] uppercase tracking-wider mt-1 opacity-80">
-              {card.label}
-            </div>
-          </div>
+          <StatCard key={card.label} label={card.label} value={card.value} variant={card.variant} icon={card.icon} />
         ))}
       </div>
     </div>
