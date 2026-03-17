@@ -1,14 +1,22 @@
 import Foundation
 
 public struct GardenSnapshot: Equatable {
-    public struct GardenScope: Equatable {
+    public struct GroupScope: Equatable {
         public var vitality: VitalityLevel
+        public var attentionCount: Int
+        public var unknownCount: Int
 
-        public init(vitality: VitalityLevel) {
+        public init(
+            vitality: VitalityLevel,
+            attentionCount: Int = 0,
+            unknownCount: Int = 0
+        ) {
             self.vitality = vitality
+            self.attentionCount = attentionCount
+            self.unknownCount = unknownCount
         }
 
-        public static let empty = GardenScope(vitality: .medium)
+        public static let empty = GroupScope(vitality: .medium)
     }
 
     public enum VitalityLevel: String, Equatable {
@@ -18,15 +26,15 @@ public struct GardenSnapshot: Equatable {
     }
 
     public var generatedAt: Date
-    public var wholeGarden: GardenScope
-    public var subsets: [GardenScope]
-    public var plants: [GardenScope]
+    public var wholeGarden: GroupScope
+    public var subsets: [SubsetScope]
+    public var plants: [PlantScope]
 
     public init(
         generatedAt: Date,
-        wholeGarden: GardenScope,
-        subsets: [GardenScope],
-        plants: [GardenScope]
+        wholeGarden: GroupScope,
+        subsets: [SubsetScope],
+        plants: [PlantScope]
     ) {
         self.generatedAt = generatedAt
         self.wholeGarden = wholeGarden
@@ -36,9 +44,9 @@ public struct GardenSnapshot: Equatable {
 
     public static func generatedAt(
         _ date: Date,
-        wholeGarden: GardenScope,
-        subsets: [GardenScope],
-        plants: [GardenScope]
+        wholeGarden: GroupScope,
+        subsets: [SubsetScope],
+        plants: [PlantScope]
     ) -> GardenSnapshot {
         GardenSnapshot(
             generatedAt: date,
