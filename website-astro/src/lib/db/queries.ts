@@ -13,6 +13,9 @@ export interface Plant {
   temp_min: number;
   temp_max: number;
   light_preference: string;
+  garden_id: string | null;
+  catalog_id: string | null;
+  identification_confidence: 'exact' | 'probable' | 'guess' | 'unknown';
   created_at: string;
   updated_at: string;
 }
@@ -69,9 +72,9 @@ export async function getPlant(id: string): Promise<Plant | null> {
 export async function createPlant(plant: Omit<Plant, 'created_at' | 'updated_at'>): Promise<void> {
   const db = getDb();
   await db.execute({
-    sql: `INSERT INTO plants (id, user_id, name, species, emoji, photo_url, moisture_min, moisture_max, temp_min, temp_max, light_preference)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [plant.id, plant.user_id, plant.name, plant.species, plant.emoji, plant.photo_url, plant.moisture_min, plant.moisture_max, plant.temp_min, plant.temp_max, plant.light_preference],
+    sql: `INSERT INTO plants (id, user_id, name, species, emoji, photo_url, moisture_min, moisture_max, temp_min, temp_max, light_preference, garden_id, catalog_id, identification_confidence)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [plant.id, plant.user_id, plant.name, plant.species, plant.emoji, plant.photo_url, plant.moisture_min, plant.moisture_max, plant.temp_min, plant.temp_max, plant.light_preference, plant.garden_id, plant.catalog_id, plant.identification_confidence],
   });
 }
 
