@@ -114,14 +114,19 @@ if (session) {
       const password = formData.get("password") as string;
 
       try {
-        const res = await fetch("/api/auth/sign-up/email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
-        });
+        let res: Response | null = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          res = await fetch("/api/auth/sign-up/email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+          if (res.status !== 503) break;
+          await new Promise(r => setTimeout(r, 1000));
+        }
 
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}));
+        if (!res || !res.ok) {
+          const data = await res?.json().catch(() => ({})) || {};
           errorMsg.textContent = data.message || errorDefault;
           errorMsg.style.display = "block";
           submitBtn.disabled = false;
