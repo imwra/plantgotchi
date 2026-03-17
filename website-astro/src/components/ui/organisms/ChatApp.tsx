@@ -5,6 +5,7 @@ import SiteNav from './SiteNav';
 import type { Conversation } from './ConversationList';
 import type { Message } from './ConversationView';
 import { relativeTime } from '../../../lib/time-utils';
+import { Analytics } from '../../../lib/analytics';
 
 // ---------------------------------------------------------------------------
 // ChatLabels
@@ -149,6 +150,11 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
           setLastMessageTime(msgs[msgs.length - 1].timestampRaw);
         }
         setTypingUsers(data.typers ?? []);
+        const conv = conversations.find((c) => c.id === activeConversationId);
+        Analytics.track('chat_conversation_viewed', {
+          conversation_id: activeConversationId,
+          conversation_type: conv ? (conv.isGroup ? 'group' : 'dm') : undefined,
+        });
       } catch {
         // ignore
       }
@@ -161,7 +167,13 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversationId: activeConversationId }),
-    }).catch(() => {});
+    })
+      .then((r) => {
+        if (r.ok) {
+          Analytics.track('chat_conversation_read', { conversation_id: activeConversationId });
+        }
+      })
+      .catch(() => {});
 
     return () => {
       cancelled = true;
@@ -252,6 +264,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
           },
         ]);
         setLastMessageTime(msg.created_at);
+        Analytics.track('chat_message_sent', { conversation_id: activeConversationId, message_type: 'text' });
         fetchConversations();
       }
     } catch {
@@ -268,6 +281,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ conversationId: activeConversationId }),
     }).catch(() => {});
+    Analytics.track('chat_typing_started', { conversation_id: activeConversationId });
     typingTimeout.current = setTimeout(() => {
       typingTimeout.current = undefined;
     }, 3000);
@@ -288,6 +302,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
         if (res.ok) {
           const { url } = await res.json();
           await sendMessage('image', url);
+          Analytics.track('chat_file_uploaded', { conversation_id: activeConversationId, file_type: file.type });
         }
       } catch {
         // ignore
@@ -306,6 +321,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
       });
       if (res.ok) {
         const conv = await res.json();
+        Analytics.track('chat_conversation_created', { conversation_id: conv.id, conversation_type: conv.type });
         setShowNewConversation(false);
         setSearchResults([]);
         await fetchConversations();
@@ -325,6 +341,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
       });
       if (res.ok) {
         const conv = await res.json();
+        Analytics.track('chat_conversation_created', { conversation_id: conv.id, conversation_type: conv.type });
         setShowNewConversation(false);
         setSearchResults([]);
         await fetchConversations();
@@ -367,6 +384,7 @@ export default function ChatApp({ userName, userId, locale, navLabels, chatLabel
         body: JSON.stringify({ messageId, emoji }),
       });
       if (res.ok) {
+        Analytics.track('chat_reaction_added', { conversation_id: activeConversationId, emoji });
         if (activeConversationId) {
           const msgsRes = await fetch(`/api/chat/messages?conversationId=${activeConversationId}`);
           if (msgsRes.ok) {
