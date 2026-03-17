@@ -20,19 +20,19 @@ export default function QuizBlock({ question, options, correctIndex, explanation
   };
 
   return (
-    <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
-      <p className="mb-3 font-bold text-white">{question}</p>
+    <div className="rounded-xl border border-border bg-bg-card p-4 shadow-sm">
+      <p className="mb-3 font-pixel text-pixel-sm text-text">{question}</p>
       <div className="space-y-2">
         {options.map((opt, i) => (
           <button
             key={i}
             onClick={() => !submitted && !disabled && setSelected(i)}
             disabled={submitted || disabled}
-            className={`w-full rounded border px-3 py-2 text-left text-sm transition-colors ${
-              submitted && i === correctIndex ? 'border-green-500 bg-green-900/30 text-green-300' :
-              submitted && i === selected && i !== correctIndex ? 'border-red-500 bg-red-900/30 text-red-300' :
-              selected === i ? 'border-blue-500 bg-blue-900/20 text-white' :
-              'border-gray-600 text-gray-300 hover:border-gray-500'
+            className={`w-full rounded-md border px-3 py-2 text-left text-sm transition-colors ${
+              submitted && i === correctIndex ? 'border-border-accent bg-primary-pale text-primary' :
+              submitted && i === selected && i !== correctIndex ? 'border-danger bg-danger-pale text-danger' :
+              selected === i ? 'border-water bg-water-pale text-text' :
+              'border-border-light text-text-mid hover:border-border'
             }`}
           >
             {opt}
@@ -40,11 +40,11 @@ export default function QuizBlock({ question, options, correctIndex, explanation
         ))}
       </div>
       {!submitted && !disabled && (
-        <button onClick={handleSubmit} disabled={selected === null} className="mt-3 rounded bg-green-600 px-4 py-1 text-sm text-white hover:bg-green-500 disabled:opacity-40">
+        <button onClick={handleSubmit} disabled={selected === null} className="mt-3 rounded-md border-2 border-primary-dark bg-primary px-4 py-1 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-40 transition-colors">
           Submit
         </button>
       )}
-      {submitted && <p className="mt-3 text-sm text-gray-400">{explanation}</p>}
+      {submitted && <p className="mt-3 text-sm text-text-mid">{explanation}</p>}
     </div>
   );
 }

@@ -8,10 +8,10 @@ export default function VideoPlayer({ url, caption }: { url: string; caption?: s
 
   return (
     <div className="space-y-2">
-      <div className="aspect-video w-full overflow-hidden rounded-lg border border-gray-700">
+      <div className="aspect-video w-full overflow-hidden rounded-xl border border-border shadow-sm">
         <iframe src={embedUrl} className="h-full w-full" allowFullScreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
       </div>
-      {caption && <p className="text-sm text-gray-400">{caption}</p>}
+      {caption && <p className="text-sm text-text-mid">{caption}</p>}
     </div>
   );
 }
