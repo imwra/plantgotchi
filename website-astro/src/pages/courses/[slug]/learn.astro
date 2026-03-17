@@ -1,0 +1,14 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CourseLearnerView from "../../../components/ui/organisms/CourseLearnerView";
+import { getSession } from "../../../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) return Astro.redirect("/login");
+
+const { slug } = Astro.params;
+---
+
+<BaseLayout title="Learn">
+  <CourseLearnerView client:load slug={slug!} />
+</BaseLayout>

@@ -1,21 +1,43 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import AdminPanel from "../components/admin/AdminPanel";
+import AdminPanel from "../components/ui/organisms/AdminPanel";
 import { getSession } from "../lib/auth";
+import { getLocaleFromPath, useTranslations } from "../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
 
 const session = await getSession(Astro.request);
 if (!session) {
-  return Astro.redirect("/login");
+  return Astro.redirect(locale === "en" ? "/en/login" : "/login");
 }
 
 // Only allow admin users
 if ((session.user as any).role !== "admin") {
-  return Astro.redirect("/garden");
+  return Astro.redirect(locale === "en" ? "/en/garden" : "/garden");
 }
 
 const userName = session.user.name || session.user.email;
 ---
 
-<BaseLayout title="Admin - Plantgotchi">
-  <AdminPanel client:load userName={userName} />
+<BaseLayout title={t("admin.title")}>
+  <AdminPanel
+    client:load
+    userName={userName}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+  />
 </BaseLayout>

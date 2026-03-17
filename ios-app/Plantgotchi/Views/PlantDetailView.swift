@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -43,8 +44,8 @@ struct PlantDetailView: View {
                     .padding(.top, 100)
             }
         }
-        .background(PlantgotchiTheme.cream.ignoresSafeArea())
-        .navigationTitle(plant?.name ?? "Plant")
+        .background(PlantgotchiTheme.background.ignoresSafeArea())
+        .navigationTitle(plant?.name ?? S.plant)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await loadData()
@@ -89,33 +90,33 @@ struct PlantDetailView: View {
 
     private func readingsSection(pv: PlantView) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("SENSOR READINGS")
+            Text(S.sensorReadings)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ReadingTile(
                     icon: "drop.fill",
-                    label: "Moisture",
+                    label: S.moisture,
                     value: pv.moisture.map { "\($0)%" } ?? "--",
                     color: PlantgotchiTheme.blue
                 )
                 ReadingTile(
                     icon: "thermometer.medium",
-                    label: "Temperature",
+                    label: S.temperature,
                     value: pv.temp.map { String(format: "%.1f\u{00B0}C", $0) } ?? "--",
                     color: PlantgotchiTheme.red
                 )
                 ReadingTile(
                     icon: "sun.max.fill",
-                    label: "Light",
+                    label: S.light,
                     value: pv.light.map { "\($0) lux" } ?? "--",
-                    subtitle: pv.lightLabel,
+                    subtitle: S.lightLabel(pv.lightLabel),
                     color: PlantgotchiTheme.yellow
                 )
                 ReadingTile(
                     icon: "battery.75percent",
-                    label: "Battery",
+                    label: S.battery,
                     value: latestReading?.battery.map { "\($0)%" } ?? "--",
                     color: PlantgotchiTheme.green
                 )
@@ -130,7 +131,7 @@ struct PlantDetailView: View {
         HStack(spacing: 12) {
             ActionButton(
                 icon: "drop.fill",
-                label: "Water",
+                label: S.water,
                 color: PlantgotchiTheme.blue
             ) {
                 logCare(action: "water")
@@ -138,7 +139,7 @@ struct PlantDetailView: View {
 
             ActionButton(
                 icon: "leaf.fill",
-                label: "Fertilize",
+                label: S.fertilize,
                 color: PlantgotchiTheme.green
             ) {
                 logCare(action: "fertilize")
@@ -146,7 +147,7 @@ struct PlantDetailView: View {
 
             ActionButton(
                 icon: "scissors",
-                label: "Prune",
+                label: S.prune,
                 color: PlantgotchiTheme.purple
             ) {
                 logCare(action: "prune")
@@ -154,7 +155,7 @@ struct PlantDetailView: View {
 
             ActionButton(
                 icon: "arrow.triangle.2.circlepath",
-                label: "Repot",
+                label: S.repot,
                 color: PlantgotchiTheme.yellow
             ) {
                 logCare(action: "repot")
@@ -166,7 +167,7 @@ struct PlantDetailView: View {
 
     private var recommendationsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("RECOMMENDATIONS")
+            Text(S.recommendations)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
@@ -182,12 +183,12 @@ struct PlantDetailView: View {
                             .font(PlantgotchiTheme.bodyFont)
                             .foregroundColor(PlantgotchiTheme.text)
 
-                        HStack {
-                            Text(rec.source)
-                                .font(.caption2)
-                                .foregroundColor(PlantgotchiTheme.text.opacity(0.4))
-                            if rec.actedOn {
+                        if rec.actedOn {
+                            HStack(spacing: 4) {
                                 Image(systemName: "checkmark.circle.fill")
+                                    .font(.caption2)
+                                    .foregroundColor(PlantgotchiTheme.green)
+                                Text(LocaleManager.shared.locale == .ptBR ? "feito" : "done")
                                     .font(.caption2)
                                     .foregroundColor(PlantgotchiTheme.green)
                             }
@@ -217,7 +218,7 @@ struct PlantDetailView: View {
 
     private var careLogSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("CARE LOG")
+            Text(S.careLog)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
@@ -228,7 +229,7 @@ struct PlantDetailView: View {
                         .frame(width: 24)
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(log.action.capitalized)
+                        Text(S.careAction(log.action))
                             .font(PlantgotchiTheme.bodyFont.weight(.medium))
                             .foregroundColor(PlantgotchiTheme.text)
                         if let notes = log.notes, !notes.isEmpty {
@@ -319,15 +320,16 @@ struct PlantDetailView: View {
     }
 
     private func formatDate(_ iso: String) -> String {
-        // Simple relative date formatting
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         if let date = formatter.date(from: iso) {
             let relative = RelativeDateTimeFormatter()
             relative.unitsStyle = .short
+            relative.locale = LocaleManager.shared.locale == .ptBR
+                ? Locale(identifier: "pt_BR")
+                : Locale(identifier: "en_US")
             return relative.localizedString(for: date, relativeTo: Date())
         }
-        // Fall back to just the date part
         return String(iso.prefix(10))
     }
 }
@@ -391,3 +393,4 @@ struct ActionButton: View {
         }
     }
 }
+#endif

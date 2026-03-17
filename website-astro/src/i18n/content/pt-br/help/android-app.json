@@ -1,0 +1,32 @@
+{
+  "slug": "android-app",
+  "title": "App Android",
+  "category": "Apps Mobile",
+  "description": "Recursos, escaneamento BLE e armazenamento local de dados em dispositivos Android.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>O app Plantgotchi para Android e construido com Jetpack Compose e Material 3, oferecendo uma experiencia moderna com suporte completo offline.</p>"
+    },
+    {
+      "heading": "Principais Recursos",
+      "body": "<ul><li><strong>Escaneamento de sensores BLE</strong> \u2014 descubra sensores usando as APIs BLE do Android</li><li><strong>Leituras em tempo real</strong> \u2014 dados ao vivo de umidade, temperatura, luz e bateria</li><li><strong>Offline-first</strong> \u2014 banco de dados Room local (SQLite) armazena todos os dados</li><li><strong>Sincronizacao na nuvem</strong> \u2014 envie e receba dados do Turso quando conectado</li><li><strong>Registro de cuidados</strong> \u2014 acompanhe rega, adubacao, replantio, poda e anotacoes</li><li><strong>Motor de regras</strong> \u2014 alertas offline instantaneos quando leituras saem da faixa</li></ul>"
+    },
+    {
+      "heading": "Escaneamento BLE",
+      "body": "<p>O app Android escaneia sensores Plantgotchi que anunciam o UUID do servico GATT personalizado (<code>0000FE00-...</code>). O <code>BLEManager</code> gerencia o ciclo de vida da conexao, e o <code>SensorParser</code> converte bytes BLE brutos em leituras tipadas.</p><p>O parsing de dados segue o mesmo protocolo: umidade (uint16 LE), temperatura (int16 LE \u00f7 100), luz (uint32 LE) e bateria (uint8). Valores fora dos limites retornam null.</p>"
+    },
+    {
+      "heading": "Banco de Dados Local",
+      "body": "<p>O app usa Room (abstracao SQLite do Android) com classes de entidade para Plant, SensorReading, CareLog e Recommendation. Classes DAO fornecem consultas tipadas, e o esquema corresponde exatamente as plataformas web e iOS para sincronizacao perfeita na nuvem.</p>"
+    },
+    {
+      "heading": "Motor de Regras Offline",
+      "body": "<p>O app Android inclui um <code>RuleEngine</code> integrado que avalia cada leitura de sensor contra os limites da sua planta. Alertas sao gerados instantaneamente \u2014 sem necessidade de internet. As regras cobrem umidade (baixa/alta), temperatura (baixa/alta), nivel de bateria e incompatibilidades de preferencia de luz.</p>"
+    },
+    {
+      "heading": "Requisitos",
+      "body": "<ul><li>Android 8.0 (API 26) ou posterior</li><li>Permissoes de Bluetooth e localizacao para escaneamento BLE</li><li>Internet necessaria apenas para sincronizacao na nuvem e recomendacoes por IA</li></ul>"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "reading-data",
+  "title": "Lendo Dados do Sensor",
+  "category": "Cuidados com Plantas",
+  "description": "Entenda o que as leituras de umidade, temperatura, luz e bateria significam para suas plantas.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Seu sensor Plantgotchi mede quatro metricas. Veja o que cada uma significa e como interpreta-la.</p>"
+    },
+    {
+      "heading": "Umidade (0\u2013100%)",
+      "body": "<p>A umidade do solo e medida como porcentagem. Uma leitura de 0% significa completamente seco; 100% significa completamente saturado (o que geralmente significa que voce regou demais ou o vaso nao tem drenagem).</p><ul><li><strong>Abaixo de 30%</strong> \u2014 A maioria das plantas estara com sede. Hora de regar!</li><li><strong>30\u201380%</strong> \u2014 A faixa padrao feliz para plantas de interior comuns.</li><li><strong>Acima de 80%</strong> \u2014 Risco de apodrecimento de raizes para a maioria das especies. Deixe o solo secar.</li></ul><p>Suculentas e cactos preferem a faixa inferior (20\u201340%), enquanto plantas tropicais como samambaias podem ficar felizes ate 80\u201390%. Ajuste os limites da sua planta adequadamente.</p>"
+    },
+    {
+      "heading": "Temperatura (\u00b0C)",
+      "body": "<p>Temperatura ambiente perto da planta. O sensor transmite isso como um inteiro multiplicado por 100 (ex.: 2350 = 23,50\u00b0C), que o app converte automaticamente.</p><ul><li><strong>Abaixo de 15\u00b0C</strong> \u2014 Muito frio para a maioria das plantas tropicais de interior.</li><li><strong>15\u201330\u00b0C</strong> \u2014 A faixa confortavel padrao.</li><li><strong>Acima de 30\u00b0C</strong> \u2014 Risco de estresse termico, especialmente com sol direto nas folhas.</li></ul><p>O motor de regras dispara um alerta <strong>critico</strong> se a temperatura estiver mais de 5\u00b0C fora da faixa da sua planta.</p>"
+    },
+    {
+      "heading": "Luz (lux)",
+      "body": "<p>Intensidade de luz medida em lux. Isso ajuda a saber se sua planta esta recebendo luz suficiente (ou demais).</p><ul><li><strong>Abaixo de 1.000 lux</strong> \u2014 Luz baixa (rotulado como \"baixa\" no app)</li><li><strong>1.000\u20132.000 lux</strong> \u2014 Luz media</li><li><strong>Acima de 2.000 lux</strong> \u2014 Luz alta/intensa</li></ul><p>Se a preferencia de luz da sua planta e definida como \"alta\" mas ela esta recebendo apenas 500 lux, o motor de regras sugerira move-la para um local mais iluminado.</p>"
+    },
+    {
+      "heading": "Bateria (%)",
+      "body": "<p>A carga restante da bateria do sensor. Voce recebera um aviso em 15% e um alerta critico em 5%. Veja <a href=\"/help/sensor-battery\">Bateria e Carregamento</a> para detalhes.</p>"
+    },
+    {
+      "heading": "Pontos de Saude (HP)",
+      "body": "<p>HP e uma pontuacao unica de 0\u2013100 que resume quao proximas as condicoes da sua planta estao da faixa ideal. E calculado medindo a distancia de cada leitura do ponto medio da faixa de limites, depois fazendo a media. 100 HP significa condicoes perfeitas; pontuacoes mais baixas significam que algo precisa de atencao. Se nenhuma leitura esta disponivel, o HP padrao e 50.</p>"
+    }
+  ]
+}

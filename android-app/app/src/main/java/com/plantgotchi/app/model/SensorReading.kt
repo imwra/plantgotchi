@@ -21,7 +21,6 @@ import androidx.room.PrimaryKey
     ],
     indices = [
         Index(value = ["plant_id", "timestamp"]),
-        Index(value = ["sensor_id", "timestamp"]),
         Index(value = ["sensor_id", "timestamp"], unique = true)
     ]
 )

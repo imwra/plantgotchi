@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { getLocaleFromPath } from "../i18n";
 
 interface Props {
   title?: string;
@@ -10,10 +11,13 @@ const {
   title = "Plantgotchi - Smart Plant Monitoring with Retro Soul",
   description = "Stick it in soil. Connect to WiFi. Watch your plants thrive. Smart plant sensors with a Tamagotchi-inspired app experience.",
 } = Astro.props;
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const htmlLang = locale === "pt-br" ? "pt-BR" : "en";
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={htmlLang}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,7 +46,7 @@ const {
       }
     </script>
   </head>
-  <body class="bg-cream text-pixel-black antialiased">
+  <body class="bg-bg text-text antialiased">
     <slot />
   </body>
 </html>

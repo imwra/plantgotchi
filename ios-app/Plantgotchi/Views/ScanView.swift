@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -31,11 +32,11 @@ struct ScanView: View {
                     }
                 }
             }
-            .navigationTitle("Scan Sensors")
+            .navigationTitle(S.scanSensors)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") { dismiss() }
+                    Button(S.close) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     scanButton
@@ -65,32 +66,32 @@ struct ScanView: View {
             case .scanning:
                 ProgressView()
                     .scaleEffect(0.8)
-                Text("Scanning for sensors...")
+                Text(S.scanning)
                     .font(PlantgotchiTheme.captionFont)
             case .connecting:
                 ProgressView()
                     .scaleEffect(0.8)
-                Text("Connecting...")
+                Text(S.connecting)
                     .font(PlantgotchiTheme.captionFont)
             case .connected:
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(PlantgotchiTheme.green)
-                Text("Connected to \(bleManager.connectedSensorName ?? "sensor")")
+                Text(S.connectedTo(bleManager.connectedSensorName ?? "sensor"))
                     .font(PlantgotchiTheme.captionFont)
             case .poweredOff:
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundColor(PlantgotchiTheme.yellow)
-                Text("Bluetooth is turned off")
+                Text(S.bluetoothOff)
                     .font(PlantgotchiTheme.captionFont)
             case .unauthorized:
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundColor(PlantgotchiTheme.red)
-                Text("Bluetooth permission required")
+                Text(S.bluetoothPermission)
                     .font(PlantgotchiTheme.captionFont)
             case .idle:
                 Image(systemName: "antenna.radiowaves.left.and.right")
                     .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-                Text("Tap Scan to search for sensors")
+                Text(S.tapScanToSearch)
                     .font(PlantgotchiTheme.captionFont)
             }
         }
@@ -107,9 +108,9 @@ struct ScanView: View {
     private var scanButton: some View {
         Group {
             if case .scanning = bleManager.state {
-                Button("Stop") { bleManager.stopScan() }
+                Button(S.stop) { bleManager.stopScan() }
             } else {
-                Button("Scan") { bleManager.startScan() }
+                Button(S.scan) { bleManager.startScan() }
             }
         }
     }
@@ -122,10 +123,10 @@ struct ScanView: View {
             Image(systemName: "sensor.tag.radiowaves.forward")
                 .font(.system(size: 48))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
-            Text("No sensors found")
+            Text(S.noSensorsFound)
                 .font(PlantgotchiTheme.pixelFont(size: 11))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-            Text("Make sure your Plantgotchi sensor is powered on and nearby")
+            Text(S.sensorNearby)
                 .font(PlantgotchiTheme.captionFont)
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.4))
                 .multilineTextAlignment(.center)
@@ -198,11 +199,11 @@ struct ScanView: View {
                     }
                 }
             }
-            .navigationTitle("Assign to Plant")
+            .navigationTitle(S.assignToPlant)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { showPlantPicker = false }
+                    Button(S.cancel) { showPlantPicker = false }
                 }
             }
         }
@@ -226,7 +227,6 @@ struct ScanView: View {
 
     private func assignSensorToPlant(_ plant: Plant) {
         guard let sensor = selectedSensor else { return }
-        // Store the sensor-to-plant mapping in UserDefaults
         var mappings = UserDefaults.standard.dictionary(forKey: "sensorPlantMappings") as? [String: String] ?? [:]
         mappings[sensor.id.uuidString] = plant.id
         UserDefaults.standard.set(mappings, forKey: "sensorPlantMappings")
@@ -238,3 +238,4 @@ struct ScanView: View {
         dismiss()
     }
 }
+#endif

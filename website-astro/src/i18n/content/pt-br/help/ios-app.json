@@ -1,0 +1,28 @@
+{
+  "slug": "ios-app",
+  "title": "App iOS",
+  "category": "Apps Mobile",
+  "description": "Recursos, escaneamento BLE e armazenamento local de dados no iPhone e iPad.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>O app Plantgotchi para iOS e construido com SwiftUI e oferece acesso completo aos dados das suas plantas, mesmo quando voce esta offline.</p>"
+    },
+    {
+      "heading": "Principais Recursos",
+      "body": "<ul><li><strong>Escaneamento de sensores BLE</strong> \u2014 descubra e pareie sensores Plantgotchi usando CoreBluetooth</li><li><strong>Leituras em tempo real</strong> \u2014 umidade, temperatura, luz e bateria atualizados a cada 30\u201360 segundos</li><li><strong>Offline-first</strong> \u2014 todos os dados armazenados localmente em GRDB (SQLite), o app funciona sem internet</li><li><strong>Sincronizacao na nuvem</strong> \u2014 envie leituras e registros de cuidados para o Turso quando online</li><li><strong>Registro de cuidados</strong> \u2014 registre rega, adubacao, replantio, poda e anotacoes</li><li><strong>Recomendacoes</strong> \u2014 veja sugestoes de cuidado por IA e baseadas em regras</li></ul>"
+    },
+    {
+      "heading": "Escaneamento BLE",
+      "body": "<p>O app usa CoreBluetooth para escanear dispositivos que anunciam o servico GATT do Plantgotchi (<code>0000FE00-...</code>). Quando um sensor e encontrado, o app conecta e se inscreve no BLE Notify em todas as quatro caracteristicas (umidade, temperatura, luz, bateria).</p><p>O <code>SensorParser</code> lida com o parsing em nivel de bytes: umidade vem como uint16, temperatura como int16 (dividido por 100), luz como uint32 e bateria como uint8. Dados invalidos sao descartados com seguranca.</p>"
+    },
+    {
+      "heading": "Banco de Dados Local",
+      "body": "<p>O app iOS usa GRDB (um wrapper Swift para SQLite) com o mesmo esquema dos apps web e Android. Suas plantas, leituras de sensores, registros de cuidados e recomendacoes sao todos armazenados localmente. O esquema inclui indices em <code>(plant_id, timestamp)</code> para consultas rapidas.</p>"
+    },
+    {
+      "heading": "Requisitos",
+      "body": "<ul><li>iOS 16 ou posterior</li><li>Permissao de Bluetooth necessaria para escaneamento de sensores</li><li>Conexao com internet necessaria apenas para sincronizacao na nuvem e recomendacoes por IA</li></ul>"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "sensor-setup",
+  "title": "Configuracao do Sensor",
+  "category": "Sensores e Hardware",
+  "description": "Como parear seu sensor Plantgotchi via Bluetooth, configurar WiFi e entender os indicadores LED.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Configurar um sensor Plantgotchi leva cerca de 2 minutos. Aqui esta o passo a passo completo.</p>"
+    },
+    {
+      "heading": "Pareamento Bluetooth",
+      "body": "<p>Todos os sensores Plantgotchi se comunicam via Bluetooth Low Energy (BLE). O sensor anuncia um servico GATT personalizado com UUID <code>0000FE00-0000-1000-8000-00805F9B34FB</code>.</p><ol><li>Ligue seu sensor (insira a bateria ou pressione o botao).</li><li>Abra o app Plantgotchi e va para a tela de escaneamento de sensores.</li><li>O app escaneia dispositivos que anunciam o UUID do servico Plantgotchi.</li><li>Toque no seu sensor quando ele aparecer na lista.</li><li>O app conecta e le as quatro caracteristicas de dados: umidade, temperatura, luz e bateria.</li></ol>"
+    },
+    {
+      "heading": "Caracteristicas de Dados BLE",
+      "body": "<p>Cada sensor expoe estas caracteristicas BLE (todas suportam Read e Notify):</p><table><thead><tr><th>Metrica</th><th>Sufixo UUID</th><th>Formato</th><th>Unidade</th></tr></thead><tbody><tr><td>Umidade</td><td>FE01</td><td>uint16, little-endian</td><td>0\u2013100%</td></tr><tr><td>Temperatura</td><td>FE02</td><td>int16, little-endian</td><td>\u00b0C \u00d7 100</td></tr><tr><td>Luz</td><td>FE03</td><td>uint32, little-endian</td><td>lux</td></tr><tr><td>Bateria</td><td>FE04</td><td>uint8</td><td>0\u2013100%</td></tr></tbody></table><p>A temperatura e enviada como um inteiro multiplicado por 100 (ex.: 2350 = 23,50\u00b0C) para evitar problemas de ponto flutuante via BLE. O app divide por 100 automaticamente.</p>"
+    },
+    {
+      "heading": "Configuracao WiFi (Solo / PlantCam / Pro)",
+      "body": "<p>Sensores com capacidade WiFi podem se conectar diretamente a sua rede:</p><ol><li>Apos o pareamento BLE, o app envia as credenciais WiFi para a caracteristica de configuracao (<code>FE05</code>).</li><li>O sensor se conecta a sua rede WiFi e comeca a enviar leituras diretamente para o Turso.</li><li>O BLE permanece ativo como fallback caso o WiFi caia.</li></ol>"
+    },
+    {
+      "heading": "Indicadores LED",
+      "body": "<ul><li><strong>Verde solido</strong> \u2014 Conectado e transmitindo normalmente</li><li><strong>Azul piscando</strong> \u2014 Anunciando BLE, aguardando conexao</li><li><strong>Amarelo piscando</strong> \u2014 Conectando ao WiFi</li><li><strong>Flash vermelho</strong> \u2014 Bateria criticamente baixa (abaixo de 5%)</li></ul>"
+    },
+    {
+      "heading": "Intervalo de Notificacao",
+      "body": "<p>Por padrao, sensores enviam novas leituras a cada 30\u201360 segundos via BLE Notify. Voce pode ajustar este intervalo pela caracteristica de configuracao para equilibrar entre dados frescos e vida da bateria.</p>"
+    }
+  ]
+}

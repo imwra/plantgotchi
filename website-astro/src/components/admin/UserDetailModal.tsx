@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Badge } from '../ui/atoms';
 
 interface UserDetail {
   id: string;
@@ -48,35 +49,35 @@ export default function UserDetailModal({ userId, onClose }: { userId: string; o
     >
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] overflow-y-auto m-4 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="pixel-font text-sm text-green-dark">USER DETAIL</h2>
-          <button onClick={onClose} className="text-pixel-gray hover:text-pixel-black text-lg cursor-pointer">
+          <h2 className="pixel-font text-sm text-primary-dark">USER DETAIL</h2>
+          <button onClick={onClose} className="text-text-mid hover:text-text text-lg cursor-pointer">
             ✕
           </button>
         </div>
 
-        {loading && <p className="text-sm text-pixel-gray">Loading...</p>}
+        {loading && <p className="text-sm text-text-mid">Loading...</p>}
 
         {user && (
           <div className="space-y-6">
             {/* User info */}
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div><span className="text-pixel-gray">Email:</span> {user.email}</div>
-              <div><span className="text-pixel-gray">Name:</span> {user.name || "—"}</div>
-              <div><span className="text-pixel-gray">Role:</span> <span className={user.role === "admin" ? "text-accent-blue font-bold" : ""}>{user.role}</span></div>
-              <div><span className="text-pixel-gray">Joined:</span> {new Date(user.createdAt).toLocaleDateString()}</div>
+              <div><span className="text-text-mid">Email:</span> {user.email}</div>
+              <div><span className="text-text-mid">Name:</span> {user.name || "—"}</div>
+              <div><span className="text-text-mid">Role:</span> <span className={user.role === "admin" ? "text-water font-bold" : ""}>{user.role}</span></div>
+              <div><span className="text-text-mid">Joined:</span> {new Date(user.createdAt).toLocaleDateString()}</div>
             </div>
 
             {/* Plants */}
             <div>
               <h3 className="pixel-font text-[10px] text-brown mb-2">PLANTS ({user.plants.length})</h3>
               {user.plants.length === 0 ? (
-                <p className="text-xs text-pixel-gray italic">No plants</p>
+                <p className="text-xs text-text-mid italic">No plants</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {user.plants.map((p) => (
-                    <div key={p.id} className="bg-cream rounded-lg px-3 py-2 text-xs border border-cream-dark">
+                    <div key={p.id} className="bg-bg rounded-lg px-3 py-2 text-xs border border-bg-warm">
                       <span className="mr-1">{p.emoji}</span> {p.name}
-                      {p.species && <span className="text-pixel-gray ml-1">({p.species})</span>}
+                      {p.species && <span className="text-text-mid ml-1">({p.species})</span>}
                     </div>
                   ))}
                 </div>
@@ -87,15 +88,15 @@ export default function UserDetailModal({ userId, onClose }: { userId: string; o
             <div>
               <h3 className="pixel-font text-[10px] text-brown mb-2">RECENT CARE ({user.recentCareLogs.length})</h3>
               {user.recentCareLogs.length === 0 ? (
-                <p className="text-xs text-pixel-gray italic">No care logs</p>
+                <p className="text-xs text-text-mid italic">No care logs</p>
               ) : (
                 <div className="space-y-1">
                   {user.recentCareLogs.map((log) => (
-                    <div key={log.id} className="flex items-center gap-2 text-xs py-1 border-b border-cream-dark/30">
-                      <span className="text-pixel-gray">{new Date(log.createdAt).toLocaleDateString()}</span>
+                    <div key={log.id} className="flex items-center gap-2 text-xs py-1 border-b border-bg-warm/30">
+                      <span className="text-text-mid">{new Date(log.createdAt).toLocaleDateString()}</span>
                       <span className="font-medium">{log.plantName}</span>
-                      <span className="px-1.5 py-0.5 bg-green-plant/10 text-green-dark rounded text-[10px]">{log.action}</span>
-                      {log.notes && <span className="text-pixel-gray truncate">{log.notes}</span>}
+                      <Badge label={log.action} variant="success" />
+                      {log.notes && <span className="text-text-mid truncate">{log.notes}</span>}
                     </div>
                   ))}
                 </div>
@@ -106,12 +107,12 @@ export default function UserDetailModal({ userId, onClose }: { userId: string; o
             <div>
               <h3 className="pixel-font text-[10px] text-brown mb-2">RECENT READINGS ({user.recentReadings.length})</h3>
               {user.recentReadings.length === 0 ? (
-                <p className="text-xs text-pixel-gray italic">No readings</p>
+                <p className="text-xs text-text-mid italic">No readings</p>
               ) : (
                 <div className="space-y-1">
                   {user.recentReadings.slice(0, 10).map((r, i) => (
-                    <div key={i} className="flex items-center gap-3 text-xs py-1 border-b border-cream-dark/30">
-                      <span className="text-pixel-gray">{new Date(r.timestamp).toLocaleDateString()}</span>
+                    <div key={i} className="flex items-center gap-3 text-xs py-1 border-b border-bg-warm/30">
+                      <span className="text-text-mid">{new Date(r.timestamp).toLocaleDateString()}</span>
                       <span className="font-medium">{r.plantName}</span>
                       {r.moisture !== null && <span>💧{r.moisture}%</span>}
                       {r.temperature !== null && <span>🌡{r.temperature}°</span>}

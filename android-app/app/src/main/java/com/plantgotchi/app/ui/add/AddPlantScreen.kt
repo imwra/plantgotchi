@@ -37,13 +37,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
+import com.plantgotchi.app.R
 import com.posthog.PostHog
-import com.plantgotchi.app.model.Plant
+import com.plantgotchi.app.BuildConfig
 import com.plantgotchi.app.ui.theme.Green
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.*
 import java.util.UUID
 
 private val EMOJI_OPTIONS = listOf(
@@ -91,7 +97,7 @@ fun AddPlantScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Add Plant",
+                        text = stringResource(R.string.add_title),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 },
@@ -99,7 +105,7 @@ fun AddPlantScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.detail_back),
                         )
                     }
                 },
@@ -121,8 +127,8 @@ fun AddPlantScreen(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Plant name") },
-                placeholder = { Text("e.g. Office Fern") },
+                label = { Text(stringResource(R.string.add_name_label)) },
+                placeholder = { Text(stringResource(R.string.add_name_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -132,8 +138,8 @@ fun AddPlantScreen(
             OutlinedTextField(
                 value = species,
                 onValueChange = { species = it },
-                label = { Text("Species (optional)") },
-                placeholder = { Text("e.g. Nephrolepis exaltata") },
+                label = { Text(stringResource(R.string.add_species_label)) },
+                placeholder = { Text(stringResource(R.string.add_species_hint)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -141,7 +147,7 @@ fun AddPlantScreen(
 
             // Emoji picker
             Text(
-                text = "Choose an emoji",
+                text = stringResource(R.string.add_emoji_label),
                 style = MaterialTheme.typography.titleSmall,
             )
             FlowRow(
@@ -162,19 +168,25 @@ fun AddPlantScreen(
 
             // Light preference
             Text(
-                text = "Light preference",
+                text = stringResource(R.string.add_light_label),
                 style = MaterialTheme.typography.titleSmall,
             )
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 LIGHT_OPTIONS.forEach { option ->
+                    val label = when (option) {
+                        "low" -> stringResource(R.string.light_low)
+                        "medium" -> stringResource(R.string.light_medium)
+                        "high" -> stringResource(R.string.light_high)
+                        else -> option
+                    }
                     FilterChip(
                         selected = option == lightPreference,
                         onClick = { lightPreference = option },
                         label = {
                             Text(
-                                text = option.replaceFirstChar { it.uppercase() },
+                                text = label,
                                 style = MaterialTheme.typography.labelMedium,
                             )
                         },
@@ -187,12 +199,12 @@ fun AddPlantScreen(
 
             // Moisture range
             Text(
-                text = "Moisture range: ${moistureMin.toInt()}% – ${moistureMax.toInt()}%",
+                text = stringResource(R.string.add_moisture_range, moistureMin.toInt(), moistureMax.toInt()),
                 style = MaterialTheme.typography.titleSmall,
             )
             Column {
                 Text(
-                    text = "Minimum: ${moistureMin.toInt()}%",
+                    text = stringResource(R.string.add_minimum, "${moistureMin.toInt()}%"),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Slider(
@@ -206,7 +218,7 @@ fun AddPlantScreen(
                     colors = SliderDefaults.colors(thumbColor = Green, activeTrackColor = Green),
                 )
                 Text(
-                    text = "Maximum: ${moistureMax.toInt()}%",
+                    text = stringResource(R.string.add_maximum, "${moistureMax.toInt()}%"),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Slider(
@@ -223,12 +235,12 @@ fun AddPlantScreen(
 
             // Temperature range
             Text(
-                text = "Temp range: ${"%.0f".format(tempMin)}\u00B0C – ${"%.0f".format(tempMax)}\u00B0C",
+                text = stringResource(R.string.add_temp_range, "%.0f".format(tempMin), "%.0f".format(tempMax)),
                 style = MaterialTheme.typography.titleSmall,
             )
             Column {
                 Text(
-                    text = "Minimum: ${"%.0f".format(tempMin)}\u00B0C",
+                    text = stringResource(R.string.add_minimum, "${"%.0f".format(tempMin)}\u00B0C"),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Slider(
@@ -242,7 +254,7 @@ fun AddPlantScreen(
                     colors = SliderDefaults.colors(thumbColor = Green, activeTrackColor = Green),
                 )
                 Text(
-                    text = "Maximum: ${"%.0f".format(tempMax)}\u00B0C",
+                    text = stringResource(R.string.add_maximum, "${"%.0f".format(tempMax)}\u00B0C"),
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Slider(
@@ -261,27 +273,31 @@ fun AddPlantScreen(
             Button(
                 onClick = {
                     if (name.isBlank()) return@Button
-                    val plantId = UUID.randomUUID().toString()
                     scope.launch {
-                        PlantgotchiApp.db.plantDao().insert(
-                            Plant(
-                                id = plantId,
-                                userId = userId,
-                                name = name.trim(),
-                                species = species.trim().ifBlank { null },
-                                emoji = selectedEmoji,
-                                moistureMin = moistureMin.toInt(),
-                                moistureMax = moistureMax.toInt(),
-                                tempMin = tempMin.toDouble(),
-                                tempMax = tempMax.toDouble(),
-                                lightPreference = lightPreference,
-                            )
-                        )
-                        onPlantAdded(plantId)
-                        PostHog.capture("plant_added", properties = mapOf(
-                            "plant_id" to plantId,
-                            "species" to species.trim().ifBlank { null },
-                        ))
+                        try {
+                            val app = PlantgotchiApp.instance
+                            val response = app.httpClient.post("${BuildConfig.API_BASE_URL}/api/plants") {
+                                contentType(ContentType.Application.Json)
+                                setBody(buildJsonObject {
+                                    put("name", name.trim())
+                                    put("species", species.trim().ifBlank { null }?.let { JsonPrimitive(it) } ?: JsonNull)
+                                    put("emoji", selectedEmoji)
+                                    put("light_preference", lightPreference)
+                                    put("moisture_min", moistureMin.toInt())
+                                    put("moisture_max", moistureMax.toInt())
+                                    put("temp_min", tempMin.toInt())
+                                    put("temp_max", tempMax.toInt())
+                                }.toString())
+                            }
+                            if (response.status == HttpStatusCode.Created) {
+                                val body = Json.parseToJsonElement(response.bodyAsText()).jsonObject
+                                val plantId = body["id"]?.jsonPrimitive?.content ?: return@launch
+                                onPlantAdded(plantId)
+                                PostHog.capture("plant_added", properties = mapOf("plant_id" to plantId))
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -290,7 +306,7 @@ fun AddPlantScreen(
                 shape = RoundedCornerShape(12.dp),
             ) {
                 Text(
-                    text = "\uD83C\uDF31 Add Plant",
+                    text = stringResource(R.string.add_save),
                     style = MaterialTheme.typography.labelLarge,
                 )
             }

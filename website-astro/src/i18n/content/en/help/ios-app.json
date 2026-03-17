@@ -1,0 +1,28 @@
+{
+  "slug": "ios-app",
+  "title": "iOS App",
+  "category": "Mobile Apps",
+  "description": "Features, BLE scanning, and local data storage on iPhone and iPad.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>The Plantgotchi iOS app is built with SwiftUI and gives you full access to your plant data, even when you're offline.</p>"
+    },
+    {
+      "heading": "Key Features",
+      "body": "<ul><li><strong>BLE sensor scanning</strong> \u2014 discover and pair Plantgotchi sensors using CoreBluetooth</li><li><strong>Real-time readings</strong> \u2014 moisture, temperature, light, and battery updated every 30\u201360 seconds</li><li><strong>Offline-first</strong> \u2014 all data stored locally in GRDB (SQLite) so the app works without internet</li><li><strong>Cloud sync</strong> \u2014 push readings and care logs to Turso when online</li><li><strong>Care logging</strong> \u2014 record watering, fertilizing, repotting, pruning, and notes</li><li><strong>Recommendations</strong> \u2014 view AI and rule-based care suggestions</li></ul>"
+    },
+    {
+      "heading": "BLE Scanning",
+      "body": "<p>The app uses CoreBluetooth to scan for devices advertising the Plantgotchi GATT service (<code>0000FE00-...</code>). When a sensor is found, the app connects and subscribes to BLE Notify on all four characteristics (moisture, temperature, light, battery).</p><p>The <code>SensorParser</code> handles byte-level parsing: moisture comes as a uint16, temperature as int16 (divided by 100), light as uint32, and battery as uint8. Invalid data is safely discarded.</p>"
+    },
+    {
+      "heading": "Local Database",
+      "body": "<p>The iOS app uses GRDB (a Swift SQLite wrapper) with the same schema as the web and Android apps. Your plants, sensor readings, care logs, and recommendations are all stored locally. The schema includes indexes on <code>(plant_id, timestamp)</code> for fast lookups.</p>"
+    },
+    {
+      "heading": "Requirements",
+      "body": "<ul><li>iOS 16 or later</li><li>Bluetooth permission required for sensor scanning</li><li>Internet connection needed only for cloud sync and AI recommendations</li></ul>"
+    }
+  ]
+}

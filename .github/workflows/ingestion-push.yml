@@ -1,0 +1,39 @@
+name: Plant Data Ingestion — Push to Turso
+
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - 'ingestion/staged/**'
+
+jobs:
+  push:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: ingestion/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ingestion
+        run: npm ci
+
+      - name: Push staged data to Turso
+        working-directory: ingestion
+        env:
+          TURSO_URL: ${{ secrets.TURSO_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: npx tsx run.ts push
+
+      - name: Post summary to PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} \
+            --body "$(cat ingestion/staged/report.md)"

@@ -1,0 +1,28 @@
+{
+  "slug": "creating-account",
+  "title": "Criando Sua Conta",
+  "category": "Primeiros Passos",
+  "description": "Como se cadastrar, fazer login e gerenciar seu perfil Plantgotchi.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Sua conta Plantgotchi permite sincronizar dados de plantas entre dispositivos e acessar seu jardim pelo painel web. Veja como configurar.</p>"
+    },
+    {
+      "heading": "Cadastrando-se",
+      "body": "<ol><li>Acesse <a href=\"/signup\">plantgotchi.com/signup</a> ou toque em \"Cadastrar\" no app mobile.</li><li>Insira seu endereco de email e escolha uma senha.</li><li>Toque em \"Criar Conta\" \u2014 pronto!</li></ol><p>O Plantgotchi usa autenticacao por email e senha com a biblioteca better-auth. Suas credenciais sao criptografadas e os cookies de sessao expiram apos 5 minutos de inatividade, sendo renovados automaticamente quando voce interage com o app.</p>"
+    },
+    {
+      "heading": "Fazendo Login",
+      "body": "<p>Acesse <a href=\"/login\">plantgotchi.com/login</a> ou abra o app e toque em \"Login.\" Insira seu email e senha, e voce sera levado ao seu painel do jardim.</p>"
+    },
+    {
+      "heading": "Seu Painel do Jardim",
+      "body": "<p>Apos o login, a pagina <a href=\"/garden\">Jardim</a> mostra todas as suas plantas com seu HP atual, status e leituras mais recentes do sensor. Daqui voce pode:</p><ul><li>Adicionar novas plantas com o botao \"+\"</li><li>Tocar em qualquer cartao de planta para ver leituras detalhadas e historico de cuidados</li><li>Registrar acoes de cuidado (rega, adubacao, poda, etc.)</li><li>Ver recomendacoes por IA e baseadas em regras</li></ul>"
+    },
+    {
+      "heading": "Seguranca da Conta",
+      "body": "<p>Escolha uma senha forte (12+ caracteres recomendados). Seus dados de sessao e registros de plantas sao armazenados em um banco de dados Turso na nuvem, com toda comunicacao criptografada via HTTPS. IDs de usuario sao vinculados as suas plantas, registros de cuidados e recomendacoes para que seus dados permanecam privados.</p>"
+    }
+  ]
+}

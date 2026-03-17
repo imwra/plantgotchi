@@ -4,6 +4,7 @@ import SwiftUI
 /// Shows emoji, name, moisture bar, HP bar, and status indicator.
 struct PlantCardView: View {
     let plantView: PlantView
+    @ObservedObject private var themeManager = ThemeManager.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -18,8 +19,8 @@ struct PlantCardView: View {
             }
 
             // Name
-            Text(plantView.name)
-                .font(PlantgotchiTheme.pixelFont(size: 11))
+            Text(themeManager.isRetro ? plantView.name.uppercased() : plantView.name)
+                .font(PlantgotchiTheme.pixelFont(size: themeManager.isRetro ? 9 : 11))
                 .foregroundColor(PlantgotchiTheme.text)
                 .lineLimit(1)
 
@@ -71,27 +72,30 @@ struct PlantCardView: View {
 
 struct StatusBadge: View {
     let status: PlantStatus
+    @ObservedObject private var themeManager = ThemeManager.shared
 
     var body: some View {
         HStack(spacing: 4) {
             Circle()
                 .fill(PlantgotchiTheme.statusColor(status))
                 .frame(width: 8, height: 8)
-            Text(statusLabel)
-                .font(.system(size: 9, weight: .medium, design: .rounded))
+            Text(themeManager.isRetro ? statusLabel.uppercased() : statusLabel)
+                .font(themeManager.isRetro
+                    ? .system(size: 8, weight: .bold, design: .monospaced)
+                    : .system(size: 9, weight: .medium, design: .rounded))
                 .foregroundColor(PlantgotchiTheme.statusColor(status))
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .background(PlantgotchiTheme.statusColor(status).opacity(0.15))
-        .cornerRadius(8)
+        .cornerRadius(themeManager.isRetro ? 2 : 8)
     }
 
     private var statusLabel: String {
         switch status {
-        case .happy: return "Happy"
-        case .thirsty: return "Thirsty"
-        case .unknown: return "?"
+        case .happy: return S.statusHappy
+        case .thirsty: return S.statusThirsty
+        case .unknown: return S.statusUnknown
         }
     }
 }

@@ -1,0 +1,23 @@
+---
+import HelpLayout from "../../../layouts/HelpLayout.astro";
+import { getLocaleFromPath, loadContent } from "../../../i18n";
+
+const { slug } = Astro.params;
+const locale = getLocaleFromPath(Astro.url.pathname);
+
+let article: any;
+try {
+  article = await loadContent(locale, `help/${slug}`);
+} catch {
+  return Astro.redirect(locale === "en" ? "/en/help" : "/help");
+}
+---
+
+<HelpLayout title={article.title} category={article.category} description={article.description}>
+  {article.sections.map((section: any) => (
+    <>
+      {section.heading && <h2>{section.heading}</h2>}
+      <Fragment set:html={section.body} />
+    </>
+  ))}
+</HelpLayout>

@@ -1,0 +1,40 @@
+{
+  "slug": "quick-start",
+  "title": "Guia de Inicio Rapido",
+  "category": "Primeiros Passos",
+  "description": "Da caixa ate a primeira leitura da sua planta em 5 minutos.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Pronto para dar um coracao digital as suas plantas? Siga estes passos para comecar rapidamente.</p>"
+    },
+    {
+      "heading": "Passo 1: Crie Sua Conta",
+      "body": "<p>Acesse <a href=\"/signup\">plantgotchi.com/signup</a> e crie uma conta com seu email e uma senha. Voce tambem pode se cadastrar diretamente no app iOS ou Android.</p>"
+    },
+    {
+      "heading": "Passo 2: Carregue ou Insira a Bateria",
+      "body": "<p>Se voce tem um <strong>Sensor Solo</strong> ou <strong>PlantCam</strong>, carregue-o via USB-C ate o LED ficar verde. Para o <strong>Sensor BLE Filho</strong>, insira a bateria CR2032 incluida.</p>"
+    },
+    {
+      "heading": "Passo 3: Coloque no Solo",
+      "body": "<p>Empurre a sonda do sensor no solo da sua planta cerca de 5 a 7 cm de profundidade. As sondas de umidade precisam de bom contato com o solo para leituras precisas. Evite coloca-lo rente a borda do vaso.</p>"
+    },
+    {
+      "heading": "Passo 4: Abra o App e Escaneie",
+      "body": "<p>Abra o app Plantgotchi no seu celular. Toque em \"Escanear Sensores\" \u2014 o app usa Bluetooth Low Energy para descobrir dispositivos Plantgotchi proximos. Seu sensor deve aparecer em poucos segundos. Toque nele para parear.</p>"
+    },
+    {
+      "heading": "Passo 5: Adicione Sua Planta",
+      "body": "<p>Apos o sensor ser pareado, voce sera solicitado a criar um perfil de planta. De um nome a sua planta, escolha uma especie (ou deixe generico), escolha um emoji avatar e defina seus limites de umidade e temperatura. Os padroes de 30\u201380% de umidade e 15\u201330\u00b0C funcionam bem para a maioria das plantas de interior.</p>"
+    },
+    {
+      "heading": "Passo 6: Veja os Dados Fluirem",
+      "body": "<p>Em 30\u201360 segundos voce vera sua primeira leitura aparecer \u2014 porcentagem de umidade, temperatura, nivel de luz e status da bateria. Sua planta agora tem uma barra de HP e um indicador de status. Tudo pronto!</p>"
+    },
+    {
+      "heading": "Proximos Passos",
+      "body": "<ul><li>Aprenda sobre <a href=\"/help/reading-data\">leitura dos dados do sensor</a></li><li>Configure a <a href=\"/help/syncing-data\">sincronizacao na nuvem</a> para acesso web</li><li>Explore as <a href=\"/help/ai-recommendations\">recomendacoes de cuidado por IA</a></li></ul>"
+    }
+  ]
+}

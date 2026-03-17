@@ -1,0 +1,71 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import GardenDashboard from "../components/ui/organisms/GardenDashboard";
+import { getLocaleFromPath, useTranslations } from "../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={t("demo.title")}>
+  <GardenDashboard
+    client:load
+    userName="Demo"
+    demoMode={true}
+    demoBannerText={t("demo.banner")}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+    dashLabels={{
+      subtitle: t("dash.subtitle"),
+      plants: t("dash.plants"),
+      happy: t("dash.happy"),
+      needCare: t("dash.needCare"),
+      allPlants: t("dash.allPlants"),
+      plantDetails: t("dash.plantDetails"),
+      tapPlant: t("dash.tapPlant"),
+      hp: t("dash.hp"),
+      moisture: t("dash.moisture"),
+      temp: t("dash.temp"),
+      light: t("dash.light"),
+      health: t("dash.health"),
+      watered: t("dash.watered"),
+      noData: t("dash.noData"),
+      statusHappy: t("dash.statusHappy"),
+      statusStressed: t("dash.statusStressed"),
+      statusCritical: t("dash.statusCritical"),
+      recommendations: t("dash.recommendations"),
+      careHistory: t("dash.careHistory"),
+      logReading: t("dash.logReading"),
+      logCare: t("dash.logCare"),
+      loading: t("dash.loading"),
+      noPlantsYet: t("dash.noPlantsYet"),
+      addFirstPlant: t("dash.addFirstPlant"),
+      add: t("dash.add"),
+      footer: t("dash.footer"),
+      noLogsYet: t("dash.noLogsYet"),
+      dismiss: t("dash.dismiss"),
+      careWater: t("dash.careWater"),
+      careFertilize: t("dash.careFertilize"),
+      carePrune: t("dash.carePrune"),
+      careRepot: t("dash.careRepot"),
+      careMist: t("dash.careMist"),
+      carePestTreatment: t("dash.carePestTreatment"),
+      severityInfo: t("dash.severityInfo"),
+      severityWarning: t("dash.severityWarning"),
+      severityUrgent: t("dash.severityUrgent"),
+    }}
+  />
+</BaseLayout>

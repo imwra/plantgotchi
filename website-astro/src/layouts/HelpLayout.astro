@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
-import SiteNav from "../components/SiteNav";
+import SiteNav from "../components/ui/organisms/SiteNav";
+import { getLocaleFromPath, useTranslations, loadContent } from "../i18n";
 
 interface Props {
   title: string;
@@ -10,68 +11,43 @@ interface Props {
 
 const { title, description, category } = Astro.props;
 
-const categories = [
-  {
-    name: "Getting Started",
-    emoji: "🌱",
-    articles: [
-      { title: "What is Plantgotchi?", href: "/help/what-is-plantgotchi" },
-      { title: "Quick Start Guide", href: "/help/quick-start" },
-      { title: "Creating Your Account", href: "/help/creating-account" },
-    ],
-  },
-  {
-    name: "Sensors & Hardware",
-    emoji: "📡",
-    articles: [
-      { title: "Sensor Types", href: "/help/sensor-types" },
-      { title: "Sensor Setup", href: "/help/sensor-setup" },
-      { title: "Battery & Charging", href: "/help/sensor-battery" },
-    ],
-  },
-  {
-    name: "Mobile Apps",
-    emoji: "📱",
-    articles: [
-      { title: "iOS App", href: "/help/ios-app" },
-      { title: "Android App", href: "/help/android-app" },
-      { title: "Syncing Your Data", href: "/help/syncing-data" },
-    ],
-  },
-  {
-    name: "Plant Care",
-    emoji: "🌿",
-    articles: [
-      { title: "Adding Plants", href: "/help/adding-plants" },
-      { title: "Reading Sensor Data", href: "/help/reading-data" },
-      { title: "AI Recommendations", href: "/help/ai-recommendations" },
-    ],
-  },
-  {
-    name: "Troubleshooting",
-    emoji: "🔧",
-    articles: [
-      { title: "Sensor Not Connecting", href: "/help/sensor-not-connecting" },
-      { title: "Data Not Syncing", href: "/help/data-not-syncing" },
-      { title: "FAQ", href: "/help/faq" },
-    ],
-  },
-];
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+const prefix = locale === "en" ? "/en" : "";
+const helpIndex = await loadContent(locale, "help-index") as any;
 ---
 
-<BaseLayout title={`${title} - Plantgotchi Help`} description={description}>
-  <SiteNav client:load />
+<BaseLayout title={`${title} - Plantgotchi ${t("help.breadcrumb.help")}`} description={description}>
+  <SiteNav
+    client:load
+    locale={locale}
+    currentPath={Astro.url.pathname}
+    labels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+  />
 
   <div class="max-w-6xl mx-auto px-4 py-8">
     {/* Breadcrumb */}
-    <nav class="text-xs text-pixel-gray mb-6">
-      <a href="/" class="hover:text-green-dark transition-colors">Home</a>
+    <nav class="text-xs text-text-mid mb-6">
+      <a href={`${prefix}/`} class="hover:text-primary-dark transition-colors">{t("help.breadcrumb.home")}</a>
       <span class="mx-2">/</span>
-      <a href="/help" class="hover:text-green-dark transition-colors">Help</a>
+      <a href={`${prefix}/help`} class="hover:text-primary-dark transition-colors">{t("help.breadcrumb.help")}</a>
       {category && (
         <>
           <span class="mx-2">/</span>
-          <span class="text-pixel-black">{category}</span>
+          <span class="text-text">{category}</span>
         </>
       )}
     </nav>
@@ -80,18 +56,18 @@ const categories = [
       {/* Sidebar */}
       <aside class="lg:w-64 shrink-0">
         <div class="lg:sticky lg:top-20">
-          <h3 class="pixel-font text-[10px] text-green-dark mb-4">Help Topics</h3>
-          {categories.map((cat) => (
+          <h3 class="pixel-font text-[10px] text-primary-dark mb-4">{t("help.sidebar.title")}</h3>
+          {helpIndex.categories.map((cat: any) => (
             <div class="mb-4">
-              <p class="text-xs font-bold text-pixel-black mb-1">
+              <p class="text-xs font-bold text-text mb-1">
                 {cat.emoji} {cat.name}
               </p>
               <ul class="space-y-1">
-                {cat.articles.map((article) => (
+                {cat.articles.map((article: any) => (
                   <li>
                     <a
-                      href={article.href}
-                      class="text-xs text-pixel-gray hover:text-green-dark transition-colors block py-0.5 pl-5"
+                      href={`${prefix}/help/${article.slug}`}
+                      class="text-xs text-text-mid hover:text-primary-dark transition-colors block py-0.5 pl-5"
                     >
                       {article.title}
                     </a>
@@ -106,8 +82,8 @@ const categories = [
       {/* Main content */}
       <main class="flex-1 min-w-0">
         <article class="bg-white/60 p-6 sm:p-8 pixel-border">
-          <h1 class="pixel-font text-sm sm:text-base text-green-dark mb-6">{title}</h1>
-          <div class="prose prose-sm max-w-none [&_h2]:pixel-font [&_h2]:text-[11px] [&_h2]:text-pixel-black [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:font-bold [&_h3]:text-pixel-black [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:text-pixel-gray [&_p]:leading-relaxed [&_p]:mb-4 [&_ul]:text-pixel-gray [&_ul]:mb-4 [&_ul]:space-y-1 [&_li]:leading-relaxed [&_ol]:text-pixel-gray [&_ol]:mb-4 [&_ol]:space-y-1 [&_code]:bg-cream-dark [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-green-dark [&_code]:text-xs [&_a]:text-green-plant [&_a]:underline [&_a]:hover:text-green-dark [&_table]:w-full [&_table]:text-xs [&_th]:text-left [&_th]:p-2 [&_th]:bg-cream-dark [&_th]:font-bold [&_td]:p-2 [&_td]:border-t [&_td]:border-cream-dark">
+          <h1 class="pixel-font text-sm sm:text-base text-primary-dark mb-6">{title}</h1>
+          <div class="prose prose-sm max-w-none [&_h2]:pixel-font [&_h2]:text-[11px] [&_h2]:text-text [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:font-bold [&_h3]:text-text [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:text-text-mid [&_p]:leading-relaxed [&_p]:mb-4 [&_ul]:text-text-mid [&_ul]:mb-4 [&_ul]:space-y-1 [&_li]:leading-relaxed [&_ol]:text-text-mid [&_ol]:mb-4 [&_ol]:space-y-1 [&_code]:bg-bg-warm [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:text-primary-dark [&_code]:text-xs [&_a]:text-primary [&_a]:underline [&_a]:hover:text-primary-dark [&_table]:w-full [&_table]:text-xs [&_th]:text-left [&_th]:p-2 [&_th]:bg-bg-warm [&_th]:font-bold [&_td]:p-2 [&_td]:border-t [&_td]:border-bg-warm">
             <slot />
           </div>
         </article>

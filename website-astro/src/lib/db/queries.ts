@@ -13,6 +13,9 @@ export interface Plant {
   temp_min: number;
   temp_max: number;
   light_preference: string;
+  garden_id: string | null;
+  catalog_id: string | null;
+  identification_confidence: 'exact' | 'probable' | 'guess' | 'unknown';
   created_at: string;
   updated_at: string;
 }

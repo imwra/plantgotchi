@@ -1,0 +1,28 @@
+{
+  "slug": "ai-recommendations",
+  "title": "Recomendacoes por IA",
+  "category": "Cuidados com Plantas",
+  "description": "Como o motor de regras offline e o Claude IA trabalham juntos para dar conselhos de cuidado para suas plantas.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>O Plantgotchi usa um sistema de duas camadas para manter voce informado sobre as necessidades da sua planta \u2014 um motor de regras offline instantaneo e um consultor de IA periodico.</p>"
+    },
+    {
+      "heading": "Camada 1: Motor de Regras Offline",
+      "body": "<p>Toda vez que uma nova leitura de sensor chega, o motor de regras a avalia contra os limites da sua planta. Isso acontece instantaneamente no seu dispositivo \u2014 sem necessidade de internet.</p><p>As regras verificadas em cada leitura:</p><table><thead><tr><th>Condicao</th><th>Severidade</th><th>Exemplo de Alerta</th></tr></thead><tbody><tr><td>Umidade abaixo do minimo</td><td>Aviso (Critico se &lt;20%)</td><td>\"Precisa de agua! Umidade do solo em 18%\"</td></tr><tr><td>Umidade acima do maximo</td><td>Aviso</td><td>\"Pode estar com excesso de agua \u2014 umidade em 92%\"</td></tr><tr><td>Temperatura abaixo do minimo</td><td>Aviso (Critico se &gt;5\u00b0C abaixo)</td><td>\"Muito frio! 8\u00b0C (minimo: 15\u00b0C)\"</td></tr><tr><td>Temperatura acima do maximo</td><td>Aviso (Critico se &gt;5\u00b0C acima)</td><td>\"Muito quente! 37\u00b0C (maximo: 30\u00b0C)\"</td></tr><tr><td>Bateria abaixo de 15%</td><td>Aviso (Critico se &lt;5%)</td><td>\"Bateria do sensor baixa \u2014 carregue em breve\"</td></tr><tr><td>Luz muito baixa para preferencia</td><td>Info</td><td>\"Prefere luz intensa mas recebendo apenas 500 lux\"</td></tr></tbody></table><p>Se todas as leituras estao dentro da faixa, nenhuma recomendacao e gerada \u2014 sua planta esta feliz!</p>"
+    },
+    {
+      "heading": "Camada 2: Consultor Claude IA",
+      "body": "<p>A cada 6 horas (quando online), o Plantgotchi envia os dados recentes da sua planta para o Claude IA para uma recomendacao personalizada. A IA recebe:</p><ul><li>Nome, especie e preferencias de cuidado da sua planta</li><li>Os ultimos 7 dias de leituras de sensor (tendencias de umidade e temperatura)</li><li>Suas ultimas 10 acoes de cuidado (quando voce regou, adubou, etc.)</li></ul><p>O Claude analisa as tendencias \u2014 nao apenas a leitura atual \u2014 e fornece uma unica frase acionavel. Por exemplo: \"O solo da sua monstera tem estado consistentemente seco; considere aumentar a frequencia de rega para duas vezes por semana.\"</p>"
+    },
+    {
+      "heading": "Severidade das Recomendacoes",
+      "body": "<p>Recomendacoes por IA sao automaticamente classificadas com um nivel de severidade:</p><ul><li><strong>Urgente</strong> \u2014 a IA diz \"imediatamente\" ou \"urgente\" (aja agora)</li><li><strong>Aviso</strong> \u2014 menciona \"deveria,\" \"considere,\" ou \"observe\" (aja em breve)</li><li><strong>Info</strong> \u2014 dicas gerais e observacoes (bom saber)</li></ul>"
+    },
+    {
+      "heading": "Visualizando Recomendacoes",
+      "body": "<p>Todas as recomendacoes (tanto do motor de regras quanto da IA) aparecem na visualizacao detalhada da sua planta na secao Recomendacoes. Cada uma mostra sua fonte (\"regras\" ou \"claude\"), severidade e data/hora. Voce pode marcar recomendacoes como \"executadas\" para limpa-las.</p>"
+    }
+  ]
+}

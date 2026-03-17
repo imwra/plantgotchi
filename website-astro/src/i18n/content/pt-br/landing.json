@@ -1,0 +1,219 @@
+{
+  "meta": {
+    "title": "Plantgotchi - Monitoramento Inteligente de Plantas com Alma Retro",
+    "description": "Coloque no solo. Conecte ao WiFi. Veja suas plantas prosperarem. Sensores inteligentes para plantas com experiencia inspirada em Tamagotchi."
+  },
+  "hero": {
+    "tagline": "Sensores inteligentes para plantas com experiencia inspirada em Tamagotchi",
+    "heading": ["Coloque no solo.", "Conecte ao WiFi.", "Veja suas plantas", "prosperarem."],
+    "cta": "Faca seu Pre-pedido",
+    "ctaSecondary": "Veja Como Funciona"
+  },
+  "products": [
+    {
+      "name": "Sensor BLE Filho",
+      "price": "R$49 - R$65",
+      "nickname": "O pequenino",
+      "specs": ["Apenas BLE", "Bateria CR2032", "2 anos de bateria"]
+    },
+    {
+      "name": "Sensor Solo",
+      "price": "R$79 - R$99",
+      "nickname": "O independente",
+      "specs": ["WiFi + BLE", "Recarga USB-C", "Opcao com tela OLED"]
+    },
+    {
+      "name": "PlantCam",
+      "price": "R$139 - R$159",
+      "nickname": "O fotografo",
+      "specs": ["Camera 5MP", "Time-lapse automatico", "4-6 meses de bateria"]
+    },
+    {
+      "name": "PlantCam Pro",
+      "price": "R$379 - R$429",
+      "nickname": "O cerebro",
+      "specs": ["Deteccao de doencas por IA", "Hub para todos os sensores", "Powered by Raspberry Pi"]
+    }
+  ],
+  "setups": [
+    {
+      "title": "Hub + Filhos",
+      "desc": "Ideal para colecionadores (5+ plantas)",
+      "detail": "CamHub Pro + sensores BLE"
+    },
+    {
+      "title": "Independente",
+      "desc": "Perfeito para 1-3 plantas",
+      "detail": "Sensores WiFi funcionam sozinhos"
+    },
+    {
+      "title": "Pai + Filhos",
+      "desc": "Sem necessidade de hub",
+      "detail": "Sensor pai retransmite dados dos filhos"
+    }
+  ],
+  "bundles": [
+    { "name": "Kit Inicial", "price": "R$189", "contents": "1 Sensor Solo + 1 PlantCam" },
+    { "name": "Kit Jardim", "price": "R$539", "contents": "5 Sensores BLE + 1 CamHub Pro" },
+    { "name": "Kit Pai de Planta", "price": "R$245", "contents": "5 Sensores BLE + 1 Solo (pai)" },
+    { "name": "Pack 5 Sensores", "price": "R$159", "contents": "5 Sensores BLE Filho" }
+  ],
+  "appFeatures": [
+    { "title": "Monitoramento em tempo real", "desc": "Dados ao vivo de umidade, luz e temperatura" },
+    { "title": "Notificacoes push", "desc": "Nunca mais esqueca de regar" },
+    { "title": "Linha do tempo de fotos", "desc": "Time-lapses automaticos de crescimento" },
+    { "title": "Historico de cuidados", "desc": "Acompanhe cada acao e tendencia" }
+  ],
+  "howItWorks": {
+    "title": "Como Funciona",
+    "steps": [
+      { "label": "PASSO 1", "title": "Coloque no solo", "desc": "Insira o sensor no vaso da sua planta" },
+      { "label": "PASSO 2", "title": "Conecte", "desc": "Pareia via Bluetooth ou WiFi" },
+      { "label": "PASSO 3", "title": "Monitore", "desc": "Veja dados em tempo real no app" }
+    ]
+  },
+  "sections": {
+    "productLineup": "Linha de Produtos",
+    "setupConfigurations": "Configuracoes de Setup",
+    "appExperience": "Experiencia do App",
+    "preOrderBundles": "Pacotes Pre-venda",
+    "openSource": "Codigo Aberto"
+  },
+  "openSource": {
+    "title": "Construido sobre Codigo Aberto",
+    "description": "Hardware baseado no b-parasite por rbaron. Licenca CC BY-SA 4.0 — projetos abertos, vendas comerciais permitidas.",
+    "cta": "Ver no GitHub"
+  },
+  "footer": {
+    "tagline": "Feito com amor para plantas e pixels",
+    "links": {
+      "help": "Ajuda",
+      "github": "GitHub",
+      "privacy": "Privacidade"
+    }
+  },
+  "notifications": [
+    { "title": "Aloe There esta com sede!", "time": "2m atras", "desc": "Umidade em 31%" },
+    { "title": "Herb precisa de mais luz", "time": "1h atras", "desc": "Nivel de luz baixo" },
+    { "title": "Fern-ando esta prosperando!", "time": "3h atras", "desc": "HP chegou a 92%" },
+    { "title": "Bateria baixa: Herb", "time": "5h atras", "desc": "Sensor em 41%" },
+    { "title": "Nova foto capturada", "time": "1d atras", "desc": "PlantCam foto automatica" }
+  ],
+  "gardenFeatures": [
+    "Barras segmentadas de HP e umidade",
+    "Mini graficos de tendencia de 7 dias por planta",
+    "Indicadores de sensor ao vivo com animacoes",
+    "Painel de detalhes expansivel ao toque",
+    "Bottom-sheet mobile para detalhes da planta"
+  ],
+  "settingsGroups": [
+    { "section": "NOTIFICACOES", "items": ["Lembretes de rega", "Alertas de bateria baixa", "Resumo diario"] },
+    { "section": "SENSORES", "items": ["Intervalo de sincronizacao: 15 min", "Brilho do LED", "Agenda de sono"] },
+    { "section": "CONTA", "items": ["Perfil", "Exportar dados"] }
+  ],
+  "photoLabels": ["Hoje", "3 dias atras", "1 semana atras", "2 semanas atras"],
+  "appPreview": {
+    "subtitle": "Suas plantas, reimaginadas como amigos pixelados.",
+    "phoneMockup": {
+      "hp": "HP",
+      "moisture": "UMIDADE",
+      "sevenDayMoisture": "UMIDADE 7 DIAS",
+      "water": "REGAR",
+      "photo": "FOTO",
+      "history": "HISTORICO"
+    }
+  },
+  "digitalGarden": {
+    "title": "Seu Jardim Digital",
+    "subtitle": "Cada planta da sua casa, monitorada em um dashboard lindo. Veja quem esta prosperando e quem precisa de agua.",
+    "desktopView": "VISAO DESKTOP",
+    "mobileView": "VISAO MOBILE",
+    "desktopAlt": "Dashboard Jardim Plantgotchi - Visao desktop mostrando 6 plantas com dados ao vivo, barras de HP, niveis de umidade e painel de detalhes",
+    "mobileAlt": "Dashboard Jardim Plantgotchi - Visao mobile com cards de plantas, barras de HP e indicadores de umidade",
+    "allPlantsTitle": "Todas as suas plantas, uma visao",
+    "allPlantsDesc": "O dashboard do jardim mostra cada planta da sua casa com dados ao vivo dos sensores. Toque em qualquer planta para ver graficos detalhados, historico de cuidados e fotos time-lapse.",
+    "tryDemo": "Experimente a Demo"
+  },
+  "dashboardMockup": {
+    "headerTitle": "PLANTGOTCHI",
+    "headerSubtitle": "MONITOR DO JARDIM V0.1",
+    "clock": "18:02:38",
+    "statsPlants": "6 PLANTAS",
+    "statsHappy": "3 FELIZES",
+    "statsSensors": "4 SENSORES",
+    "statsNeedWater": "PRECISA REGAR",
+    "allPlantsLabel": "TODAS AS PLANTAS (6)",
+    "plantDetailsLabel": "DETALHES DA PLANTA",
+    "noSensor": "SEM SENSOR",
+    "live": "AO VIVO",
+    "moisture": "UMIDADE",
+    "moistureChart": "UMIDADE (7 DIAS)",
+    "light": "LUZ",
+    "temp": "TEMP",
+    "hp": "HP",
+    "btnWater": "REGAR",
+    "btnLog": "ANOTAR",
+    "btnEdit": "EDITAR",
+    "statusHappy": "FELIZ",
+    "statusStressed": "ESTRESSADA",
+    "statusManual": "MANUAL",
+    "footer": "PLANTGOTCHI \u2022 ESP32 \u2022 SENSOR DE SOLO \u2022 FEITO COM \u2764 \ud83c\udf3f \ud83c\udde7\ud83c\uddf7",
+    "plants": [
+      { "name": "JIBOIA", "species": "Epipremnum aureum", "status": "happy", "hp": 92, "moisture": 60, "temp": "24.5", "light": "MEDIA", "timeAgo": "2H ATRAS", "hasSensor": true },
+      { "name": "SUCULENTA", "species": "Echeveria elegans", "status": "stressed", "hp": 58, "moisture": 31, "temp": "26.1", "light": "ALTA", "timeAgo": "30 ATRAS", "hasSensor": true },
+      { "name": "SAMAMBAIA", "species": "Nephrolepis exaltata", "status": "happy", "hp": 95, "moisture": 85, "temp": "22.3", "light": "BAIXA", "timeAgo": "6H ATRAS", "hasSensor": true },
+      { "name": "ESPADA-DE-SAO-JORGE", "species": "Sansevieria trifasciata", "status": "manual", "hp": 0, "moisture": 0, "temp": "0", "light": "", "timeAgo": "30 ATRAS", "hasSensor": false },
+      { "name": "MONSTERA", "species": "Monstera deliciosa", "status": "happy", "hp": 78, "moisture": 55, "temp": "23.8", "light": "MEDIA", "timeAgo": "1D ATRAS", "hasSensor": true },
+      { "name": "CACTO", "species": "Cereus jamacaru", "status": "manual", "hp": 0, "moisture": 0, "temp": "0", "light": "", "timeAgo": "2H ATRAS", "hasSensor": false }
+    ],
+    "detailPlant": {
+      "name": "JIBOIA",
+      "species": "Epipremnum aureum",
+      "moisture": "68%",
+      "temp": "24.5\u00b0C",
+      "light": "MEDIA",
+      "hp": "92/100"
+    }
+  },
+  "iosScreens": {
+    "title": "Projetado para iOS",
+    "subtitle": "Uma experiencia de app nativa feita para amantes de plantas. Cada tela projetada para tornar o cuidado com plantas divertido.",
+    "myGarden": "Meu Jardim",
+    "morePlants": "+2 plantas",
+    "tabLabels": ["Jardim", "Camera", "Alertas", "Mais"],
+    "back": "Voltar",
+    "screenLabels": ["Jardim", "Detalhe da Planta", "Fotos", "Notificacoes", "Parear Sensor", "Configuracoes"],
+    "photoTimeline": "Linha do Tempo de Fotos",
+    "playTimelapse": "Reproduzir Time-lapse",
+    "alerts": "Alertas",
+    "addSensor": "Adicionar Sensor",
+    "scanning": "Procurando sensores...",
+    "pair": "Parear",
+    "pairingInstructions": "Coloque o sensor no modo de pareamento (segure o botao por 3s)",
+    "settings": "Configuracoes",
+    "comingSoon": "Em breve 2026",
+    "downloadAppStore": "Baixe na App Store",
+    "nativeApp": "App iOS nativo. Feito com SwiftUI."
+  },
+  "bundlesSection": {
+    "subtitle": "Economize mais comprando em pacote.",
+    "bestValue": "MELHOR VALOR",
+    "preOrder": "Pre-pedido"
+  },
+  "openSourceSection": {
+    "forkedFrom": "Fork do",
+    "byRbaron": "por rbaron. Esquematicos, firmware e cases sao todos abertos.",
+    "license": "LICENCA"
+  },
+  "footerSection": {
+    "stayInLoop": "Fique por dentro",
+    "stayInLoopDesc": "Receba atualizacoes sobre datas de lancamento, novos sensores e dicas de cuidados com plantas.",
+    "join": "Entrar",
+    "emailPlaceholder": "voce@email.com",
+    "emailAriaLabel": "Endereco de e-mail",
+    "linksTitle": "Links",
+    "linkItems": ["Como Funciona", "Produtos", "Precos", "App", "Mockups"],
+    "followUs": "Siga-nos",
+    "socialLinks": ["GitHub", "Twitter", "Discord"]
+  }
+}

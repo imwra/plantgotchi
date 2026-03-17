@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import PostHog
 
@@ -19,7 +20,8 @@ struct AddPlantView: View {
     @State private var showError = false
     @State private var errorMessage = ""
 
-    private let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
+    @EnvironmentObject private var authService: AuthService
+    private var userId: String { authService.userId ?? "default-user" }
 
     private let emojiOptions = [
         "\u{1F331}", "\u{1F33F}", "\u{1F335}", "\u{1F33B}", "\u{1F337}",
@@ -37,38 +39,29 @@ struct AddPlantView: View {
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Emoji picker
                         emojiPickerSection
-
-                        // Name & Species
                         nameSection
-
-                        // Light preference
                         lightSection
-
-                        // Moisture thresholds
                         moistureSection
-
-                        // Temperature thresholds
                         temperatureSection
                     }
                     .padding()
                 }
             }
-            .navigationTitle("New Plant")
+            .navigationTitle(S.newPlant)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button(S.cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { savePlant() }
+                    Button(S.save) { savePlant() }
                         .font(.body.weight(.semibold))
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {}
+            .alert(S.error, isPresented: $showError) {
+                Button(S.ok) {}
             } message: {
                 Text(errorMessage)
             }
@@ -117,15 +110,15 @@ struct AddPlantView: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("DETAILS")
+            Text(S.details)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
-            TextField("Plant name", text: $name)
+            TextField(S.plantName, text: $name)
                 .textFieldStyle(.roundedBorder)
                 .font(PlantgotchiTheme.bodyFont)
 
-            TextField("Species (optional)", text: $species)
+            TextField(S.speciesOptional, text: $species)
                 .textFieldStyle(.roundedBorder)
                 .font(PlantgotchiTheme.bodyFont)
         }
@@ -136,14 +129,14 @@ struct AddPlantView: View {
 
     private var lightSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("LIGHT PREFERENCE")
+            Text(S.lightPreference)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
-            Picker("Light", selection: $lightPreference) {
-                ForEach(lightOptions, id: \.self) { option in
-                    Text(option.capitalized).tag(option)
-                }
+            Picker(S.light, selection: $lightPreference) {
+                Text(S.lightLow).tag("low")
+                Text(S.lightMedium).tag("medium")
+                Text(S.lightHigh).tag("high")
             }
             .pickerStyle(.segmented)
         }
@@ -154,39 +147,35 @@ struct AddPlantView: View {
 
     private var moistureSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("MOISTURE RANGE")
+            Text(S.moistureRange)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             HStack {
                 Image(systemName: "drop.fill")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Min: \(Int(moistureMin))%")
+                Text(S.minValue(Int(moistureMin), unit: "%"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $moistureMin, in: 0...100, step: 5) {
-                Text("Minimum moisture")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: moistureMin) { _, newValue in
-                if newValue > moistureMax { moistureMax = newValue }
-            }
+            Slider(value: $moistureMin, in: 0...100, step: 5)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: moistureMin) { _, newValue in
+                    if newValue > moistureMax { moistureMax = newValue }
+                }
 
             HStack {
                 Image(systemName: "drop.fill")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Max: \(Int(moistureMax))%")
+                Text(S.maxValue(Int(moistureMax), unit: "%"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $moistureMax, in: 0...100, step: 5) {
-                Text("Maximum moisture")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: moistureMax) { _, newValue in
-                if newValue < moistureMin { moistureMin = newValue }
-            }
+            Slider(value: $moistureMax, in: 0...100, step: 5)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: moistureMax) { _, newValue in
+                    if newValue < moistureMin { moistureMin = newValue }
+                }
         }
         .plantgotchiCard()
     }
@@ -195,39 +184,35 @@ struct AddPlantView: View {
 
     private var temperatureSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("TEMPERATURE RANGE")
+            Text(S.temperatureRange)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             HStack {
                 Image(systemName: "thermometer.snowflake")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Min: \(Int(tempMin))\u{00B0}C")
+                Text(S.minValue(Int(tempMin), unit: "\u{00B0}C"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $tempMin, in: -10...50, step: 1) {
-                Text("Minimum temperature")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: tempMin) { _, newValue in
-                if newValue > tempMax { tempMax = newValue }
-            }
+            Slider(value: $tempMin, in: -10...50, step: 1)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: tempMin) { _, newValue in
+                    if newValue > tempMax { tempMax = newValue }
+                }
 
             HStack {
                 Image(systemName: "thermometer.sun.fill")
                     .foregroundColor(PlantgotchiTheme.red)
-                Text("Max: \(Int(tempMax))\u{00B0}C")
+                Text(S.maxValue(Int(tempMax), unit: "\u{00B0}C"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $tempMax, in: -10...50, step: 1) {
-                Text("Maximum temperature")
-            }
-            .tint(PlantgotchiTheme.red)
-            .onChange(of: tempMax) { _, newValue in
-                if newValue < tempMin { tempMin = newValue }
-            }
+            Slider(value: $tempMax, in: -10...50, step: 1)
+                .tint(PlantgotchiTheme.red)
+                .onChange(of: tempMax) { _, newValue in
+                    if newValue < tempMin { tempMin = newValue }
+                }
         }
         .plantgotchiCard()
     }
@@ -238,29 +223,60 @@ struct AddPlantView: View {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         guard !trimmedName.isEmpty else { return }
 
-        let plant = Plant(
-            userId: userId,
-            name: trimmedName,
-            species: species.isEmpty ? nil : species,
-            emoji: selectedEmoji,
-            moistureMin: Int(moistureMin),
-            moistureMax: Int(moistureMax),
-            tempMin: tempMin,
-            tempMax: tempMax,
-            lightPreference: lightPreference
-        )
+        Task {
+            do {
+                let baseURL: String
+                if let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
+                   let config = NSDictionary(contentsOfFile: configPath),
+                   let url = config["APIBaseURL"] as? String, !url.isEmpty {
+                    baseURL = url
+                } else {
+                    baseURL = "http://localhost:4321"
+                }
 
-        do {
-            try AppDatabase.shared.savePlant(plant)
-            PostHogSDK.shared.capture("plant_added", properties: [
-                "plant_id": plant.id,
-                "species": plant.species ?? "",
-            ])
-            onSave?()
-            dismiss()
-        } catch {
-            errorMessage = "Failed to save plant: \(error.localizedDescription)"
-            showError = true
+                let body: [String: Any] = [
+                    "name": trimmedName,
+                    "species": species.isEmpty ? NSNull() : species,
+                    "emoji": selectedEmoji,
+                    "light_preference": lightPreference,
+                    "moisture_min": Int(moistureMin),
+                    "moisture_max": Int(moistureMax),
+                    "temp_min": Int(tempMin),
+                    "temp_max": Int(tempMax),
+                ]
+                let jsonData = try JSONSerialization.data(withJSONObject: body)
+
+                let client = AuthenticatedHTTPClient(baseURL: baseURL)
+                let (data, httpResponse) = try await client.request(
+                    path: "/api/plants",
+                    method: "POST",
+                    body: jsonData
+                )
+
+                guard httpResponse.statusCode == 201 else {
+                    errorMessage = S.failedToSave
+                    showError = true
+                    return
+                }
+
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let plantId = json["id"] as? String {
+                    PostHogSDK.shared.capture("plant_added", properties: [
+                        "plant_id": plantId,
+                        "species": species.isEmpty ? "" : species,
+                    ])
+                }
+
+                await MainActor.run {
+                    onSave?()
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    errorMessage = "\(S.failedToSave): \(error.localizedDescription)"
+                    showError = true
+                }
+            }
         }
     }
 }
@@ -268,3 +284,4 @@ struct AddPlantView: View {
 #Preview {
     AddPlantView()
 }
+#endif

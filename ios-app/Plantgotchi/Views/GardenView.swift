@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 import GRDB
 import PostHog
@@ -7,6 +8,9 @@ import PostHog
 /// FAB navigates to AddPlantView.
 struct GardenView: View {
     @EnvironmentObject private var bleManager: BLEManager
+    @EnvironmentObject private var themeManager: ThemeManager
+    @ObservedObject private var localeManager = LocaleManager.shared
+    @EnvironmentObject private var authService: AuthService
     @State private var plants: [Plant] = []
     @State private var plantViews: [PlantView] = []
     @State private var isLoading = false
@@ -14,8 +18,7 @@ struct GardenView: View {
     @State private var showScan = false
     @State private var showSettings = false
 
-    /// In a real app, this would come from authentication.
-    private let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
+    private var userId: String { authService.userId ?? "default-user" }
 
     private let columns = [
         GridItem(.flexible(), spacing: PlantgotchiTheme.spacing),
@@ -25,7 +28,7 @@ struct GardenView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                PlantgotchiTheme.cream
+                PlantgotchiTheme.background
                     .ignoresSafeArea()
 
                 if plantViews.isEmpty && !isLoading {
@@ -68,7 +71,7 @@ struct GardenView: View {
                     }
                 }
             }
-            .navigationTitle("My Garden")
+            .navigationTitle(S.myGarden)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { showScan = true }) {
@@ -91,11 +94,18 @@ struct GardenView: View {
             .sheet(isPresented: $showScan) {
                 ScanView()
             }
-            .sheet(isPresented: $showSettings) {
+            .sheet(isPresented: $showSettings, onDismiss: {
+                Task { await refreshPlants() }
+            }) {
                 SettingsView()
             }
             .task {
                 await refreshPlants()
+                while !Task.isCancelled {
+                    try? await Task.sleep(nanoseconds: 15_000_000_000)
+                    guard !Task.isCancelled else { break }
+                    await refreshPlants()
+                }
             }
         }
     }
@@ -106,10 +116,10 @@ struct GardenView: View {
         VStack(spacing: 20) {
             Text("\u{1F331}")
                 .font(.system(size: 64))
-            Text("No plants yet!")
+            Text(S.noPlantsYet)
                 .font(PlantgotchiTheme.pixelFont(size: 14))
                 .foregroundColor(PlantgotchiTheme.text)
-            Text("Tap + to add your first plant")
+            Text(S.tapToAdd)
                 .font(PlantgotchiTheme.bodyFont)
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
         }
@@ -122,13 +132,51 @@ struct GardenView: View {
         isLoading = true
         defer { isLoading = false }
 
-        let db = AppDatabase.shared
         do {
-            plants = try db.getPlants(userId: userId)
-            plantViews = try plants.map { plant in
-                let reading = try db.getLatestReading(plantId: plant.id)
-                let logs = try db.getCareLogs(plantId: plant.id, limit: 5)
-                return toPlantView(plant: plant, latestReading: reading, recentCareLogs: logs)
+            let baseURL: String
+            if let configPath = Bundle.main.path(forResource: "Config", ofType: "plist"),
+               let config = NSDictionary(contentsOfFile: configPath),
+               let url = config["APIBaseURL"] as? String, !url.isEmpty {
+                baseURL = url
+            } else {
+                baseURL = "http://localhost:4321"
+            }
+
+            let client = AuthenticatedHTTPClient(baseURL: baseURL)
+            let (data, httpResponse) = try await client.request(
+                path: "/api/plants",
+                method: "GET"
+            )
+
+            guard httpResponse.statusCode == 200 else {
+                print("[GardenView] API returned non-200")
+                return
+            }
+
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                print("[GardenView] Failed to parse response")
+                return
+            }
+
+            plants = json.compactMap { entry -> Plant? in
+                guard let p = entry["plant"] as? [String: Any],
+                      let id = p["id"] as? String,
+                      let name = p["name"] as? String else { return nil }
+                return Plant(
+                    id: id,
+                    userId: p["user_id"] as? String ?? "",
+                    name: name,
+                    species: p["species"] as? String,
+                    emoji: p["emoji"] as? String ?? "\u{1F331}",
+                    moistureMin: p["moisture_min"] as? Int ?? 30,
+                    moistureMax: p["moisture_max"] as? Int ?? 80,
+                    tempMin: p["temp_min"] as? Double ?? 15.0,
+                    tempMax: p["temp_max"] as? Double ?? 30.0,
+                    lightPreference: p["light_preference"] as? String ?? "medium"
+                )
+            }
+            plantViews = plants.map { plant in
+                toPlantView(plant: plant, latestReading: nil, recentCareLogs: [])
             }
             PostHogSDK.shared.capture("garden_viewed", properties: [
                 "plant_count": plantViews.count,
@@ -142,4 +190,6 @@ struct GardenView: View {
 #Preview {
     GardenView()
         .environmentObject(BLEManager())
+        .environmentObject(ThemeManager.shared)
 }
+#endif

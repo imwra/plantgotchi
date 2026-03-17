@@ -4,62 +4,106 @@
 
     <!-- Garden screen -->
     <string name="garden_title">Plantgotchi</string>
-    <string name="garden_empty_title">No plants yet!</string>
-    <string name="garden_empty_subtitle">Tap + to add your first plant</string>
-    <string name="garden_add_plant">Add plant</string>
-    <string name="garden_scan_sensors">Scan sensors</string>
-    <string name="garden_settings">Settings</string>
+    <string name="garden_empty_title">Nenhuma planta ainda!</string>
+    <string name="garden_empty_subtitle">Toque + para adicionar sua primeira planta</string>
+    <string name="garden_add_plant">Adicionar planta</string>
+    <string name="garden_scan_sensors">Escanear sensores</string>
+    <string name="garden_settings">Configurações</string>
 
     <!-- Plant detail -->
-    <string name="detail_health">Health</string>
-    <string name="detail_sensor_readings">Sensor Readings</string>
-    <string name="detail_recommendations">Recommendations</string>
-    <string name="detail_care_log">Care Log</string>
-    <string name="detail_water">Water</string>
-    <string name="detail_fertilize">Fertilize</string>
-
-    <!-- Scan screen -->
-    <string name="scan_title">Scan Sensors</string>
-    <string name="scan_ready">Ready to scan</string>
-    <string name="scan_scanning">Scanning\u2026</string>
-    <string name="scan_connecting">Connecting\u2026</string>
-    <string name="scan_connected">Connected!</string>
-    <string name="scan_no_sensors">No sensors found</string>
-    <string name="scan_help">Make sure your Plantgotchi sensor is powered on and nearby</string>
-    <string name="scan_pair">Pair</string>
-
-    <!-- Add plant -->
-    <string name="add_title">Add Plant</string>
-    <string name="add_name_label">Plant name</string>
-    <string name="add_name_hint">e.g. Office Fern</string>
-    <string name="add_species_label">Species (optional)</string>
-    <string name="add_species_hint">e.g. Nephrolepis exaltata</string>
-    <string name="add_emoji_label">Choose an emoji</string>
-    <string name="add_light_label">Light preference</string>
-    <string name="add_moisture_label">Moisture range</string>
-    <string name="add_temp_label">Temperature range</string>
-    <string name="add_save">Add Plant</string>
-
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
-    <string name="settings_cloud_sync">Cloud Sync</string>
-    <string name="settings_cloud_desc">Connect to Turso to sync your plant data across devices.</string>
-    <string name="settings_turso_url">Turso Database URL</string>
-    <string name="settings_turso_token">Auth Token</string>
-    <string name="settings_save">Save</string>
-    <string name="settings_saved">Saved</string>
-    <string name="settings_paired_sensors">Paired Sensors</string>
-    <string name="settings_no_sensors">No sensors currently paired.</string>
-    <string name="settings_about">About</string>
-    <string name="settings_version">Plantgotchi v1.0.0</string>
-    <string name="settings_sign_out">Sign Out</string>
+    <string name="detail_back">Voltar</string>
+    <string name="detail_health">Saúde</string>
+    <string name="detail_hp">HP</string>
+    <string name="detail_sensor_readings">Leituras do Sensor</string>
+    <string name="detail_moisture">💧 Umidade</string>
+    <string name="detail_temp">🌡 Temp</string>
+    <string name="detail_light">☀ Luz</string>
+    <string name="detail_battery">🔋 Bateria</string>
+    <string name="detail_no_data">--</string>
+    <string name="detail_recommendations">Recomendações</string>
+    <string name="detail_care_log">Registro de Cuidados</string>
+    <string name="detail_water">💧 Regar</string>
+    <string name="detail_fertilize">🌿 Fertilizar</string>
+    <string name="detail_tap_to_mark">Toque para marcar como feito</string>
+    <string name="detail_watered_note">Regada pelo app</string>
+    <string name="detail_fertilized_note">Fertilizada pelo app</string>
 
     <!-- Status labels -->
-    <string name="status_happy">Happy</string>
-    <string name="status_thirsty">Thirsty</string>
-    <string name="status_unknown">Unknown</string>
+    <string name="status_happy">❤ Feliz</string>
+    <string name="status_thirsty">☹ Com Sede</string>
+    <string name="status_needs_attention">☹ Precisa de atenção</string>
+    <string name="status_unknown">\? Desconhecido</string>
+    <string name="status_no_data">\? Sem dados</string>
+
+    <!-- Scan screen -->
+    <string name="scan_title">Escanear Sensores</string>
+    <string name="scan_ready">Pronto para escanear</string>
+    <string name="scan_scanning">Escaneando\u2026</string>
+    <string name="scan_connecting">Conectando\u2026</string>
+    <string name="scan_connected">Conectado!</string>
+    <string name="scan_disconnected">Desconectado</string>
+    <string name="scan_stop">Parar</string>
+    <string name="scan_start">Escanear</string>
+    <string name="scan_no_sensors">Nenhum sensor encontrado</string>
+    <string name="scan_help">Certifique-se de que seu sensor Plantgotchi esteja ligado e próximo</string>
+    <string name="scan_pair">Parear</string>
+    <string name="scan_signal">Intensidade do sinal</string>
+
+    <!-- Add plant -->
+    <string name="add_title">Adicionar Planta</string>
+    <string name="add_name_label">Nome da planta</string>
+    <string name="add_name_hint">ex. Samambaia do Escritório</string>
+    <string name="add_species_label">Espécie (opcional)</string>
+    <string name="add_species_hint">ex. Nephrolepis exaltata</string>
+    <string name="add_emoji_label">Escolha um emoji</string>
+    <string name="add_light_label">Preferência de luz</string>
+    <string name="add_moisture_range">Faixa de umidade: %1$d%% – %2$d%%</string>
+    <string name="add_temp_range">Faixa de temp: %1$s°C – %2$s°C</string>
+    <string name="add_minimum">Mínimo: %1$s</string>
+    <string name="add_maximum">Máximo: %1$s</string>
+    <string name="add_save">🌱 Adicionar Planta</string>
+
+    <!-- Light options -->
+    <string name="light_low">Baixa</string>
+    <string name="light_medium">Média</string>
+    <string name="light_high">Alta</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Configurações</string>
+    <string name="settings_demo_mode">Modo Demo</string>
+    <string name="settings_demo_desc">Carregue amostras de cannabis com dados de sensores para visualizar o app.</string>
+    <string name="settings_demo_data">🌿 Dados Demo</string>
+    <string name="settings_demo_loaded_title">Dados Demo Carregados</string>
+    <string name="settings_demo_loaded_message">6 variedades de cannabis com leituras de sensores, registros de cuidados e recomendações de cultivo foram adicionadas ao seu jardim.</string>
+    <string name="settings_ok">OK</string>
+    <string name="settings_cloud_sync">Sincronização na Nuvem</string>
+    <string name="settings_cloud_desc">Conecte ao Turso para sincronizar seus dados de plantas entre dispositivos.</string>
+    <string name="settings_turso_url">URL do Banco Turso</string>
+    <string name="settings_turso_url_hint">https://seu-banco.turso.io</string>
+    <string name="settings_turso_token">Token de Autenticação</string>
+    <string name="settings_turso_token_hint">eyJhbGciOi…</string>
+    <string name="settings_save">Salvar</string>
+    <string name="settings_saved">✓ Salvo</string>
+    <string name="settings_paired_sensors">Sensores Pareados</string>
+    <string name="settings_no_sensors">Nenhum sensor pareado. Vá em Escanear para encontrar e parear sensores.</string>
+    <string name="settings_about">Sobre</string>
+    <string name="settings_version">Plantgotchi v1.0.0</string>
+    <string name="settings_about_desc">Mantenha suas plantas felizes com monitoramento de sensores BLE em tempo real e recomendações de cuidados com IA.</string>
+    <string name="settings_sign_out">Sair</string>
+
+    <!-- Language settings -->
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_desc">Escolha o idioma do aplicativo.</string>
+    <string name="language_pt">Português</string>
+    <string name="language_en">English</string>
+
+    <!-- Care actions -->
+    <string name="care_water">regar</string>
+    <string name="care_fertilize">fertilizar</string>
+    <string name="care_prune">podar</string>
+    <string name="care_repot">transplantar</string>
 
     <!-- BLE permissions -->
-    <string name="ble_permission_rationale">Plantgotchi needs Bluetooth access to connect to your plant sensors.</string>
-    <string name="location_permission_rationale">Location access is required on Android to scan for BLE devices.</string>
+    <string name="ble_permission_rationale">Plantgotchi precisa de acesso ao Bluetooth para conectar aos seus sensores de plantas.</string>
+    <string name="location_permission_rationale">Acesso à localização é necessário no Android para escanear dispositivos BLE.</string>
 </resources>

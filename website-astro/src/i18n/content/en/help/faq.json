@@ -1,0 +1,72 @@
+{
+  "slug": "faq",
+  "title": "Frequently Asked Questions",
+  "category": "Troubleshooting",
+  "description": "Answers to the most common Plantgotchi questions.",
+  "sections": [
+    {
+      "heading": "General",
+      "body": ""
+    },
+    {
+      "heading": "What plants work with Plantgotchi?",
+      "body": "<p>Any potted plant with soil! The moisture sensor needs to be inserted into soil to work. It works with houseplants, herbs, succulents, and outdoor potted plants. Hydroponic setups aren't supported yet.</p>"
+    },
+    {
+      "heading": "Do I need internet to use Plantgotchi?",
+      "body": "<p>No. The app is offline-first \u2014 sensor readings, care logging, and the rule engine all work without internet. You only need internet for cloud sync (to access data from the web or another device) and AI recommendations from Claude.</p>"
+    },
+    {
+      "heading": "Can multiple people monitor the same plant?",
+      "body": "<p>Yes! Multiple phones can receive BLE broadcasts from the same sensor (though only one can hold an active GATT connection at a time). If both users sync to the cloud, their care logs are both preserved (each gets a unique UUID). Sensor readings are deduplicated automatically.</p>"
+    },
+    {
+      "heading": "Sensors",
+      "body": ""
+    },
+    {
+      "heading": "How deep should I insert the sensor?",
+      "body": "<p>About 2\u20133 inches (5\u20137 cm) into the soil. The moisture probes need good soil contact. Avoid pressing it against the pot wall or into rocks/gravel.</p>"
+    },
+    {
+      "heading": "Is the sensor waterproof?",
+      "body": "<p>The probe portion is water-resistant and designed for soil contact. The electronics housing at the top should stay above the soil line and out of standing water. Don't submerge the entire sensor.</p>"
+    },
+    {
+      "heading": "How often does the sensor take readings?",
+      "body": "<p>Every 30\u201360 seconds by default. This interval is configurable via the BLE Config characteristic. Longer intervals save battery; shorter intervals give more granular data.</p>"
+    },
+    {
+      "heading": "Data & Privacy",
+      "body": ""
+    },
+    {
+      "heading": "Where is my data stored?",
+      "body": "<p>Locally on your phone (GRDB on iOS, Room on Android) and optionally in Turso cloud (distributed SQLite). The web dashboard reads from Turso. Your data is linked to your user account and not shared with other users.</p>"
+    },
+    {
+      "heading": "What data does the AI see?",
+      "body": "<p>When generating recommendations, Claude AI receives your plant's name, species, care preferences, the last 7 days of sensor readings, and your last 10 care actions. This data is sent to Anthropic's API and processed according to their privacy policy. No data is stored by the AI between requests.</p>"
+    },
+    {
+      "heading": "Can I delete my data?",
+      "body": "<p>Yes. You can delete individual plants from your garden (historical readings are preserved but disassociated). To delete your entire account and all associated data, contact support.</p>"
+    },
+    {
+      "heading": "Troubleshooting",
+      "body": ""
+    },
+    {
+      "heading": "My HP score seems wrong \u2014 what gives?",
+      "body": "<p>HP is calculated from how close your moisture and temperature readings are to the midpoint of your threshold ranges. If your thresholds are very wide (e.g., 10\u201390% moisture), the midpoint is 50%, and readings far from 50% will lower HP even if they're technically in range. Try narrowing your thresholds to better reflect your plant's actual preferences.</p>"
+    },
+    {
+      "heading": "Why don't I see AI recommendations?",
+      "body": "<p>AI recommendations require: (1) an internet connection, (2) an API key configured on the server, and (3) at least some sensor readings for the plant. The AI runs on a 6-hour cycle, so new plants may not get a recommendation immediately.</p>"
+    },
+    {
+      "heading": "The app says \"unknown\" for my plant's status",
+      "body": "<p>\"Unknown\" means no recent sensor readings are available. Make sure your sensor is powered on, in BLE range, and paired with the app. See <a href=\"/help/sensor-not-connecting\">Sensor Not Connecting</a> for troubleshooting steps.</p>"
+    }
+  ]
+}

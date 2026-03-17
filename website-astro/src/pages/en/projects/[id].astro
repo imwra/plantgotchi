@@ -1,0 +1,81 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ProjectView from "../../../components/ui/organisms/ProjectView";
+import { getSession } from "../../../lib/auth";
+import { getLocaleFromPath, useTranslations } from "../../../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const session = await getSession(Astro.request);
+if (!session) {
+  return Astro.redirect(locale === "en" ? "/en/login" : "/login");
+}
+
+if ((session.user as any).role !== "admin") {
+  return Astro.redirect(locale === "en" ? "/en/garden" : "/garden");
+}
+
+const { id } = Astro.params;
+const userName = session.user.name || session.user.email;
+---
+
+<BaseLayout title={t("projects.title")}>
+  <ProjectView
+    client:load
+    projectId={id!}
+    userName={userName}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      chat: t("nav.chat"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      projects: t("nav.projects"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+    labels={{
+      title: t("projects.title"),
+      settings: t("projects.settings"),
+      fields: t("projects.fields"),
+      addField: t("projects.addField"),
+      groupBy: t("projects.groupBy"),
+      groupByNone: t("projects.groupByNone"),
+      columns: t("projects.columns"),
+      search: t("projects.search"),
+      viewTable: t("projects.viewTable"),
+      viewBoard: t("projects.viewBoard"),
+      viewBoardSoon: t("projects.viewBoardSoon"),
+      addIssue: t("projects.addIssue"),
+      members: t("projects.members"),
+      name: t("projects.name"),
+      description: t("projects.description"),
+      create: t("projects.create"),
+      cancel: t("projects.cancel"),
+      issues: t("projects.issues"),
+      statusTodo: t("issues.statusTodo"),
+      statusInProgress: t("issues.statusInProgress"),
+      statusDone: t("issues.statusDone"),
+      statusBlocked: t("issues.statusBlocked"),
+      statusArchived: t("issues.statusArchived"),
+      save: t("issues.save"),
+      delete: t("issues.delete"),
+      confirmDelete: t("issues.confirmDelete"),
+      boardBy: t("projects.board.boardBy"),
+      emptyColumn: t("projects.board.emptyColumn"),
+      dragHint: t("projects.board.dragHint"),
+      newView: t("projects.views.newView"),
+      saveAsNew: t("projects.views.saveAsNew"),
+      rename: t("projects.views.rename"),
+      default: t("projects.views.default"),
+      clickToEdit: t("projects.inline.clickToEdit"),
+    }}
+  />
+</BaseLayout>

@@ -1,0 +1,72 @@
+{
+  "slug": "faq",
+  "title": "Perguntas Frequentes",
+  "category": "Solucao de Problemas",
+  "description": "Respostas para as perguntas mais comuns sobre o Plantgotchi.",
+  "sections": [
+    {
+      "heading": "Geral",
+      "body": ""
+    },
+    {
+      "heading": "Quais plantas funcionam com o Plantgotchi?",
+      "body": "<p>Qualquer planta em vaso com solo! O sensor de umidade precisa ser inserido no solo para funcionar. Funciona com plantas de interior, ervas, suculentas e plantas de exterior em vasos. Configuracoes hidroponicas ainda nao sao suportadas.</p>"
+    },
+    {
+      "heading": "Preciso de internet para usar o Plantgotchi?",
+      "body": "<p>Nao. O app e offline-first \u2014 leituras de sensores, registro de cuidados e o motor de regras funcionam sem internet. Voce so precisa de internet para sincronizacao na nuvem (para acessar dados da web ou de outro dispositivo) e recomendacoes por IA do Claude.</p>"
+    },
+    {
+      "heading": "Varias pessoas podem monitorar a mesma planta?",
+      "body": "<p>Sim! Multiplos celulares podem receber transmissoes BLE do mesmo sensor (embora apenas um possa manter uma conexao GATT ativa por vez). Se ambos os usuarios sincronizam com a nuvem, seus registros de cuidados sao preservados (cada um recebe um UUID unico). Leituras de sensores sao deduplicadas automaticamente.</p>"
+    },
+    {
+      "heading": "Sensores",
+      "body": ""
+    },
+    {
+      "heading": "Qual a profundidade para inserir o sensor?",
+      "body": "<p>Cerca de 5\u20137 cm no solo. As sondas de umidade precisam de bom contato com o solo. Evite pressa-lo contra a parede do vaso ou em pedras/cascalho.</p>"
+    },
+    {
+      "heading": "O sensor e a prova d'agua?",
+      "body": "<p>A parte da sonda e resistente a agua e projetada para contato com o solo. O compartimento eletronico no topo deve ficar acima da linha do solo e fora de agua parada. Nao submirja o sensor inteiro.</p>"
+    },
+    {
+      "heading": "Com que frequencia o sensor faz leituras?",
+      "body": "<p>A cada 30\u201360 segundos por padrao. Este intervalo e configuravel pela caracteristica de configuracao BLE. Intervalos maiores economizam bateria; intervalos menores fornecem dados mais granulares.</p>"
+    },
+    {
+      "heading": "Dados e Privacidade",
+      "body": ""
+    },
+    {
+      "heading": "Onde meus dados sao armazenados?",
+      "body": "<p>Localmente no seu celular (GRDB no iOS, Room no Android) e opcionalmente na nuvem Turso (SQLite distribuido). O painel web le do Turso. Seus dados sao vinculados a sua conta de usuario e nao sao compartilhados com outros usuarios.</p>"
+    },
+    {
+      "heading": "Quais dados a IA ve?",
+      "body": "<p>Ao gerar recomendacoes, o Claude IA recebe o nome da sua planta, especie, preferencias de cuidado, os ultimos 7 dias de leituras de sensor e suas ultimas 10 acoes de cuidado. Esses dados sao enviados para a API da Anthropic e processados de acordo com sua politica de privacidade. Nenhum dado e armazenado pela IA entre requisicoes.</p>"
+    },
+    {
+      "heading": "Posso excluir meus dados?",
+      "body": "<p>Sim. Voce pode excluir plantas individuais do seu jardim (leituras historicas sao preservadas mas desassociadas). Para excluir sua conta inteira e todos os dados associados, entre em contato com o suporte.</p>"
+    },
+    {
+      "heading": "Solucao de Problemas",
+      "body": ""
+    },
+    {
+      "heading": "Meu HP parece errado \u2014 o que houve?",
+      "body": "<p>O HP e calculado com base em quao proximas suas leituras de umidade e temperatura estao do ponto medio das faixas de limites. Se seus limites sao muito amplos (ex.: 10\u201390% de umidade), o ponto medio e 50%, e leituras longe de 50% reduzirao o HP mesmo estando tecnicamente na faixa. Tente estreitar seus limites para refletir melhor as preferencias reais da sua planta.</p>"
+    },
+    {
+      "heading": "Por que nao vejo recomendacoes por IA?",
+      "body": "<p>Recomendacoes por IA requerem: (1) uma conexao com internet, (2) uma chave API configurada no servidor, e (3) pelo menos algumas leituras de sensor para a planta. A IA roda em um ciclo de 6 horas, entao plantas novas podem nao receber uma recomendacao imediatamente.</p>"
+    },
+    {
+      "heading": "O app diz \"desconhecido\" para o status da minha planta",
+      "body": "<p>\"Desconhecido\" significa que nao ha leituras recentes de sensor disponiveis. Certifique-se de que seu sensor esta ligado, no alcance BLE e pareado com o app. Veja <a href=\"/help/sensor-not-connecting\">Sensor Nao Conecta</a> para passos de solucao de problemas.</p>"
+    }
+  ]
+}

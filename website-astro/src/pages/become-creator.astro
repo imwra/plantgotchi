@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CreatorProfileForm from "../components/ui/organisms/CreatorProfileForm";
+import { getSession } from "../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) return Astro.redirect("/login");
+---
+
+<BaseLayout title="Become a Creator">
+  <CreatorProfileForm client:load mode="create" />
+</BaseLayout>

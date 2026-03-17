@@ -1,0 +1,28 @@
+{
+  "slug": "adding-plants",
+  "title": "Adicionando Plantas",
+  "category": "Cuidados com Plantas",
+  "description": "Como adicionar plantas, definir limites de cuidado e personalizar seu jardim.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Cada planta no Plantgotchi tem seu proprio perfil com limites de cuidado personalizados. Veja como configurar.</p>"
+    },
+    {
+      "heading": "Criando um Perfil de Planta",
+      "body": "<ol><li>Abra seu <a href=\"/garden\">Painel do Jardim</a> e toque no botao \"Adicionar Planta\".</li><li>De um <strong>nome</strong> a sua planta \u2014 seja criativo! \"Fernando o Feto\" funciona otimo.</li><li>Opcionalmente defina uma <strong>especie</strong> (ex.: \"Monstera Deliciosa\") para recomendacoes de IA mais direcionadas.</li><li>Escolha um <strong>emoji avatar</strong> no seletor \u2014 ele aparece no cartao da sua planta.</li><li>Opcionalmente adicione uma <strong>URL de foto</strong> se quiser uma foto real da sua planta.</li></ol>"
+    },
+    {
+      "heading": "Definindo Limites",
+      "body": "<p>Limites dizem ao Plantgotchi quando alertar voce. Voce pode personalizar estes para cada planta:</p><table><thead><tr><th>Metrica</th><th>Min Padrao</th><th>Max Padrao</th><th>Notas</th></tr></thead><tbody><tr><td>Umidade</td><td>30%</td><td>80%</td><td>Bom para a maioria das plantas de interior</td></tr><tr><td>Temperatura</td><td>15\u00b0C</td><td>30\u00b0C</td><td>Plantas tropicais podem precisar de mais</td></tr></tbody></table><p>Voce tambem pode definir uma <strong>preferencia de luz</strong> \u2014 baixa, media ou alta. Isso e usado pelo motor de regras: se sua planta prefere alta luz mas o sensor le abaixo de 1.000 lux, voce recebera um lembrete gentil para move-la.</p>"
+    },
+    {
+      "heading": "Guia de Preferencia de Luz",
+      "body": "<ul><li><strong>Baixa</strong> \u2014 abaixo de 1.000 lux (ex.: espada-de-sao-jorge, jiboia, zamioculca)</li><li><strong>Media</strong> \u2014 1.000\u20132.000 lux (ex.: filodendro, lirio-da-paz)</li><li><strong>Alta</strong> \u2014 acima de 2.000 lux (ex.: suculentas, ervas, figueira-lira)</li></ul>"
+    },
+    {
+      "heading": "Editando e Excluindo Plantas",
+      "body": "<p>Toque em qualquer cartao de planta para abrir sua visualizacao detalhada, depois use o botao de edicao para alterar nome, limites ou emoji. Voce tambem pode excluir uma planta \u2014 isso remove o perfil da planta mas preserva as leituras historicas do sensor no banco de dados.</p>"
+    }
+  ]
+}

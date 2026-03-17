@@ -1,0 +1,54 @@
+{
+  "categories": [
+    {
+      "name": "Getting Started",
+      "emoji": "🌱",
+      "description": "New to Plantgotchi? Start here.",
+      "articles": [
+        { "slug": "what-is-plantgotchi", "title": "What is Plantgotchi?", "desc": "Learn how smart sensors and retro vibes keep your plants alive." },
+        { "slug": "quick-start", "title": "Quick Start Guide", "desc": "From unboxing to your first reading in 5 minutes." },
+        { "slug": "creating-account", "title": "Creating Your Account", "desc": "Sign up, log in, and manage your profile." }
+      ]
+    },
+    {
+      "name": "Sensors & Hardware",
+      "emoji": "📡",
+      "description": "Everything about your plant sensors.",
+      "articles": [
+        { "slug": "sensor-types", "title": "Sensor Types", "desc": "Compare BLE Child, Solo, PlantCam, and PlantCam Pro." },
+        { "slug": "sensor-setup", "title": "Sensor Setup", "desc": "Pairing via Bluetooth, WiFi configuration, and LED codes." },
+        { "slug": "sensor-battery", "title": "Battery & Charging", "desc": "Battery life expectations, charging, and replacement." }
+      ]
+    },
+    {
+      "name": "Mobile Apps",
+      "emoji": "📱",
+      "description": "Get the most from the Plantgotchi apps.",
+      "articles": [
+        { "slug": "ios-app", "title": "iOS App", "desc": "Features, BLE scanning, and local data on iPhone and iPad." },
+        { "slug": "android-app", "title": "Android App", "desc": "Features, BLE scanning, and local data on Android devices." },
+        { "slug": "syncing-data", "title": "Syncing Your Data", "desc": "How cloud sync works and what happens offline." }
+      ]
+    },
+    {
+      "name": "Plant Care",
+      "emoji": "🌿",
+      "description": "Help your plants thrive with data.",
+      "articles": [
+        { "slug": "adding-plants", "title": "Adding Plants", "desc": "Add plants, set thresholds, and pick the perfect emoji." },
+        { "slug": "reading-data", "title": "Reading Sensor Data", "desc": "Understand moisture, temperature, and light readings." },
+        { "slug": "ai-recommendations", "title": "AI Recommendations", "desc": "How the rule engine and Claude AI provide care advice." }
+      ]
+    },
+    {
+      "name": "Troubleshooting",
+      "emoji": "🔧",
+      "description": "Fix common issues quickly.",
+      "articles": [
+        { "slug": "sensor-not-connecting", "title": "Sensor Not Connecting", "desc": "BLE troubleshooting, range tips, and interference fixes." },
+        { "slug": "data-not-syncing", "title": "Data Not Syncing", "desc": "Cloud sync issues and offline queue recovery." },
+        { "slug": "faq", "title": "FAQ", "desc": "Answers to the most common questions." }
+      ]
+    }
+  ]
+}

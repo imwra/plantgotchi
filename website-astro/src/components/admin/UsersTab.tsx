@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Badge } from '../ui/atoms';
 import UserDetailModal from "./UserDetailModal";
 
 interface AdminUser {
@@ -35,28 +36,28 @@ export default function UsersTab() {
       .finally(() => setLoading(false));
   }, [page]);
 
-  if (loading) return <p className="text-sm text-pixel-gray">Loading users...</p>;
-  if (error) return <p className="text-sm text-accent-red">{error}</p>;
+  if (loading) return <p className="text-sm text-text-mid">Loading users...</p>;
+  if (error) return <p className="text-sm text-danger">{error}</p>;
 
   const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="pixel-font text-xs text-green-dark">{total} USERS</h2>
+        <h2 className="pixel-font text-xs text-primary-dark">{total} USERS</h2>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-cream-dark overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-bg-warm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-cream-dark bg-cream/50">
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Email</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Name</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Role</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Plants</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Joined</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Last Active</th>
+              <tr className="border-b border-bg-warm bg-bg/50">
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Email</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Name</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Role</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Plants</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Joined</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Last Active</th>
               </tr>
             </thead>
             <tbody>
@@ -64,24 +65,18 @@ export default function UsersTab() {
                 <tr
                   key={user.id}
                   onClick={() => setSelectedUserId(user.id)}
-                  className="border-b border-cream-dark/50 hover:bg-cream/40 cursor-pointer transition"
+                  className="border-b border-bg-warm/50 hover:bg-bg/40 cursor-pointer transition"
                 >
                   <td className="px-4 py-2 font-medium">{user.email}</td>
-                  <td className="px-4 py-2 text-pixel-gray">{user.name || "—"}</td>
+                  <td className="px-4 py-2 text-text-mid">{user.name || "—"}</td>
                   <td className="px-4 py-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                      user.role === "admin"
-                        ? "bg-accent-blue/20 text-accent-blue"
-                        : "bg-cream-dark text-pixel-gray"
-                    }`}>
-                      {user.role}
-                    </span>
+                    <Badge label={user.role} variant={user.role === 'admin' ? 'info' : 'neutral'} />
                   </td>
                   <td className="px-4 py-2">{user.plantCount}</td>
-                  <td className="px-4 py-2 text-pixel-gray text-xs">
+                  <td className="px-4 py-2 text-text-mid text-xs">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-2 text-pixel-gray text-xs">
+                  <td className="px-4 py-2 text-text-mid text-xs">
                     {user.lastActive
                       ? new Date(user.lastActive).toLocaleDateString()
                       : "—"}
@@ -99,17 +94,17 @@ export default function UsersTab() {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="px-3 py-1 text-xs rounded border border-cream-dark disabled:opacity-40 cursor-pointer"
+            className="px-3 py-1 text-xs rounded border border-bg-warm disabled:opacity-40 cursor-pointer"
           >
             Prev
           </button>
-          <span className="text-xs text-pixel-gray">
+          <span className="text-xs text-text-mid">
             Page {page + 1} of {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="px-3 py-1 text-xs rounded border border-cream-dark disabled:opacity-40 cursor-pointer"
+            className="px-3 py-1 text-xs rounded border border-bg-warm disabled:opacity-40 cursor-pointer"
           >
             Next
           </button>

@@ -1,5 +1,7 @@
 import Foundation
+#if os(iOS)
 import BackgroundTasks
+#endif
 
 /// Manages periodic background tasks for Claude API analysis.
 /// Registers a `BGAppRefreshTask` that queries recent plant data,
@@ -22,6 +24,7 @@ final class BackgroundAgent {
 
     /// Schedule the next background refresh task.
     func scheduleNextRefresh() {
+        #if os(iOS)
         let request = BGAppRefreshTaskRequest(identifier: Self.taskIdentifier)
         request.earliestBeginDate = Date(timeIntervalSinceNow: refreshInterval)
         do {
@@ -29,10 +32,12 @@ final class BackgroundAgent {
         } catch {
             print("[BackgroundAgent] Failed to schedule refresh: \(error)")
         }
+        #endif
     }
 
     // MARK: - Task Handler
 
+#if os(iOS)
     /// Handle the background app refresh task.
     func handleAppRefresh(task: BGAppRefreshTask) {
         // Schedule the next refresh immediately
@@ -51,6 +56,7 @@ final class BackgroundAgent {
             task.setTaskCompleted(success: true)
         }
     }
+#endif
 
     // MARK: - Claude Analysis
 

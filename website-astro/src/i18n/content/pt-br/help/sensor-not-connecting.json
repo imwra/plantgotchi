@@ -1,0 +1,32 @@
+{
+  "slug": "sensor-not-connecting",
+  "title": "Sensor Nao Conecta",
+  "category": "Solucao de Problemas",
+  "description": "Resolva problemas de pareamento Bluetooth, alcance e interferencia.",
+  "sections": [
+    {
+      "heading": null,
+      "body": "<p>Nao consegue encontrar seu sensor durante o escaneamento BLE? Aqui estao as causas mais comuns e as solucoes.</p>"
+    },
+    {
+      "heading": "Verifique o Basico",
+      "body": "<ol><li><strong>O sensor esta ligado?</strong> Procure um LED azul piscando (modo de anuncio BLE). Se nao ha LED, a bateria pode estar descarregada \u2014 veja <a href=\"/help/sensor-battery\">Bateria e Carregamento</a>.</li><li><strong>O Bluetooth esta habilitado no seu celular?</strong> Va nas configuracoes do celular e certifique-se de que o Bluetooth esta ligado.</li><li><strong>Voce concedeu permissoes de Bluetooth?</strong> No Android, permissoes de Bluetooth e Localizacao sao necessarias para escaneamento BLE. No iOS, permissao de Bluetooth e necessaria.</li></ol>"
+    },
+    {
+      "heading": "Problemas de Alcance",
+      "body": "<p>O BLE tem alcance tipico de 10\u201330 metros (30\u2013100 pes) ao ar livre, mas paredes, moveis e outros objetos reduzem isso significativamente. Para melhores resultados:</p><ul><li>Fique a menos de 5 metros (15 pes) do sensor durante o pareamento inicial.</li><li>Evite colocar sensores atras de paredes grossas ou prateleiras de metal.</li><li>Se o alcance e um problema, considere um Sensor Solo (backup WiFi) ou PlantCam Pro (modo hub).</li></ul>"
+    },
+    {
+      "heading": "Interferencia",
+      "body": "<p>O BLE opera na banda de 2,4 GHz, compartilhada com WiFi, micro-ondas e outros dispositivos Bluetooth. Se voce tem muitos dispositivos BLE proximos, eles podem interferir:</p><ul><li>Afaste o sensor de roteadores WiFi e micro-ondas.</li><li>Se voce tem muitos dispositivos BLE, espaco-os fisicamente.</li><li>Tente escanear de um local diferente no comodo.</li></ul>"
+    },
+    {
+      "heading": "Sensor Nao Aparece no Escaneamento",
+      "body": "<p>O app escaneia especificamente por dispositivos que anunciam o UUID do servico GATT do Plantgotchi (<code>0000FE00-...</code>). Se seu sensor nao aparece:</p><ol><li>Reinicie o sensor (remova e reinsira a bateria, ou pressione o botao de reset).</li><li>Feche e reabra o app Plantgotchi.</li><li>No Android, tente desligar e religar o Bluetooth nas configuracoes do sistema.</li><li>Certifique-se de que nenhum outro app ou dispositivo esta atualmente conectado ao sensor \u2014 o BLE suporta apenas uma conexao ativa por vez.</li></ol>"
+    },
+    {
+      "heading": "Ja Pareado com Outro Celular",
+      "body": "<p>Um sensor Plantgotchi so pode estar ativamente conectado a um dispositivo por vez. Se outro celular esta conectado, o sensor nao aparecera no seu escaneamento. Desconecte o outro celular primeiro, depois escaneie novamente. Nota: multiplos celulares <em>podem</em> receber anuncios BLE simultaneamente, mas apenas um pode manter uma conexao GATT ativa.</p>"
+    }
+  ]
+}

@@ -30,11 +30,23 @@ jobs:
         env:
           PUBLIC_POSTHOG_KEY: ${{ secrets.PUBLIC_POSTHOG_KEY }}
           PUBLIC_POSTHOG_HOST: ${{ secrets.PUBLIC_POSTHOG_HOST }}
+          TURSO_URL: ${{ secrets.TURSO_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+
+      - name: Prepare Pages-compatible output
+        working-directory: website-astro
+        run: |
+          mkdir -p dist-pages/_worker.js
+          cp -r dist/client/* dist-pages/
+          cp -r dist/server/chunks dist-pages/_worker.js/
+          cp dist/server/entry.mjs dist-pages/_worker.js/index.js
+          cp dist/server/virtual_astro_middleware.mjs dist-pages/_worker.js/
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=plantgotchi
+          command: pages deploy dist-pages --project-name=plantgotchi --commit-dirty=true
           workingDirectory: website-astro

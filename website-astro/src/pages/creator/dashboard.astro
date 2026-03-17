@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CreatorDashboard from "../../components/ui/organisms/CreatorDashboard";
+import { getSession } from "../../lib/auth";
+
+const session = await getSession(Astro.request);
+if (!session) return Astro.redirect("/login");
+---
+
+<BaseLayout title="Creator Dashboard">
+  <CreatorDashboard client:load />
+</BaseLayout>
