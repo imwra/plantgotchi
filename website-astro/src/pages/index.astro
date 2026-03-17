@@ -36,6 +36,18 @@ const VENT_LINES = [0, 1, 2, 3, 4, 5, 6];
 const LED_DOTS = [0, 1, 2];
 
 const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plant", "bg-accent-red", "bg-accent-blue"];
+
+const SEG_HP = [0,1,2,3,4,5,6,7,8,9];
+const SEG_MOIST = [0,1,2,3,4,5,6,7];
+const SPARK_DATA = [
+  [40,55,45,60,50,70,65],
+  [60,50,40,35,30,25,31],
+  [70,75,80,78,82,85,85],
+  [0,0,0,0,0,0,0],
+  [50,55,48,60,52,58,55],
+  [0,0,0,0,0,0,0],
+];
+const DETAIL_CHART_NEW = [55,62,58,70,64,72,68];
 ---
 
 <BaseLayout title={content.meta.title} description={content.meta.description}>
@@ -603,7 +615,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
         <!-- Desktop mockup -->
         <div class="mb-10">
           <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.desktopView}</div>
-          <div class="rounded-xl overflow-hidden pixel-border shadow-lg bg-cream">
+          <div class="rounded-xl overflow-hidden pixel-border shadow-lg bg-[#f5f0e1]">
             <!-- Browser title bar -->
             <div class="bg-pixel-black px-4 py-2 flex items-center gap-2">
               <div class="flex gap-1.5">
@@ -617,134 +629,172 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             </div>
 
             <!-- Dashboard content -->
-            <div class="p-4">
-              <!-- Top bar -->
-              <div class="flex items-center justify-between mb-4">
-                <div>
-                  <h3 class="pixel-font text-[9px] text-green-dark">{content.dashboardMockup.title}</h3>
-                  <div class="flex gap-3 mt-1">
-                    <span class="text-[7px] text-pixel-gray">🌱 {content.dashboardMockup.plantsCount}</span>
-                    <span class="text-[7px] text-pixel-gray">😊 {content.dashboardMockup.happyCount}</span>
-                    <span class="text-[7px] text-pixel-gray">📡 {content.dashboardMockup.sensorsCount}</span>
+            <div class="p-3 sm:p-4">
+              <!-- Header bar -->
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-5 h-5 flex items-center justify-center">
+                    <svg viewBox="0 0 20 20" width="20" height="20"><path d="M10 2C7 2 4 5 4 8C4 11 7 13 10 13C13 13 16 11 16 8C16 5 13 2 10 2Z" fill="#4CAF50"/><path d="M9.5 13L9.5 17L10.5 17L10.5 13Z" fill="#2E7D32"/><path d="M7 6Q10 3 13 6" fill="none" stroke="#81C784" stroke-width="1"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="pixel-font text-[9px] text-green-dark leading-none">{content.dashboardMockup.headerTitle}</h3>
+                    <p class="pixel-font text-[4px] text-pixel-gray mt-0.5">{content.dashboardMockup.headerSubtitle}</p>
                   </div>
                 </div>
-                <div class="bg-cream-dark rounded px-3 py-1.5 pixel-border">
-                  <span class="pixel-font text-[6px] text-accent-orange">💧 {content.dashboardMockup.needsWater}</span>
+                <div class="bg-cream rounded-full px-3 py-1 border border-pixel-gray/20">
+                  <span class="pixel-font text-[6px] text-pixel-black">{content.dashboardMockup.clock}</span>
                 </div>
               </div>
 
-              <div class="flex gap-4">
+              <!-- Stats pills -->
+              <div class="flex gap-2 mb-3 flex-wrap">
+                <span class="pixel-font text-[5px] bg-cream rounded-full px-2.5 py-1 border border-pixel-gray/20">{`🌱 ${content.dashboardMockup.statsPlants}`}</span>
+                <span class="pixel-font text-[5px] bg-cream rounded-full px-2.5 py-1 border border-pixel-gray/20">{`😊 ${content.dashboardMockup.statsHappy}`}</span>
+                <span class="pixel-font text-[5px] bg-cream rounded-full px-2.5 py-1 border border-pixel-gray/20">{`📡 ${content.dashboardMockup.statsSensors}`}</span>
+                <span class="pixel-font text-[5px] bg-accent-orange/20 text-accent-orange rounded-full px-2.5 py-1 border border-accent-orange/30">{`🌧 ${content.dashboardMockup.statsNeedWater}`}</span>
+              </div>
+
+              <div class="flex gap-3">
                 <!-- Plant cards grid -->
-                <div class="flex-1">
-                  <div class="flex items-center justify-between mb-2">
-                    <span class="pixel-font text-[7px] text-pixel-black">{content.dashboardMockup.allPlants}</span>
+                <div class="flex-1 min-w-0">
+                  <div class="mb-2">
+                    <span class="pixel-font text-[6px] text-pixel-black">{content.dashboardMockup.allPlantsLabel}</span>
                   </div>
-                  <div class="grid grid-cols-3 gap-2">
-                    {GARDEN_PLANTS.map((plant, i) => {
-                      const hpColor = plant.hp > 80 ? "bg-green-plant" : plant.hp > 50 ? "bg-accent-orange" : "bg-accent-red";
-                      const moistColor = plant.moisture > 60 ? "bg-accent-blue" : plant.moisture > 35 ? "bg-green-plant" : "bg-accent-orange";
-                      const statusKey = plant.status === "happy" ? "statusHappy" : plant.status === "thirsty" ? "statusThirsty" : "statusNeedsLight";
-                      return (
-                        <div class={`bg-white/80 rounded-lg p-2.5 pixel-border ${i === 0 ? "ring-2 ring-green-plant" : ""}`}>
-                          <div class="flex items-center gap-2 mb-1.5">
-                            <!-- Pixel plant icon -->
-                            <div class="flex items-end justify-center w-6 h-6">
-                              <div class="w-2 h-1.5 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                              <div class="w-1 h-4 bg-green-dark"></div>
-                              <div class="w-2 h-1.5 bg-green-plant rounded-sm rotate-[15deg]"></div>
-                            </div>
-                            <div>
-                              <p class="pixel-font text-[5px] text-green-dark">{plant.name}</p>
-                              <p class="text-[5px] text-pixel-gray">{plant.type}</p>
-                            </div>
+                  <div class="grid grid-cols-2 gap-2">
+                    {content.dashboardMockup.plants.map((plant: any, i: number) => (
+                      <div class={`bg-cream rounded-lg p-2 pixel-border relative ${i === 0 ? "ring-1 ring-green-plant" : ""}`}>
+                        <div class="flex items-start justify-between mb-1">
+                          <div class="min-w-0 flex-1">
+                            <p class="pixel-font text-[5px] text-pixel-black leading-tight truncate">{plant.name}</p>
+                            <p class="text-[4px] text-pixel-gray truncate italic">{plant.species}</p>
                           </div>
-                          <!-- HP bar -->
-                          <div class="mb-1">
-                            <div class="flex justify-between mb-0.5">
-                              <span class="pixel-font text-[4px] text-pixel-gray">HP</span>
-                              <span class="pixel-font text-[4px] text-pixel-gray">{plant.hp}%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-cream-dark rounded-sm">
-                              <div class={`h-full ${hpColor} rounded-sm`} style={`width: ${plant.hp}%;`}></div>
-                            </div>
+                          <span class={`pixel-font text-[3.5px] px-1.5 py-0.5 rounded-sm shrink-0 ml-1 ${plant.status === "happy" ? "bg-green-plant text-cream" : plant.status === "thirsty" ? "bg-accent-orange text-cream" : "bg-pixel-gray/30 text-pixel-gray"}`}>
+                            {plant.status === "happy" ? content.dashboardMockup.statusHappy : plant.status === "thirsty" ? content.dashboardMockup.statusThirsty : content.dashboardMockup.statusManual}
+                          </span>
+                        </div>
+                        <div class="flex gap-1.5 items-center mb-1">
+                          <div class="w-8 h-8 flex items-end justify-center shrink-0">
+                            {i === 0 && <div class="relative"><div class="w-2.5 h-2 bg-green-plant rounded-sm rotate-[-25deg] absolute -left-2 top-0"></div><div class="w-2.5 h-2 bg-green-plant rounded-sm rotate-[25deg] absolute -right-2 top-0"></div><div class="w-2.5 h-3 bg-green-plant rounded-sm rotate-[-10deg] absolute -left-1 -top-2"></div><div class="w-2.5 h-3 bg-green-plant rounded-sm rotate-[10deg] absolute -right-1 -top-2"></div><div class="w-1 h-4 bg-green-dark mx-auto"></div><div class="w-4 h-2 bg-brown rounded-sm mx-auto -mt-px"></div></div>}
+                            {i === 1 && <div class="relative"><div class="w-3 h-2 bg-green-light rounded-full mx-auto"></div><div class="w-4 h-2.5 bg-green-plant rounded-full mx-auto -mt-1"></div><div class="w-5 h-3 bg-green-dark rounded-full mx-auto -mt-1.5"></div><div class="w-3 h-1.5 bg-brown rounded-sm mx-auto mt-px"></div></div>}
+                            {i === 2 && <div class="relative"><div class="w-1.5 h-3 bg-green-plant rounded-t-full rotate-[-20deg] absolute -left-1 top-0"></div><div class="w-1.5 h-3.5 bg-green-plant rounded-t-full rotate-[-8deg] absolute left-0 -top-1"></div><div class="w-1.5 h-4 bg-green-dark rounded-t-full mx-auto"></div><div class="w-1.5 h-3.5 bg-green-plant rounded-t-full rotate-[8deg] absolute right-0 -top-1"></div><div class="w-1.5 h-3 bg-green-plant rounded-t-full rotate-[20deg] absolute -right-1 top-0"></div><div class="w-4 h-2 bg-brown rounded-sm mx-auto mt-px"></div></div>}
+                            {i === 3 && <div class="relative"><div class="w-1.5 h-6 bg-green-dark rounded-t-sm mx-auto"></div><div class="w-1.5 h-5 bg-green-plant rounded-t-sm absolute -left-1 top-1"></div><div class="w-1.5 h-5 bg-green-plant rounded-t-sm absolute -right-1 top-1"></div><div class="w-4 h-2 bg-brown rounded-sm mx-auto mt-px"></div></div>}
+                            {i === 4 && <div class="relative"><div class="w-4 h-3 bg-green-plant rounded-full rotate-[-15deg] absolute -left-1 -top-1"></div><div class="w-4 h-3 bg-green-dark rounded-full rotate-[15deg] absolute -right-1 -top-1"></div><div class="w-3 h-3 bg-green-light rounded-full mx-auto -mt-0.5"></div><div class="w-1 h-3 bg-green-dark mx-auto mt-0.5"></div><div class="w-4 h-2 bg-brown rounded-sm mx-auto -mt-px"></div></div>}
+                            {i === 5 && <div class="relative"><div class="w-2 h-5 bg-green-dark rounded-t-full mx-auto"></div><div class="w-1 h-1 bg-green-plant rounded-full absolute -right-0.5 top-1"></div><div class="w-1 h-1 bg-green-plant rounded-full absolute -left-0.5 top-2"></div><div class="w-3 h-2 bg-brown rounded-sm mx-auto mt-px"></div></div>}
                           </div>
-                          <!-- Moisture bar -->
-                          <div>
-                            <div class="flex justify-between mb-0.5">
-                              <span class="pixel-font text-[4px] text-pixel-gray">💧</span>
-                              <span class="pixel-font text-[4px] text-pixel-gray">{plant.moisture}%</span>
+                          {plant.hasSensor ? (
+                            <div class="flex-1 min-w-0">
+                              <div class="flex items-center gap-1 mb-0.5">
+                                <span class="pixel-font text-[3.5px] text-pixel-gray w-4">{content.dashboardMockup.hp}</span>
+                                <div class="flex gap-px flex-1">
+                                  {SEG_HP.map((si) => (
+                                    <div class={si < Math.round(plant.hp / 10) ? "w-[5px] h-[6px] rounded-[1px] bg-green-plant" : "w-[5px] h-[6px] rounded-[1px] bg-pixel-gray opacity-15"}></div>
+                                  ))}
+                                </div>
+                                <span class="pixel-font text-[3.5px] text-pixel-gray">{plant.hp}%</span>
+                              </div>
+                              <div class="flex items-center gap-1">
+                                <span class="pixel-font text-[3.5px] text-pixel-gray w-4">💧</span>
+                                <div class="flex gap-px flex-1">
+                                  {SEG_MOIST.map((si) => (
+                                    <div class={si < Math.round(plant.moisture / 12.5) ? "w-[5px] h-[6px] rounded-[1px] bg-accent-blue" : "w-[5px] h-[6px] rounded-[1px] bg-pixel-gray opacity-15"}></div>
+                                  ))}
+                                </div>
+                                <span class="pixel-font text-[3.5px] text-pixel-gray">{plant.moisture}%</span>
+                              </div>
                             </div>
-                            <div class="w-full h-1.5 bg-cream-dark rounded-sm">
-                              <div class={`h-full ${moistColor} rounded-sm`} style={`width: ${plant.moisture}%;`}></div>
+                          ) : (
+                            <div class="flex-1 flex items-center justify-center">
+                              <span class="pixel-font text-[4px] text-pixel-gray bg-pixel-gray/10 rounded px-2 py-1">{content.dashboardMockup.noSensor}</span>
                             </div>
+                          )}
+                        </div>
+                        <div class="flex items-center justify-between">
+                          <div class="flex gap-2">
+                            {plant.hasSensor && <span class="text-[4px] text-pixel-gray">{`🌡 ${plant.temp}°`}</span>}
+                            {plant.hasSensor && plant.light && <span class="text-[4px] text-pixel-gray">{`☀ ${plant.light}`}</span>}
                           </div>
-                          <div class="mt-1">
-                            <span class={`pixel-font text-[3.5px] ${plant.status === "happy" ? "text-green-plant" : plant.status === "thirsty" ? "text-accent-orange" : "text-accent-blue"}`}>
-                              {content.dashboardMockup[statusKey]}
+                          {plant.hasSensor && (
+                            <div class="flex items-end gap-px h-3 w-8">
+                              {SPARK_DATA[i].map((v) => (
+                                <div class="flex-1 bg-green-plant/40 rounded-t-sm" style={`height:${Math.max(v, 5)}%`}></div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div class="flex items-center justify-between mt-0.5">
+                          <span class="text-[3.5px] text-pixel-gray">{`🕐 ${plant.timeAgo}`}</span>
+                          {plant.hasSensor ? (
+                            <span class="flex items-center gap-0.5">
+                              <span class="w-1 h-1 bg-green-plant rounded-full animate-pulse-glow"></span>
+                              <span class="pixel-font text-[3px] text-green-plant">{`📡 ${content.dashboardMockup.live}`}</span>
                             </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <!-- Detail sidebar -->
-                <div class="w-48 bg-white/80 rounded-lg p-3 pixel-border hidden sm:block">
-                  <div class="text-center mb-3">
-                    <div class="flex items-end justify-center gap-1 h-10 mb-1">
-                      <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                      <div class="w-1.5 h-7 bg-green-dark"></div>
-                      <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[15deg]"></div>
-                    </div>
-                    <div class="mx-auto w-5 h-2.5 bg-brown rounded-sm"></div>
-                    <p class="pixel-font text-[6px] text-green-dark mt-1">Fern-ando</p>
-                    <p class="text-[5px] text-pixel-gray">Boston Fern</p>
-                  </div>
-
-                  <div class="flex gap-1 mb-3">
-                    <span class="pixel-font text-[4px] bg-green-plant text-cream px-1.5 py-0.5 rounded">{content.dashboardMockup.overview}</span>
-                    <span class="pixel-font text-[4px] text-pixel-gray px-1.5 py-0.5">{content.dashboardMockup.sensors}</span>
-                    <span class="pixel-font text-[4px] text-pixel-gray px-1.5 py-0.5">{content.dashboardMockup.history}</span>
-                  </div>
-
-                  <!-- Stats -->
-                  <div class="space-y-1.5 mb-3">
-                    {DETAIL_STATS.map((st) => (
-                      <div>
-                        <div class="flex justify-between">
-                          <span class="pixel-font text-[4px] text-pixel-gray">{st.label}</span>
-                          <span class="pixel-font text-[4px]">{st.value}</span>
-                        </div>
-                        <div class="w-full h-1.5 bg-cream-dark rounded-sm">
-                          <div class={`h-full ${st.color} rounded-sm`} style={`width: ${st.pct}%;`}></div>
+                          ) : (
+                            <span class="pixel-font text-[3px] text-pixel-gray">{content.dashboardMockup.statusManual}</span>
+                          )}
                         </div>
                       </div>
                     ))}
                   </div>
+                </div>
 
-                  <!-- Mini chart -->
-                  <div class="bg-cream-dark rounded p-2">
-                    <span class="pixel-font text-[4px] text-pixel-gray">{content.dashboardMockup.weekTrend}</span>
-                    <div class="flex items-end gap-0.5 h-6 mt-1">
-                      {DETAIL_CHART.map((v) => (
-                        <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
+                <!-- Detail sidebar -->
+                <div class="w-44 shrink-0 bg-cream rounded-lg p-2.5 pixel-border hidden sm:flex flex-col">
+                  <span class="pixel-font text-[5px] text-pixel-black mb-2">{content.dashboardMockup.plantDetailsLabel}</span>
+                  <div class="flex flex-col items-center mb-2">
+                    <div class="w-12 h-12 flex items-end justify-center mb-1">
+                      <div class="relative">
+                        <div class="w-3 h-2.5 bg-green-plant rounded-sm rotate-[-25deg] absolute -left-2.5 top-0"></div>
+                        <div class="w-3 h-2.5 bg-green-plant rounded-sm rotate-[25deg] absolute -right-2.5 top-0"></div>
+                        <div class="w-3 h-4 bg-green-plant rounded-sm rotate-[-10deg] absolute -left-1.5 -top-3"></div>
+                        <div class="w-3 h-4 bg-green-plant rounded-sm rotate-[10deg] absolute -right-1.5 -top-3"></div>
+                        <div class="w-3 h-3.5 bg-green-light rounded-sm mx-auto -mt-2"></div>
+                        <div class="w-1.5 h-5 bg-green-dark mx-auto"></div>
+                        <div class="w-6 h-3 bg-brown rounded-sm mx-auto -mt-px"></div>
+                      </div>
+                    </div>
+                    <p class="pixel-font text-[6px] text-pixel-black">{content.dashboardMockup.detailPlant.name}</p>
+                    <p class="text-[4px] text-pixel-gray italic">{content.dashboardMockup.detailPlant.species}</p>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-1.5 mb-2">
+                    <div class="bg-accent-blue/15 rounded p-1.5 text-center">
+                      <span class="pixel-font text-[3.5px] text-pixel-gray block">{content.dashboardMockup.moisture}</span>
+                      <span class="pixel-font text-[6px] text-accent-blue">{content.dashboardMockup.detailPlant.moisture}</span>
+                    </div>
+                    <div class="bg-green-plant/15 rounded p-1.5 text-center">
+                      <span class="pixel-font text-[3.5px] text-pixel-gray block">{content.dashboardMockup.temp}</span>
+                      <span class="pixel-font text-[6px] text-green-dark">{content.dashboardMockup.detailPlant.temp}</span>
+                    </div>
+                    <div class="bg-accent-orange/15 rounded p-1.5 text-center">
+                      <span class="pixel-font text-[3.5px] text-pixel-gray block">{content.dashboardMockup.light}</span>
+                      <span class="pixel-font text-[6px] text-accent-orange">{content.dashboardMockup.detailPlant.light}</span>
+                    </div>
+                    <div class="bg-green-plant/15 rounded p-1.5 text-center">
+                      <span class="pixel-font text-[3.5px] text-pixel-gray block">{content.dashboardMockup.hp}</span>
+                      <span class="pixel-font text-[6px] text-green-dark">{content.dashboardMockup.detailPlant.hp}</span>
+                    </div>
+                  </div>
+
+                  <div class="bg-cream-dark/60 rounded p-1.5 mb-2">
+                    <span class="pixel-font text-[3.5px] text-pixel-gray">{content.dashboardMockup.moistureChart}</span>
+                    <div class="flex items-end gap-0.5 h-8 mt-1">
+                      {DETAIL_CHART_NEW.map((v) => (
+                        <div class="flex-1 bg-accent-blue/60 rounded-t-sm" style={`height: ${v}%;`}></div>
                       ))}
                     </div>
                   </div>
 
-                  <!-- Care info -->
-                  <div class="mt-2 space-y-1">
-                    <div class="flex justify-between">
-                      <span class="text-[5px] text-pixel-gray">{content.dashboardMockup.lastWatered}</span>
-                      <span class="pixel-font text-[4px] text-pixel-black">{content.dashboardMockup.daysAgo}</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-[5px] text-pixel-gray">{content.dashboardMockup.nextWater}</span>
-                      <span class="pixel-font text-[4px] text-green-plant">{content.dashboardMockup.tomorrow}</span>
-                    </div>
+                  <div class="flex gap-1 mt-auto">
+                    <span class="flex-1 pixel-font text-[3.5px] bg-accent-blue text-cream py-1 rounded-sm text-center">{`💧 ${content.dashboardMockup.btnWater}`}</span>
+                    <span class="flex-1 pixel-font text-[3.5px] bg-green-plant text-cream py-1 rounded-sm text-center">{`📝 ${content.dashboardMockup.btnLog}`}</span>
+                    <span class="flex-1 pixel-font text-[3.5px] bg-cream text-pixel-black py-1 rounded-sm text-center border border-pixel-gray/20">{`✏ ${content.dashboardMockup.btnEdit}`}</span>
                   </div>
                 </div>
+              </div>
+
+              <!-- Dashboard footer -->
+              <div class="mt-3 pt-2 border-t border-pixel-gray/10 text-center">
+                <span class="pixel-font text-[4px] text-pixel-gray/60">{content.dashboardMockup.footer}</span>
               </div>
             </div>
           </div>
@@ -756,49 +806,87 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.mobileView}</div>
             <div class="border-4 border-pixel-black rounded-[24px] bg-pixel-black p-1.5 shadow-lg">
               <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg relative z-10"></div>
-              <div class="rounded-[18px] overflow-hidden -mt-1.5 bg-cream">
-                <div class="p-3">
+              <div class="rounded-[18px] overflow-hidden -mt-1.5 bg-[#f5f0e1]">
+                <div class="p-2.5">
                   <!-- Mobile header -->
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="pixel-font text-[7px] text-green-dark">{content.dashboardMockup.title}</span>
-                    <div class="flex gap-1.5">
-                      <span class="text-[6px] text-pixel-gray">🌱 6</span>
-                      <span class="text-[6px] text-pixel-gray">📡 4</span>
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-1">
+                      <svg viewBox="0 0 20 20" width="12" height="12"><path d="M10 2C7 2 4 5 4 8C4 11 7 13 10 13C13 13 16 11 16 8C16 5 13 2 10 2Z" fill="#4CAF50"/><path d="M9.5 13L9.5 17L10.5 17L10.5 13Z" fill="#2E7D32"/></svg>
+                      <span class="pixel-font text-[6px] text-green-dark">{content.dashboardMockup.headerTitle}</span>
+                    </div>
+                    <div class="bg-cream rounded-full px-1.5 py-0.5 border border-pixel-gray/20">
+                      <span class="pixel-font text-[4px] text-pixel-black">{content.dashboardMockup.clock}</span>
                     </div>
                   </div>
+                  <p class="pixel-font text-[3px] text-pixel-gray mb-2">{content.dashboardMockup.headerSubtitle}</p>
 
-                  <!-- Mobile plant cards (show first 4) -->
-                  <div class="space-y-2">
-                    {GARDEN_PLANTS.slice(0, 4).map((plant) => {
-                      const hpColor = plant.hp > 80 ? "bg-green-plant" : plant.hp > 50 ? "bg-accent-orange" : "bg-accent-red";
-                      const moistColor = plant.moisture > 60 ? "bg-accent-blue" : plant.moisture > 35 ? "bg-green-plant" : "bg-accent-orange";
-                      return (
-                        <div class="bg-white/80 rounded-lg p-2 pixel-border flex items-center gap-2">
-                          <div class="flex items-end justify-center w-6 h-6 shrink-0">
-                            <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                            <div class="w-0.5 h-3 bg-green-dark"></div>
-                            <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[15deg]"></div>
-                          </div>
-                          <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-center">
-                              <p class="pixel-font text-[5px] text-green-dark">{plant.name}</p>
-                              <span class="pixel-font text-[4px] text-pixel-gray">{plant.hp}% HP</span>
-                            </div>
-                            <div class="flex gap-1.5 mt-1">
-                              <div class="flex-1 h-1.5 bg-cream-dark rounded-sm">
-                                <div class={`h-full ${hpColor} rounded-sm`} style={`width: ${plant.hp}%;`}></div>
-                              </div>
-                              <div class="flex-1 h-1.5 bg-cream-dark rounded-sm">
-                                <div class={`h-full ${moistColor} rounded-sm`} style={`width: ${plant.moisture}%;`}></div>
-                              </div>
-                            </div>
-                          </div>
+                  <!-- Mobile stats pills -->
+                  <div class="flex gap-1 mb-2 flex-wrap">
+                    <span class="pixel-font text-[3.5px] bg-cream rounded-full px-1.5 py-0.5 border border-pixel-gray/20">{`🌱 ${content.dashboardMockup.statsPlants}`}</span>
+                    <span class="pixel-font text-[3.5px] bg-cream rounded-full px-1.5 py-0.5 border border-pixel-gray/20">{`😊 ${content.dashboardMockup.statsHappy}`}</span>
+                    <span class="pixel-font text-[3.5px] bg-accent-orange/20 text-accent-orange rounded-full px-1.5 py-0.5 border border-accent-orange/30">{`🌧 ${content.dashboardMockup.statsNeedWater}`}</span>
+                  </div>
+
+                  <span class="pixel-font text-[4px] text-pixel-black mb-1 block">{content.dashboardMockup.allPlantsLabel}</span>
+
+                  <!-- Mobile plant cards -->
+                  <div class="space-y-1.5">
+                    {content.dashboardMockup.plants.map((plant: any, i: number) => (
+                      <div class="bg-cream rounded-lg p-1.5 pixel-border flex items-center gap-1.5">
+                        <div class="w-5 h-5 flex items-end justify-center shrink-0">
+                          {(i === 0 || i === 4) && <Fragment><div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[-15deg]"></div><div class="w-0.5 h-3 bg-green-dark"></div><div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[15deg]"></div></Fragment>}
+                          {i === 1 && <div class="w-3 h-2 bg-green-plant rounded-full"></div>}
+                          {i === 2 && <Fragment><div class="w-1 h-2.5 bg-green-plant rounded-t-full rotate-[-10deg]"></div><div class="w-1 h-3 bg-green-dark rounded-t-full"></div><div class="w-1 h-2.5 bg-green-plant rounded-t-full rotate-[10deg]"></div></Fragment>}
+                          {i === 3 && <Fragment><div class="w-1 h-4 bg-green-dark rounded-t-sm"></div><div class="w-1 h-3.5 bg-green-plant rounded-t-sm -ml-px"></div></Fragment>}
+                          {i === 5 && <div class="w-1.5 h-3 bg-green-dark rounded-t-full"></div>}
                         </div>
-                      );
-                    })}
-                    <div class="text-center">
-                      <span class="pixel-font text-[4px] text-pixel-gray">{content.iosScreens.morePlants}</span>
-                    </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-start justify-between">
+                            <div class="min-w-0">
+                              <p class="pixel-font text-[4px] text-pixel-black truncate">{plant.name}</p>
+                              <p class="text-[3px] text-pixel-gray truncate italic">{plant.species}</p>
+                            </div>
+                            <span class={`pixel-font text-[3px] px-1 py-px rounded-sm shrink-0 ml-1 ${plant.status === "happy" ? "bg-green-plant text-cream" : plant.status === "thirsty" ? "bg-accent-orange text-cream" : "bg-pixel-gray/30 text-pixel-gray"}`}>
+                              {plant.status === "happy" ? content.dashboardMockup.statusHappy : plant.status === "thirsty" ? content.dashboardMockup.statusThirsty : content.dashboardMockup.statusManual}
+                            </span>
+                          </div>
+                          {plant.hasSensor ? (
+                            <div class="mt-0.5">
+                              <div class="flex items-center gap-0.5">
+                                <span class="pixel-font text-[3px] text-pixel-gray">HP</span>
+                                <div class="flex gap-px flex-1">
+                                  {SEG_HP.map((si) => (
+                                    <div class={si < Math.round(plant.hp / 10) ? "w-[3px] h-[4px] rounded-[0.5px] bg-green-plant" : "w-[3px] h-[4px] rounded-[0.5px] bg-pixel-gray opacity-15"}></div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div class="flex items-center gap-0.5 mt-px">
+                                <span class="pixel-font text-[3px] text-pixel-gray">💧</span>
+                                <div class="flex gap-px flex-1">
+                                  {SEG_MOIST.map((si) => (
+                                    <div class={si < Math.round(plant.moisture / 12.5) ? "w-[3px] h-[4px] rounded-[0.5px] bg-accent-blue" : "w-[3px] h-[4px] rounded-[0.5px] bg-pixel-gray opacity-15"}></div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <span class="pixel-font text-[3px] text-pixel-gray mt-0.5 block">{content.dashboardMockup.noSensor}</span>
+                          )}
+                        </div>
+                        {plant.hasSensor && (
+                          <div class="flex items-end gap-px h-3 w-6 shrink-0">
+                            {SPARK_DATA[i].map((v) => (
+                              <div class="flex-1 bg-green-plant/40 rounded-t-sm" style={`height:${Math.max(v, 5)}%`}></div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <!-- Mobile footer -->
+                  <div class="mt-2 pt-1.5 border-t border-pixel-gray/10 text-center">
+                    <span class="pixel-font text-[3px] text-pixel-gray/60">{content.dashboardMockup.footer}</span>
                   </div>
                 </div>
               </div>
