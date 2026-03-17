@@ -50,6 +50,13 @@ class PlantgotchiApp : Application() {
             httpClient = httpClient,
         )
 
+        // When AuthInterceptor sees a 401, propagate to AuthService so UI reacts
+        CoroutineScope(Dispatchers.Main).launch {
+            authInterceptor.signOutEvents.collect {
+                authService.signOut()
+            }
+        }
+
         seedDemoDataIfNeeded()
 
         // Initialize PostHog analytics
