@@ -10,6 +10,9 @@ export interface ChatPanelProps {
   onSelectConversation?: (id: string) => void;
   onSend?: (message: string) => void;
   onNewConversation?: () => void;
+  onImageClick?: () => void;
+  onReact?: (messageId: string, emoji: string) => void;
+  onRemoveReaction?: (reactionId: string) => void;
   typingUsers?: string[];
   labels?: ChatLabels;
 }
@@ -21,6 +24,9 @@ export default function ChatPanel({
   onSelectConversation,
   onSend,
   onNewConversation,
+  onImageClick,
+  onReact,
+  onRemoveReaction,
   typingUsers = [],
   labels = DEFAULT_CHAT_LABELS,
 }: ChatPanelProps) {
@@ -64,6 +70,9 @@ export default function ChatPanel({
             memberCount={activeConversation.memberCount}
             typingUsers={typingUsers}
             onSend={onSend}
+            onImageClick={onImageClick}
+            onReact={onReact}
+            onRemoveReaction={onRemoveReaction}
             onBack={() => onSelectConversation?.('')}
             labels={{
               inputPlaceholder: labels.inputPlaceholder,

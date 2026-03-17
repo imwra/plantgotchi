@@ -301,7 +301,7 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
       const res = await fetch('/api/chat/conversations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'dm', memberIds: [userId] }),
+        body: JSON.stringify({ type: 'dm', userId }),
       });
       if (res.ok) {
         const conv = await res.json();
@@ -357,6 +357,71 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
     }
   };
 
+  // ---- Reactions ----
+  const handleReact = async (messageId: string, emoji: string) => {
+    try {
+      const res = await fetch('/api/chat/reactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, emoji }),
+      });
+      if (res.ok) {
+        if (activeConversationId) {
+          const msgsRes = await fetch(`/api/chat/messages?conversationId=${activeConversationId}`);
+          if (msgsRes.ok) {
+            const data = await msgsRes.json();
+            const msgs = (data.messages ?? []).map((m: any) => ({
+              id: m.id,
+              content: m.content,
+              type: m.type ?? 'text',
+              isMine: m.is_mine ?? false,
+              timestamp: m.created_at ? relativeTime(m.created_at) : '',
+              timestampRaw: m.created_at ?? '',
+              senderName: m.sender_name ?? '',
+              senderEmoji: m.sender_emoji ?? '',
+              reactions: (m.reactions ?? []).map((r: any) => ({ emoji: r.emoji, count: r.count, reacted: r.reacted })),
+            }));
+            setMessages(msgs);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleRemoveReaction = async (reactionId: string) => {
+    try {
+      const res = await fetch('/api/chat/reactions', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reactionId }),
+      });
+      if (res.ok) {
+        if (activeConversationId) {
+          const msgsRes = await fetch(`/api/chat/messages?conversationId=${activeConversationId}`);
+          if (msgsRes.ok) {
+            const data = await msgsRes.json();
+            const msgs = (data.messages ?? []).map((m: any) => ({
+              id: m.id,
+              content: m.content,
+              type: m.type ?? 'text',
+              isMine: m.is_mine ?? false,
+              timestamp: m.created_at ? relativeTime(m.created_at) : '',
+              timestampRaw: m.created_at ?? '',
+              senderName: m.sender_name ?? '',
+              senderEmoji: m.sender_emoji ?? '',
+              reactions: (m.reactions ?? []).map((r: any) => ({ emoji: r.emoji, count: r.count, reacted: r.reacted })),
+            }));
+            setMessages(msgs);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   // ---- Handle send from ChatPanel ----
   const handleSend = (message: string) => {
     signalTyping();
@@ -406,6 +471,9 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
             onSelectConversation={handleSelectConversation}
             onSend={handleSend}
             onNewConversation={() => setShowNewConversation(true)}
+            onImageClick={handleImageUpload}
+            onReact={handleReact}
+            onRemoveReaction={handleRemoveReaction}
             typingUsers={typingUsers}
             labels={labels}
           />

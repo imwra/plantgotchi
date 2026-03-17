@@ -45,7 +45,9 @@ export interface ConversationViewProps {
   memberCount?: number;
   typingUsers?: string[];
   onSend?: (message: string) => void;
-  onReact?: (messageId: string) => void;
+  onImageClick?: () => void;
+  onReact?: (messageId: string, emoji: string) => void;
+  onRemoveReaction?: (reactionId: string) => void;
   onBack?: () => void;
   labels?: ConversationViewLabels;
 }
@@ -57,7 +59,9 @@ export default function ConversationView({
   memberCount,
   typingUsers = [],
   onSend,
+  onImageClick,
   onReact,
+  onRemoveReaction,
   onBack,
   labels = DEFAULT_LABELS,
 }: ConversationViewProps) {
@@ -99,6 +103,7 @@ export default function ConversationView({
         {messages.map((msg) => (
           <MessageBubble
             key={msg.id}
+            messageId={msg.id}
             content={msg.content}
             type={msg.type}
             isMine={msg.isMine}
@@ -107,7 +112,8 @@ export default function ConversationView({
             senderName={msg.senderName}
             senderEmoji={msg.senderEmoji}
             reactions={msg.reactions}
-            onReact={() => onReact?.(msg.id)}
+            onReact={(emoji) => onReact?.(msg.id, emoji)}
+            onRemoveReaction={onRemoveReaction}
           />
         ))}
 
@@ -125,6 +131,7 @@ export default function ConversationView({
         value={inputValue}
         onChange={setInputValue}
         onSend={handleSend}
+        onImageClick={onImageClick}
         placeholder={labels.inputPlaceholder}
       />
     </div>
