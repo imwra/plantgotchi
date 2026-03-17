@@ -8,5 +8,24 @@ const t = useTranslations(locale);
 ---
 
 <BaseLayout title={t("demo.title")}>
-  <GardenDashboard client:load userName="Demo" demoMode={true} demoBannerText={t("demo.banner")} />
+  <GardenDashboard
+    client:load
+    userName="Demo"
+    demoMode={true}
+    demoBannerText={t("demo.banner")}
+    locale={locale}
+    navLabels={{
+      home: t("nav.home"),
+      garden: t("nav.garden"),
+      help: t("nav.help"),
+      admin: t("nav.admin"),
+      login: t("nav.login"),
+      logout: t("nav.logout"),
+      toggleMenu: t("nav.toggleMenu"),
+      langPtbr: t("lang.pt-br"),
+      langEn: t("lang.en"),
+      langCurrentPtbr: t("lang.current.pt-br"),
+      langCurrentEn: t("lang.current.en"),
+    }}
+  />
 </BaseLayout>

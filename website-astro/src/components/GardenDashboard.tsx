@@ -119,6 +119,7 @@ function StatusBadge({ status }: { status: string }) {
       border: `1.5px solid ${c.color}33`,
       animation: status === "thirsty" ? "pulse 2s ease-in-out infinite" : "none",
       whiteSpace: "nowrap",
+      flexShrink: 0,
     }}>
       {c.icon} {c.label}
     </span>
@@ -137,7 +138,7 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
       style={{
         background: isSelected ? COLORS.bgCardHover : COLORS.bgCard,
         border: `2px solid ${isSelected ? COLORS.borderAccent : hovered ? COLORS.brownLight : COLORS.borderLight}`,
-        borderRadius: 10, cursor: "pointer",
+        borderRadius: 10, cursor: "pointer", overflow: "hidden",
         transition: "all 0.2s ease",
         boxShadow: isSelected
           ? `0 4px 16px ${COLORS.shadowMd}, 0 0 0 3px ${COLORS.primaryPale}`
@@ -145,7 +146,7 @@ function PlantCard({ plant, onClick, isSelected }: { plant: PlantView; onClick: 
         transform: hovered && !isSelected ? "translateY(-2px)" : "none",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10, flexWrap: "wrap", gap: 4 }}>
         <div style={{ minWidth: 0, flex: 1, marginRight: 8 }}>
           <div style={{
             fontFamily: PIXEL_FONT, fontSize: 9, color: COLORS.text, marginBottom: 3,
@@ -360,9 +361,11 @@ interface GardenDashboardProps {
   userName?: string;
   demoMode?: boolean;
   demoBannerText?: string;
+  locale?: string;
+  navLabels?: Record<string, string>;
 }
 
-export default function GardenDashboard({ userName, demoMode, demoBannerText }: GardenDashboardProps) {
+export default function GardenDashboard({ userName, demoMode, demoBannerText, locale, navLabels }: GardenDashboardProps) {
   const [plants, setPlants] = useState<PlantView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -412,7 +415,12 @@ export default function GardenDashboard({ userName, demoMode, demoBannerText }: 
       background: `linear-gradient(170deg, ${COLORS.bg} 0%, #e8e2ce 50%, #f5f0de 100%)`,
       fontFamily: PIXEL_FONT, color: COLORS.text,
     }}>
-      <SiteNav userName={userName} />
+      <SiteNav
+        userName={demoMode ? undefined : userName}
+        locale={locale as any}
+        labels={navLabels as any}
+        currentPath={typeof window !== 'undefined' ? window.location.pathname : '/'}
+      />
       {demoMode && (
         <div style={{
           background: COLORS.sunPale,
