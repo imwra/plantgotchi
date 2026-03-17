@@ -37,38 +37,29 @@ struct AddPlantView: View {
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Emoji picker
                         emojiPickerSection
-
-                        // Name & Species
                         nameSection
-
-                        // Light preference
                         lightSection
-
-                        // Moisture thresholds
                         moistureSection
-
-                        // Temperature thresholds
                         temperatureSection
                     }
                     .padding()
                 }
             }
-            .navigationTitle("New Plant")
+            .navigationTitle(S.newPlant)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button(S.cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { savePlant() }
+                    Button(S.save) { savePlant() }
                         .font(.body.weight(.semibold))
                         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
                 }
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {}
+            .alert(S.error, isPresented: $showError) {
+                Button(S.ok) {}
             } message: {
                 Text(errorMessage)
             }
@@ -117,15 +108,15 @@ struct AddPlantView: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("DETAILS")
+            Text(S.details)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
-            TextField("Plant name", text: $name)
+            TextField(S.plantName, text: $name)
                 .textFieldStyle(.roundedBorder)
                 .font(PlantgotchiTheme.bodyFont)
 
-            TextField("Species (optional)", text: $species)
+            TextField(S.speciesOptional, text: $species)
                 .textFieldStyle(.roundedBorder)
                 .font(PlantgotchiTheme.bodyFont)
         }
@@ -136,14 +127,14 @@ struct AddPlantView: View {
 
     private var lightSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("LIGHT PREFERENCE")
+            Text(S.lightPreference)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
-            Picker("Light", selection: $lightPreference) {
-                ForEach(lightOptions, id: \.self) { option in
-                    Text(option.capitalized).tag(option)
-                }
+            Picker(S.light, selection: $lightPreference) {
+                Text(S.lightLow).tag("low")
+                Text(S.lightMedium).tag("medium")
+                Text(S.lightHigh).tag("high")
             }
             .pickerStyle(.segmented)
         }
@@ -154,39 +145,35 @@ struct AddPlantView: View {
 
     private var moistureSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("MOISTURE RANGE")
+            Text(S.moistureRange)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             HStack {
                 Image(systemName: "drop.fill")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Min: \(Int(moistureMin))%")
+                Text(S.minValue(Int(moistureMin), unit: "%"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $moistureMin, in: 0...100, step: 5) {
-                Text("Minimum moisture")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: moistureMin) { _, newValue in
-                if newValue > moistureMax { moistureMax = newValue }
-            }
+            Slider(value: $moistureMin, in: 0...100, step: 5)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: moistureMin) { _, newValue in
+                    if newValue > moistureMax { moistureMax = newValue }
+                }
 
             HStack {
                 Image(systemName: "drop.fill")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Max: \(Int(moistureMax))%")
+                Text(S.maxValue(Int(moistureMax), unit: "%"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $moistureMax, in: 0...100, step: 5) {
-                Text("Maximum moisture")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: moistureMax) { _, newValue in
-                if newValue < moistureMin { moistureMin = newValue }
-            }
+            Slider(value: $moistureMax, in: 0...100, step: 5)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: moistureMax) { _, newValue in
+                    if newValue < moistureMin { moistureMin = newValue }
+                }
         }
         .plantgotchiCard()
     }
@@ -195,39 +182,35 @@ struct AddPlantView: View {
 
     private var temperatureSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("TEMPERATURE RANGE")
+            Text(S.temperatureRange)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             HStack {
                 Image(systemName: "thermometer.snowflake")
                     .foregroundColor(PlantgotchiTheme.blue)
-                Text("Min: \(Int(tempMin))\u{00B0}C")
+                Text(S.minValue(Int(tempMin), unit: "\u{00B0}C"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $tempMin, in: -10...50, step: 1) {
-                Text("Minimum temperature")
-            }
-            .tint(PlantgotchiTheme.blue)
-            .onChange(of: tempMin) { _, newValue in
-                if newValue > tempMax { tempMax = newValue }
-            }
+            Slider(value: $tempMin, in: -10...50, step: 1)
+                .tint(PlantgotchiTheme.blue)
+                .onChange(of: tempMin) { _, newValue in
+                    if newValue > tempMax { tempMax = newValue }
+                }
 
             HStack {
                 Image(systemName: "thermometer.sun.fill")
                     .foregroundColor(PlantgotchiTheme.red)
-                Text("Max: \(Int(tempMax))\u{00B0}C")
+                Text(S.maxValue(Int(tempMax), unit: "\u{00B0}C"))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(PlantgotchiTheme.text)
             }
-            Slider(value: $tempMax, in: -10...50, step: 1) {
-                Text("Maximum temperature")
-            }
-            .tint(PlantgotchiTheme.red)
-            .onChange(of: tempMax) { _, newValue in
-                if newValue < tempMin { tempMin = newValue }
-            }
+            Slider(value: $tempMax, in: -10...50, step: 1)
+                .tint(PlantgotchiTheme.red)
+                .onChange(of: tempMax) { _, newValue in
+                    if newValue < tempMin { tempMin = newValue }
+                }
         }
         .plantgotchiCard()
     }
@@ -259,7 +242,7 @@ struct AddPlantView: View {
             onSave?()
             dismiss()
         } catch {
-            errorMessage = "Failed to save plant: \(error.localizedDescription)"
+            errorMessage = "\(S.failedToSave): \(error.localizedDescription)"
             showError = true
         }
     }

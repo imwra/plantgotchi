@@ -7,6 +7,8 @@ import PostHog
 /// FAB navigates to AddPlantView.
 struct GardenView: View {
     @EnvironmentObject private var bleManager: BLEManager
+    @EnvironmentObject private var themeManager: ThemeManager
+    @ObservedObject private var localeManager = LocaleManager.shared
     @State private var plants: [Plant] = []
     @State private var plantViews: [PlantView] = []
     @State private var isLoading = false
@@ -25,7 +27,7 @@ struct GardenView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                PlantgotchiTheme.cream
+                PlantgotchiTheme.background
                     .ignoresSafeArea()
 
                 if plantViews.isEmpty && !isLoading {
@@ -68,7 +70,7 @@ struct GardenView: View {
                     }
                 }
             }
-            .navigationTitle("My Garden")
+            .navigationTitle(S.myGarden)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: { showScan = true }) {
@@ -91,7 +93,9 @@ struct GardenView: View {
             .sheet(isPresented: $showScan) {
                 ScanView()
             }
-            .sheet(isPresented: $showSettings) {
+            .sheet(isPresented: $showSettings, onDismiss: {
+                Task { await refreshPlants() }
+            }) {
                 SettingsView()
             }
             .task {
@@ -106,10 +110,10 @@ struct GardenView: View {
         VStack(spacing: 20) {
             Text("\u{1F331}")
                 .font(.system(size: 64))
-            Text("No plants yet!")
+            Text(S.noPlantsYet)
                 .font(PlantgotchiTheme.pixelFont(size: 14))
                 .foregroundColor(PlantgotchiTheme.text)
-            Text("Tap + to add your first plant")
+            Text(S.tapToAdd)
                 .font(PlantgotchiTheme.bodyFont)
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
         }
@@ -142,4 +146,5 @@ struct GardenView: View {
 #Preview {
     GardenView()
         .environmentObject(BLEManager())
+        .environmentObject(ThemeManager.shared)
 }

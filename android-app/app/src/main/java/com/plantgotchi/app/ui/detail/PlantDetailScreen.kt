@@ -1,5 +1,6 @@
 package com.plantgotchi.app.ui.detail
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,9 +35,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
+import com.plantgotchi.app.R
 import com.plantgotchi.app.agent.RuleEngine
 import com.plantgotchi.app.model.CareLog
 import com.plantgotchi.app.model.Recommendation
@@ -76,6 +80,7 @@ fun PlantDetailScreen(
         .collectAsState(initial = emptyList())
 
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val currentPlant = plant ?: return
 
@@ -109,7 +114,7 @@ fun PlantDetailScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.detail_back),
                         )
                     }
                 },
@@ -136,9 +141,9 @@ fun PlantDetailScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = when (status) {
-                            "happy" -> "\u2665 Happy"
-                            "thirsty" -> "\u2639 Needs attention"
-                            else -> "? No data"
+                            "happy" -> stringResource(R.string.status_happy)
+                            "thirsty" -> stringResource(R.string.status_needs_attention)
+                            else -> stringResource(R.string.status_no_data)
                         },
                         style = MaterialTheme.typography.titleMedium,
                         color = when (status) {
@@ -159,9 +164,9 @@ fun PlantDetailScreen(
 
             // HP bar
             item {
-                SensorCard(title = "Health") {
+                SensorCard(title = stringResource(R.string.detail_health)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("HP", style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.detail_hp), style = MaterialTheme.typography.labelMedium)
                         Spacer(modifier = Modifier.width(8.dp))
                         LinearProgressIndicator(
                             progress = { hp / 100f },
@@ -184,11 +189,11 @@ fun PlantDetailScreen(
 
             // Sensor readings
             item {
-                SensorCard(title = "Sensor Readings") {
-                    ReadingRow(label = "\uD83D\uDCA7 Moisture", value = moisture?.let { "$it%" } ?: "--")
-                    ReadingRow(label = "\uD83C\uDF21 Temp", value = temp?.let { "${"%.1f".format(it)}\u00B0C" } ?: "--")
-                    ReadingRow(label = "\u2600 Light", value = light?.let { "$it lux ($lightLabel)" } ?: "--")
-                    ReadingRow(label = "\uD83D\uDD0B Battery", value = battery?.let { "$it%" } ?: "--")
+                SensorCard(title = stringResource(R.string.detail_sensor_readings)) {
+                    ReadingRow(label = stringResource(R.string.detail_moisture), value = moisture?.let { "$it%" } ?: stringResource(R.string.detail_no_data))
+                    ReadingRow(label = stringResource(R.string.detail_temp), value = temp?.let { "${"%.1f".format(it)}\u00B0C" } ?: stringResource(R.string.detail_no_data))
+                    ReadingRow(label = stringResource(R.string.detail_light), value = light?.let { "$it lux ($lightLabel)" } ?: stringResource(R.string.detail_no_data))
+                    ReadingRow(label = stringResource(R.string.detail_battery), value = battery?.let { "$it%" } ?: stringResource(R.string.detail_no_data))
                 }
             }
 
@@ -200,6 +205,7 @@ fun PlantDetailScreen(
                 ) {
                     Button(
                         onClick = {
+                            val wateredNote = context.getString(R.string.detail_watered_note)
                             scope.launch {
                                 PlantgotchiApp.db.careLogDao().insert(
                                     CareLog(
@@ -207,7 +213,7 @@ fun PlantDetailScreen(
                                         plantId = plantId,
                                         userId = userId,
                                         action = "water",
-                                        notes = "Watered via app",
+                                        notes = wateredNote,
                                     )
                                 )
                                 PostHog.capture("care_logged", properties = mapOf(
@@ -219,10 +225,11 @@ fun PlantDetailScreen(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Blue),
                     ) {
-                        Text("\uD83D\uDCA7 Water")
+                        Text(stringResource(R.string.detail_water))
                     }
                     Button(
                         onClick = {
+                            val fertilizedNote = context.getString(R.string.detail_fertilized_note)
                             scope.launch {
                                 PlantgotchiApp.db.careLogDao().insert(
                                     CareLog(
@@ -230,7 +237,7 @@ fun PlantDetailScreen(
                                         plantId = plantId,
                                         userId = userId,
                                         action = "fertilize",
-                                        notes = "Fertilized via app",
+                                        notes = fertilizedNote,
                                     )
                                 )
                                 PostHog.capture("care_logged", properties = mapOf(
@@ -242,7 +249,7 @@ fun PlantDetailScreen(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(containerColor = Green),
                     ) {
-                        Text("\uD83C\uDF3F Fertilize")
+                        Text(stringResource(R.string.detail_fertilize))
                     }
                 }
             }
@@ -251,7 +258,7 @@ fun PlantDetailScreen(
             if (recommendations.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Recommendations",
+                        text = stringResource(R.string.detail_recommendations),
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
@@ -271,7 +278,7 @@ fun PlantDetailScreen(
             if (careLogs.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Care Log",
+                        text = stringResource(R.string.detail_care_log),
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
@@ -363,7 +370,7 @@ private fun RecommendationRow(
                 if (!recommendation.actedOn) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Tap to mark as done",
+                        text = stringResource(R.string.detail_tap_to_mark),
                         style = MaterialTheme.typography.labelSmall,
                         color = severityColor,
                         modifier = Modifier.clip(RoundedCornerShape(4.dp))
@@ -384,6 +391,16 @@ private fun CareLogRow(careLog: CareLog) {
         "repot" -> "\uD83E\uDEB4"
         else -> "\uD83D\uDCDD"
     }
+    val actionLabel = when (careLog.action) {
+        "water" -> stringResource(R.string.care_water)
+        "fertilize" -> stringResource(R.string.care_fertilize)
+        "prune" -> stringResource(R.string.care_prune)
+        "repot" -> stringResource(R.string.care_repot)
+        else -> careLog.action
+    }.replaceFirstChar { it.uppercase() }
+
+    val ctx = LocalContext.current
+    val timeAgo = careLog.createdAt?.let { formatTimeAgo(it, ctx) } ?: ""
 
     Row(
         modifier = Modifier
@@ -395,7 +412,7 @@ private fun CareLogRow(careLog: CareLog) {
         Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = careLog.action.replaceFirstChar { it.uppercase() },
+                text = actionLabel,
                 style = MaterialTheme.typography.bodyMedium,
             )
             if (careLog.notes != null) {
@@ -407,9 +424,32 @@ private fun CareLogRow(careLog: CareLog) {
             }
         }
         Text(
-            text = careLog.createdAt?.take(10) ?: "",
+            text = timeAgo,
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+private fun formatTimeAgo(isoTimestamp: String, context: Context): String {
+    return try {
+        val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+        val date = fmt.parse(isoTimestamp) ?: return isoTimestamp.take(10)
+        val diffMs = System.currentTimeMillis() - date.time
+        val diffMin = diffMs / 60_000
+        val diffHours = diffMin / 60
+        val diffDays = diffHours / 24
+
+        val isPt = context.resources.configuration.locales[0].language == "pt"
+
+        when {
+            diffMin < 1 -> if (isPt) "agora" else "now"
+            diffMin < 60 -> if (isPt) "${diffMin}min atrás" else "${diffMin}m ago"
+            diffHours < 24 -> if (isPt) "${diffHours}h atrás" else "${diffHours}h ago"
+            diffDays < 30 -> if (isPt) "${diffDays}d atrás" else "${diffDays}d ago"
+            else -> isoTimestamp.take(10)
+        }
+    } catch (_: Exception) {
+        isoTimestamp.take(10)
     }
 }

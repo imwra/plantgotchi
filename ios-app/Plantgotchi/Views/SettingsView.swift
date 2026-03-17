@@ -7,62 +7,59 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var bleManager: BLEManager
 
-    @State private var tursoUrl: String = ""
-    @State private var tursoAuthToken: String = ""
-    @State private var claudeAPIKey: String = ""
     @State private var userId: String = ""
     @State private var sensorMappings: [String: String] = [:]
     @State private var showSaveConfirmation = false
     @State private var showClearDataAlert = false
+    @State private var isDemoMode = !UserDefaults.standard.bool(forKey: "demoModeExplicitlyOff")
+    @State private var showDemoLoadedAlert = false
+    @ObservedObject private var themeManager = ThemeManager.shared
+    @ObservedObject private var localeManager = LocaleManager.shared
 
     var body: some View {
         NavigationStack {
             ZStack {
-                PlantgotchiTheme.cream
+                PlantgotchiTheme.background
                     .ignoresSafeArea()
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // User
                         userSection
-
-                        // Turso sync
-                        tursoSection
-
-                        // Claude API
-                        claudeSection
-
-                        // Sensors
                         sensorSection
-
-                        // Danger zone
+                        languageSection
+                        themeSection
+                        demoSection
                         dangerSection
-
-                        // App info
                         infoSection
                     }
                     .padding()
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(S.settings)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Close") { dismiss() }
+                    Button(S.close) { dismiss() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { saveSettings() }
+                    Button(S.save) { saveSettings() }
                         .font(.body.weight(.semibold))
                 }
+
             }
-            .alert("Settings Saved", isPresented: $showSaveConfirmation) {
-                Button("OK") {}
+            .alert(S.settingsSaved, isPresented: $showSaveConfirmation) {
+                Button(S.ok) {}
             }
-            .alert("Clear All Data?", isPresented: $showClearDataAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Clear", role: .destructive) { clearData() }
+            .alert(S.demoLoaded, isPresented: $showDemoLoadedAlert) {
+                Button(S.ok) {}
             } message: {
-                Text("This will delete all local plant data, sensor readings, and recommendations. This cannot be undone.")
+                Text(S.demoLoadedMsg)
+            }
+            .alert(S.clearDataTitle, isPresented: $showClearDataAlert) {
+                Button(S.cancel, role: .cancel) {}
+                Button(S.clear, role: .destructive) { clearData() }
+            } message: {
+                Text(S.clearDataMsg)
             }
             .onAppear { loadSettings() }
         }
@@ -72,70 +69,15 @@ struct SettingsView: View {
 
     private var userSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("USER")
+            Text(S.user)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
-            TextField("User ID", text: $userId)
+            TextField(S.userId, text: $userId)
                 .textFieldStyle(.roundedBorder)
                 .font(PlantgotchiTheme.bodyFont)
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
-        }
-        .plantgotchiCard()
-    }
-
-    // MARK: - Turso Section
-
-    private var tursoSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("TURSO CLOUD SYNC")
-                .font(PlantgotchiTheme.pixelFont(size: 9))
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-
-            Text("Connect to your Turso database for multi-device sync.")
-                .font(PlantgotchiTheme.captionFont)
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
-
-            TextField("Database URL", text: $tursoUrl)
-                .textFieldStyle(.roundedBorder)
-                .font(PlantgotchiTheme.bodyFont)
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .keyboardType(.URL)
-
-            SecureField("Auth Token", text: $tursoAuthToken)
-                .textFieldStyle(.roundedBorder)
-                .font(PlantgotchiTheme.bodyFont)
-
-            // Sync status
-            HStack {
-                Circle()
-                    .fill(TursoSync.shared.isConfigured ? PlantgotchiTheme.green : Color.gray)
-                    .frame(width: 8, height: 8)
-                Text(TursoSync.shared.isConfigured ? "Configured" : "Not configured")
-                    .font(PlantgotchiTheme.captionFont)
-                    .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
-            }
-        }
-        .plantgotchiCard()
-    }
-
-    // MARK: - Claude Section
-
-    private var claudeSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("CLAUDE AI ANALYSIS")
-                .font(PlantgotchiTheme.pixelFont(size: 9))
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-
-            Text("Add your Anthropic API key for AI-powered plant care recommendations (runs every 6 hours in background).")
-                .font(PlantgotchiTheme.captionFont)
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
-
-            SecureField("Anthropic API Key", text: $claudeAPIKey)
-                .textFieldStyle(.roundedBorder)
-                .font(PlantgotchiTheme.bodyFont)
         }
         .plantgotchiCard()
     }
@@ -144,7 +86,7 @@ struct SettingsView: View {
 
     private var sensorSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("PAIRED SENSORS")
+            Text(S.pairedSensors)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
@@ -152,7 +94,7 @@ struct SettingsView: View {
                 HStack {
                     Image(systemName: "sensor.tag.radiowaves.forward")
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
-                    Text("No sensors paired yet")
+                    Text(S.noSensorsPaired)
                         .font(PlantgotchiTheme.captionFont)
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
                 }
@@ -167,7 +109,7 @@ struct SettingsView: View {
                                 .font(.caption.monospaced())
                                 .foregroundColor(PlantgotchiTheme.text)
                             if let plantId = sensorMappings[sensorId] {
-                                Text("Plant: \(plantId.prefix(8))...")
+                                Text("\(S.plant): \(plantId.prefix(8))...")
                                     .font(.caption2)
                                     .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
                             }
@@ -184,7 +126,6 @@ struct SettingsView: View {
                 }
             }
 
-            // BLE connection status
             HStack {
                 Circle()
                     .fill(bleManager.state == .idle ? Color.gray : PlantgotchiTheme.green)
@@ -197,18 +138,93 @@ struct SettingsView: View {
         .plantgotchiCard()
     }
 
+    // MARK: - Language Section
+
+    private var languageSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(S.language)
+                .font(PlantgotchiTheme.pixelFont(size: 9))
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
+
+            Text(S.languageDesc)
+                .font(PlantgotchiTheme.captionFont)
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
+
+            Picker(S.language, selection: $localeManager.locale) {
+                Text("Portugues (BR)").tag(AppLocale.ptBR)
+                Text("English").tag(AppLocale.en)
+            }
+            .pickerStyle(.segmented)
+        }
+        .plantgotchiCard()
+    }
+
+    // MARK: - Theme Section
+
+    private var themeSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(S.theme)
+                .font(PlantgotchiTheme.pixelFont(size: 9))
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
+
+            Text(S.themeDesc)
+                .font(PlantgotchiTheme.captionFont)
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
+
+            Toggle(isOn: $themeManager.isRetro) {
+                HStack {
+                    Image(systemName: "gamecontroller.fill")
+                        .foregroundColor(PlantgotchiTheme.purple)
+                    Text(S.retroMode)
+                        .font(PlantgotchiTheme.bodyFont)
+                        .foregroundColor(PlantgotchiTheme.text)
+                }
+            }
+            .tint(PlantgotchiTheme.retroGreen)
+        }
+        .plantgotchiCard()
+    }
+
+    // MARK: - Demo Section
+
+    private var demoSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(S.demoMode)
+                .font(PlantgotchiTheme.pixelFont(size: 9))
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
+
+            Text(S.demoDesc)
+                .font(PlantgotchiTheme.captionFont)
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
+
+            Toggle(isOn: $isDemoMode) {
+                HStack {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(PlantgotchiTheme.green)
+                    Text(S.demoData)
+                        .font(PlantgotchiTheme.bodyFont)
+                }
+            }
+            .tint(PlantgotchiTheme.green)
+            .onChange(of: isDemoMode) { _, newValue in
+                toggleDemoMode(enabled: newValue)
+            }
+        }
+        .plantgotchiCard()
+    }
+
     // MARK: - Danger Section
 
     private var dangerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("DANGER ZONE")
+            Text(S.dangerZone)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.red.opacity(0.7))
 
             Button(action: { showClearDataAlert = true }) {
                 HStack {
                     Image(systemName: "trash")
-                    Text("Clear All Local Data")
+                    Text(S.clearAllData)
                 }
                 .font(PlantgotchiTheme.bodyFont)
                 .foregroundColor(PlantgotchiTheme.red)
@@ -224,54 +240,56 @@ struct SettingsView: View {
     // MARK: - Info Section
 
     private var infoSection: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
+            if let uiImage = UIImage(named: "AppIcon60x60@2x.png")
+                ?? UIImage(named: "AppIcon60x60@2x") {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .frame(width: 64, height: 64)
+                    .cornerRadius(14)
+                    .shadow(color: PlantgotchiTheme.text.opacity(0.15), radius: 4, x: 0, y: 2)
+            }
+
             Text("Plantgotchi")
-                .font(PlantgotchiTheme.pixelFont(size: 10))
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.4))
+                .font(PlantgotchiTheme.pixelFont(size: 12))
+                .foregroundColor(PlantgotchiTheme.text)
+
             Text("v1.0.0")
                 .font(PlantgotchiTheme.captionFont)
-                .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
+
+            Text(LocaleManager.shared.locale == .ptBR
+                ? "Monitor inteligente para suas plantas com sensores BLE e recomendacoes de cuidados com IA."
+                : "Smart plant monitor with BLE sensors and AI-powered care recommendations.")
+                .font(PlantgotchiTheme.captionFont)
+                .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 16)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 8)
+        .plantgotchiCard()
     }
 
     // MARK: - Helpers
 
     private var bleStateLabel: String {
         switch bleManager.state {
-        case .idle: return "Idle"
-        case .scanning: return "Scanning"
-        case .connecting: return "Connecting"
-        case .connected: return "Connected"
-        case .poweredOff: return "Powered Off"
-        case .unauthorized: return "Unauthorized"
+        case .idle: return S.bleIdle
+        case .scanning: return S.bleScanning
+        case .connecting: return S.bleConnecting
+        case .connected: return S.bleConnected
+        case .poweredOff: return S.blePoweredOff
+        case .unauthorized: return S.bleUnauthorized
         }
     }
 
     private func loadSettings() {
-        tursoUrl = UserDefaults.standard.string(forKey: "tursoUrl") ?? ""
-        tursoAuthToken = UserDefaults.standard.string(forKey: "tursoAuthToken") ?? ""
-        claudeAPIKey = UserDefaults.standard.string(forKey: "claudeAPIKey") ?? ""
         userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
         sensorMappings = UserDefaults.standard.dictionary(forKey: "sensorPlantMappings") as? [String: String] ?? [:]
     }
 
     private func saveSettings() {
-        UserDefaults.standard.set(tursoUrl, forKey: "tursoUrl")
-        UserDefaults.standard.set(tursoAuthToken, forKey: "tursoAuthToken")
-        UserDefaults.standard.set(claudeAPIKey, forKey: "claudeAPIKey")
         UserDefaults.standard.set(userId, forKey: "userId")
-
-        // Update TursoSync with new values
-        TursoSync.shared.tursoUrl = tursoUrl
-        TursoSync.shared.tursoAuthToken = tursoAuthToken
-
-        // Schedule background agent if API key is set
-        if !claudeAPIKey.isEmpty {
-            BackgroundAgent.shared.scheduleNextRefresh()
-        }
-
         PostHogSDK.shared.capture("settings_changed")
         showSaveConfirmation = true
     }
@@ -281,8 +299,25 @@ struct SettingsView: View {
         UserDefaults.standard.set(sensorMappings, forKey: "sensorPlantMappings")
     }
 
+    private func toggleDemoMode(enabled: Bool) {
+        let uid = userId.isEmpty ? "default-user" : userId
+        UserDefaults.standard.set(!enabled, forKey: "demoModeExplicitlyOff")
+
+        do {
+            if enabled {
+                try AppDatabase.shared.loadDemoData(userId: uid)
+                PostHogSDK.shared.capture("demo_mode_enabled")
+                showDemoLoadedAlert = true
+            } else {
+                try AppDatabase.shared.clearAllData(userId: uid)
+                PostHogSDK.shared.capture("demo_mode_disabled")
+            }
+        } catch {
+            print("[SettingsView] Demo mode toggle failed: \(error)")
+        }
+    }
+
     private func clearData() {
-        // Remove the database file
         let fileManager = FileManager.default
         if let appSupportURL = try? fileManager.url(
             for: .applicationSupportDirectory,
@@ -294,7 +329,6 @@ struct SettingsView: View {
             try? fileManager.removeItem(at: dbURL)
         }
 
-        // Clear sensor mappings
         UserDefaults.standard.removeObject(forKey: "sensorPlantMappings")
         sensorMappings = [:]
 

@@ -65,6 +65,23 @@ enum PlantgotchiTheme {
         }
     }
 
+    // MARK: - Retro Colors
+
+    /// Darker cream for retro background
+    static let retroBg = Color(red: 0x1A/255, green: 0x1A/255, blue: 0x2E/255)
+
+    /// Retro card background
+    static let retroCardBg = Color(red: 0x2C/255, green: 0x2C/255, blue: 0x3E/255)
+
+    /// Retro text (phosphor green-ish white)
+    static let retroText = Color(red: 0xE8/255, green: 0xE0/255, blue: 0xD0/255)
+
+    /// Retro border color
+    static let retroBorder = Color(red: 0x5A/255, green: 0x5A/255, blue: 0x6E/255)
+
+    /// Retro green (brighter, more neon)
+    static let retroGreen = Color(red: 0x4C/255, green: 0xAF/255, blue: 0x50/255)
+
     // MARK: - Typography
 
     /// The pixel-art display font name. User must add "Press Start 2P" to the asset catalog.
@@ -76,16 +93,34 @@ enum PlantgotchiTheme {
         Font.custom(pixelFontName, size: size)
     }
 
-    /// Standard body font for readable content.
-    static let bodyFont = Font.system(.body, design: .rounded)
+    /// Body font — pixel in retro mode, rounded system otherwise.
+    static var bodyFont: Font {
+        ThemeManager.shared.isRetro
+            ? Font.system(.body, design: .monospaced)
+            : Font.system(.body, design: .rounded)
+    }
 
     /// Caption font.
-    static let captionFont = Font.system(.caption, design: .rounded)
+    static var captionFont: Font {
+        ThemeManager.shared.isRetro
+            ? Font.system(.caption, design: .monospaced)
+            : Font.system(.caption, design: .rounded)
+    }
+
+    // MARK: - Adaptive Colors
+
+    /// Background color — stays cream in both modes.
+    static var background: Color { cream }
+
+    /// Text color — stays dark brown in both modes.
+    static var adaptiveText: Color { text }
 
     // MARK: - Layout
 
     /// Standard corner radius for cards.
-    static let cornerRadius: CGFloat = 12
+    static var cornerRadius: CGFloat {
+        ThemeManager.shared.isRetro ? 0 : 12
+    }
 
     /// Standard card padding.
     static let cardPadding: CGFloat = 16
@@ -96,14 +131,24 @@ enum PlantgotchiTheme {
 
 // MARK: - View Modifiers
 
-/// A card-style background modifier.
+/// A card-style background modifier that adapts to the current theme.
 struct PlantgotchiCard: ViewModifier {
+    @ObservedObject private var theme = ThemeManager.shared
+
     func body(content: Content) -> some View {
-        content
-            .padding(PlantgotchiTheme.cardPadding)
-            .background(Color.white.opacity(0.8))
-            .cornerRadius(PlantgotchiTheme.cornerRadius)
-            .shadow(color: PlantgotchiTheme.text.opacity(0.1), radius: 4, x: 0, y: 2)
+        if theme.isRetro {
+            content
+                .padding(PlantgotchiTheme.cardPadding)
+                .background(Color.white.opacity(0.85))
+                .border(PlantgotchiTheme.text.opacity(0.4), width: 3)
+                .shadow(color: PlantgotchiTheme.text.opacity(0.15), radius: 0, x: 3, y: 3)
+        } else {
+            content
+                .padding(PlantgotchiTheme.cardPadding)
+                .background(Color.white.opacity(0.8))
+                .cornerRadius(12)
+                .shadow(color: PlantgotchiTheme.text.opacity(0.1), radius: 4, x: 0, y: 2)
+        }
     }
 }
 

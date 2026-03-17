@@ -92,10 +92,6 @@ fun AppNavigation() {
         composable(Routes.SETTINGS) {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onSignOut = {
-                    // Clear data and go back to garden
-                    navController.popBackStack(Routes.GARDEN, inclusive = false)
-                },
             )
         }
     }

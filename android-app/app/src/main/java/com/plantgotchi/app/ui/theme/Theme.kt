@@ -12,12 +12,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
-import com.plantgotchi.app.R
 
 // ---- Plantgotchi Color Palette ----
 
@@ -92,11 +90,7 @@ private val DarkColorScheme = darkColorScheme(
  * Press Start 2P pixel font — download the TTF into res/font/press_start_2p.ttf.
  * Falls back to default monospace if the font file is missing.
  */
-val PixelFontFamily = try {
-    FontFamily(Font(R.font.press_start_2p, FontWeight.Normal))
-} catch (_: Exception) {
-    FontFamily.Monospace
-}
+val PixelFontFamily = FontFamily.Monospace
 
 val PlantgotchiTypography = Typography(
     displayLarge = TextStyle(

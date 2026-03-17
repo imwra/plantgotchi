@@ -45,7 +45,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.plantgotchi.app.R
 import com.plantgotchi.app.ble.BLEManager
 import com.plantgotchi.app.ble.BleState
 import com.plantgotchi.app.ble.DiscoveredSensor
@@ -106,7 +108,7 @@ fun ScanScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Scan Sensors",
+                        text = stringResource(R.string.scan_title),
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 },
@@ -114,7 +116,7 @@ fun ScanScreen(
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.detail_back),
                         )
                     }
                 },
@@ -137,11 +139,11 @@ fun ScanScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val statusText = when (state) {
-                    BleState.IDLE -> "Ready to scan"
-                    BleState.SCANNING -> "Scanning..."
-                    BleState.CONNECTING -> "Connecting..."
-                    BleState.CONNECTED -> "Connected!"
-                    BleState.DISCONNECTED -> "Disconnected"
+                    BleState.IDLE -> stringResource(R.string.scan_ready)
+                    BleState.SCANNING -> stringResource(R.string.scan_scanning)
+                    BleState.CONNECTING -> stringResource(R.string.scan_connecting)
+                    BleState.CONNECTED -> stringResource(R.string.scan_connected)
+                    BleState.DISCONNECTED -> stringResource(R.string.scan_disconnected)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (state == BleState.SCANNING) {
@@ -161,7 +163,7 @@ fun ScanScreen(
 
                 if (state == BleState.SCANNING) {
                     OutlinedButton(onClick = { bleManager.stopScan() }) {
-                        Text("Stop")
+                        Text(stringResource(R.string.scan_stop))
                     }
                 } else {
                     Button(
@@ -180,7 +182,7 @@ fun ScanScreen(
                             contentDescription = null,
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Scan")
+                        Text(stringResource(R.string.scan_start))
                     }
                 }
             }
@@ -202,12 +204,12 @@ fun ScanScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "No sensors found",
+                            text = stringResource(R.string.scan_no_sensors),
                             style = MaterialTheme.typography.headlineSmall,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Make sure your Plantgotchi sensor is powered on and nearby",
+                            text = stringResource(R.string.scan_help),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -270,7 +272,7 @@ private fun SensorRow(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.SignalCellular4Bar,
-                        contentDescription = "Signal strength",
+                        contentDescription = stringResource(R.string.scan_signal),
                         modifier = Modifier.height(12.dp).width(12.dp),
                         tint = when {
                             sensor.rssi > -60 -> Green
@@ -291,7 +293,7 @@ private fun SensorRow(
                 onClick = onConnect,
                 enabled = !isConnecting,
             ) {
-                Text("Pair")
+                Text(stringResource(R.string.scan_pair))
             }
         }
     }

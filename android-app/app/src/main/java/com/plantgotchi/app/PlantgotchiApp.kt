@@ -1,10 +1,14 @@
 package com.plantgotchi.app
 
 import android.app.Application
+import android.content.Context
 import com.plantgotchi.app.db.AppDatabase
 import com.posthog.PostHog
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Application class for Plantgotchi.
@@ -21,6 +25,9 @@ class PlantgotchiApp : Application() {
         super.onCreate()
         instance = this
 
+        // Seed demo data on first launch
+        seedDemoDataIfNeeded()
+
         // Initialize PostHog analytics
         val posthogApiKey = BuildConfig.POSTHOG_API_KEY
         if (posthogApiKey.isNotBlank()) {
@@ -33,7 +40,23 @@ class PlantgotchiApp : Application() {
                 sessionReplay = true
             }
             PostHogAndroid.setup(this, config)
-            PostHog.register(mapOf("platform" to "android", "app_version" to "1.0.0"))
+            PostHog.register("platform", "android")
+            PostHog.register("app_version", "1.0.0")
+        }
+    }
+
+    private fun seedDemoDataIfNeeded() {
+        val prefs = getSharedPreferences("plantgotchi_prefs", Context.MODE_PRIVATE)
+        val demoSeeded = prefs.getBoolean("demo_seeded", false)
+        if (!demoSeeded) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val plants = database.plantDao().getPlantsByUserOnce("local-user")
+                if (plants.isEmpty()) {
+                    com.plantgotchi.app.ui.settings.DemoDataLoader.load("local-user", database)
+                    prefs.edit().putBoolean("demo_seeded", true).apply()
+                    prefs.edit().putBoolean("demo_mode_on", true).apply()
+                }
+            }
         }
     }
 

@@ -34,10 +34,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
+import com.plantgotchi.app.R
 import com.posthog.PostHog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.SensorReading
@@ -81,7 +83,7 @@ fun GardenScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Plantgotchi",
+                        text = stringResource(R.string.garden_title),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 },
@@ -89,13 +91,13 @@ fun GardenScreen(
                     IconButton(onClick = onScanClick) {
                         Icon(
                             imageVector = Icons.Default.Bluetooth,
-                            contentDescription = "Scan sensors",
+                            contentDescription = stringResource(R.string.garden_scan_sensors),
                         )
                     }
                     IconButton(onClick = onSettingsClick) {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(R.string.garden_settings),
                         )
                     }
                 },
@@ -111,7 +113,7 @@ fun GardenScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add plant",
+                    contentDescription = stringResource(R.string.garden_add_plant),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
@@ -156,12 +158,12 @@ private fun EmptyGarden(modifier: Modifier = Modifier) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "No plants yet!",
+                text = stringResource(R.string.garden_empty_title),
                 style = MaterialTheme.typography.headlineSmall,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Tap + to add your first plant",
+                text = stringResource(R.string.garden_empty_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

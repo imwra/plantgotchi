@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.plantgotchi.app"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.plantgotchi.app"
@@ -74,10 +74,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    // BLESSED BLE library
-    implementation("com.github.weliem:blessed-android-coroutines:0.5.0")
-
-    // Ktor HTTP client (for Turso sync)
+// Ktor HTTP client (for Turso sync)
     val ktorVersion = "2.3.12"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
@@ -96,8 +93,9 @@ dependencies {
     // DataStore Preferences (for settings)
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    // Core KTX
+    // Core KTX + AppCompat (for per-app locale support)
     implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.appcompat:appcompat:1.7.0")
 
     // PostHog analytics
     implementation("com.posthog:posthog-android:3.+")

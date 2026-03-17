@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.plantgotchi.app.R
 import com.plantgotchi.app.agent.RuleEngine
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.SensorReading
@@ -102,9 +104,9 @@ fun PlantCard(
 
             // Status indicator
             val statusText = when (status) {
-                "happy" -> "\u2665 Happy"
-                "thirsty" -> "\u2639 Thirsty"
-                else -> "? Unknown"
+                "happy" -> stringResource(R.string.status_happy)
+                "thirsty" -> stringResource(R.string.status_thirsty)
+                else -> stringResource(R.string.status_unknown)
             }
             val statusColor = when (status) {
                 "happy" -> Green
@@ -126,7 +128,7 @@ fun PlantCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = "HP",
+                    text = stringResource(R.string.detail_hp),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.width(24.dp),
                 )
@@ -174,7 +176,7 @@ fun PlantCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = if (moisture != null) "$moisture%" else "--",
+                    text = if (moisture != null) "$moisture%" else stringResource(R.string.detail_no_data),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }

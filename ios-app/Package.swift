@@ -15,7 +15,10 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
                 .product(name: "PostHog", package: "posthog-ios"),
             ],
-            path: "Plantgotchi"
+            path: "Plantgotchi",
+            resources: [
+                .process("Assets.xcassets"),
+            ]
         ),
         .testTarget(
             name: "PlantgotchiTests",
