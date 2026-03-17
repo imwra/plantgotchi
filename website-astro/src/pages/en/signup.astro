@@ -102,6 +102,9 @@ if (session) {
     const errorNetwork = form.dataset.errorNetwork || "Network error. Try again.";
     const submitText = form.dataset.submitText || "CREATE ACCOUNT";
 
+    // Pre-warm the Worker on page load
+    fetch("/api/auth/ok").catch(() => {});
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       errorMsg.style.display = "none";
@@ -115,14 +118,14 @@ if (session) {
 
       try {
         let res: Response | null = null;
-        for (let attempt = 0; attempt < 3; attempt++) {
+        for (let attempt = 0; attempt < 5; attempt++) {
           res = await fetch("/api/auth/sign-up/email", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, email, password }),
           });
           if (res.status !== 503) break;
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise(r => setTimeout(r, 1500));
         }
 
         if (!res || !res.ok) {
