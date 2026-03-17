@@ -37,37 +37,37 @@ export default function PlantsTab() {
       .finally(() => setLoading(false));
   }, [page]);
 
-  if (loading) return <p className="text-sm text-pixel-gray">Loading plants...</p>;
-  if (error) return <p className="text-sm text-accent-red">{error}</p>;
+  if (loading) return <p className="text-sm text-text-mid">Loading plants...</p>;
+  if (error) return <p className="text-sm text-danger">{error}</p>;
 
   const totalPages = Math.ceil(total / limit);
 
   return (
     <div className="space-y-4">
-      <h2 className="pixel-font text-xs text-green-dark">{total} PLANTS</h2>
+      <h2 className="pixel-font text-xs text-primary-dark">{total} PLANTS</h2>
 
-      <div className="bg-white rounded-xl shadow-sm border border-cream-dark overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-bg-warm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-cream-dark bg-cream/50">
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Plant</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Species</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Owner</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Moisture</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Temp</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Light</th>
-                <th className="text-left px-4 py-2 text-xs text-pixel-gray font-semibold">Last Reading</th>
+              <tr className="border-b border-bg-warm bg-bg/50">
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Plant</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Species</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Owner</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Moisture</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Temp</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Light</th>
+                <th className="text-left px-4 py-2 text-xs text-text-mid font-semibold">Last Reading</th>
               </tr>
             </thead>
             <tbody>
               {plants.map((plant) => (
-                <tr key={plant.id} className="border-b border-cream-dark/50 hover:bg-cream/40 transition">
+                <tr key={plant.id} className="border-b border-bg-warm/50 hover:bg-bg/40 transition">
                   <td className="px-4 py-2">
                     <span className="mr-1">{plant.emoji}</span>
                     <span className="font-medium">{plant.name}</span>
                   </td>
-                  <td className="px-4 py-2 text-pixel-gray">{plant.species || "—"}</td>
+                  <td className="px-4 py-2 text-text-mid">{plant.species || "—"}</td>
                   <td className="px-4 py-2 text-xs">{plant.ownerEmail}</td>
                   <td className="px-4 py-2">
                     {plant.moisture !== null ? `${plant.moisture}%` : "—"}
@@ -78,7 +78,7 @@ export default function PlantsTab() {
                   <td className="px-4 py-2">
                     {plant.light !== null ? plant.light : "—"}
                   </td>
-                  <td className="px-4 py-2 text-pixel-gray text-xs">
+                  <td className="px-4 py-2 text-text-mid text-xs">
                     {plant.lastReadingAt
                       ? new Date(plant.lastReadingAt).toLocaleDateString()
                       : "No readings"}
@@ -95,15 +95,15 @@ export default function PlantsTab() {
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="px-3 py-1 text-xs rounded border border-cream-dark disabled:opacity-40 cursor-pointer"
+            className="px-3 py-1 text-xs rounded border border-bg-warm disabled:opacity-40 cursor-pointer"
           >
             Prev
           </button>
-          <span className="text-xs text-pixel-gray">Page {page + 1} of {totalPages}</span>
+          <span className="text-xs text-text-mid">Page {page + 1} of {totalPages}</span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="px-3 py-1 text-xs rounded border border-cream-dark disabled:opacity-40 cursor-pointer"
+            className="px-3 py-1 text-xs rounded border border-bg-warm disabled:opacity-40 cursor-pointer"
           >
             Next
           </button>

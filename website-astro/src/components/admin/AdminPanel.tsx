@@ -24,23 +24,23 @@ export default function AdminPanel({ userName }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
 
   return (
-    <div className="min-h-screen bg-cream text-pixel-black">
+    <div className="min-h-screen bg-bg text-text">
       <SiteNav userName={userName} />
 
       {/* Header */}
-      <header className="bg-green-dark text-cream shadow-lg">
+      <header className="bg-primary-dark text-bg shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <h1 className="pixel-font text-base sm:text-lg tracking-wide">
             ADMIN PANEL
           </h1>
-          <p className="text-cream-dark text-xs mt-1 opacity-80">
+          <p className="text-bg-warm text-xs mt-1 opacity-80">
             Platform Overview & Management
           </p>
         </div>
       </header>
 
       {/* Tab bar */}
-      <div className="bg-white border-b border-cream-dark shadow-sm sticky top-14 z-40">
+      <div className="bg-white border-b border-bg-warm shadow-sm sticky top-14 z-40">
         <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
           {TABS.map((tab) => (
             <button
@@ -48,8 +48,8 @@ export default function AdminPanel({ userName }: AdminPanelProps) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 text-xs font-semibold whitespace-nowrap border-b-2 transition cursor-pointer ${
                 activeTab === tab.id
-                  ? "border-green-plant text-green-dark"
-                  : "border-transparent text-pixel-gray hover:text-pixel-black hover:border-cream-dark"
+                  ? "border-primary text-primary-dark"
+                  : "border-transparent text-text-mid hover:text-text hover:border-bg-warm"
               }`}
             >
               {tab.label}

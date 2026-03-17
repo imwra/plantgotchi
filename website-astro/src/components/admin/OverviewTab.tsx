@@ -25,17 +25,17 @@ export default function OverviewTab() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="text-sm text-pixel-gray">Loading stats...</p>;
-  if (error) return <p className="text-sm text-accent-red">{error}</p>;
+  if (loading) return <p className="text-sm text-text-mid">Loading stats...</p>;
+  if (error) return <p className="text-sm text-danger">{error}</p>;
   if (!stats) return null;
 
   const cards = [
-    { label: "Total Users", value: stats.totalUsers, color: "bg-accent-blue text-white" },
-    { label: "Total Plants", value: stats.totalPlants, color: "bg-green-plant text-white" },
+    { label: "Total Users", value: stats.totalUsers, color: "bg-water text-white" },
+    { label: "Total Plants", value: stats.totalPlants, color: "bg-primary text-white" },
     { label: "Sensor Readings", value: stats.totalReadings, color: "bg-brown text-white" },
-    { label: "Care Logs", value: stats.totalCareLogs, color: "bg-green-dark text-cream" },
-    { label: "Pending Recs", value: stats.pendingRecommendations, color: "bg-accent-orange text-white" },
-    { label: "Readings Today", value: stats.readingsToday, color: "bg-pixel-black text-cream" },
+    { label: "Care Logs", value: stats.totalCareLogs, color: "bg-primary-dark text-bg" },
+    { label: "Pending Recs", value: stats.pendingRecommendations, color: "bg-orange text-white" },
+    { label: "Readings Today", value: stats.readingsToday, color: "bg-text text-bg" },
   ];
 
   return (

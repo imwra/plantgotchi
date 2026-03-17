@@ -40,7 +40,7 @@ export default function LanguageSwitcher({
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="pixel-font text-[8px] sm:text-[10px] text-pixel-gray hover:text-green-dark px-2 py-2 transition-colors flex items-center gap-1"
+        className="pixel-font text-[8px] sm:text-[10px] text-text-mid hover:text-primary-dark px-2 py-2 transition-colors flex items-center gap-1"
         aria-label="Change language"
       >
         {currentLabel}
@@ -50,11 +50,11 @@ export default function LanguageSwitcher({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 bg-cream border-2 border-pixel-black shadow-[2px_2px_0_#2d2d2d] z-50 min-w-[140px]">
+        <div className="absolute right-0 top-full mt-1 bg-bg border-2 border-text shadow-[2px_2px_0_#2d2d2d] z-50 min-w-[140px]">
           <a
             href={ptbrPath}
-            className={`block px-3 py-2 text-xs hover:bg-cream-dark transition-colors ${
-              currentLocale === "pt-br" ? "text-green-dark font-bold" : "text-pixel-gray"
+            className={`block px-3 py-2 text-xs hover:bg-bg-warm transition-colors ${
+              currentLocale === "pt-br" ? "text-primary-dark font-bold" : "text-text-mid"
             }`}
             onClick={() => setOpen(false)}
           >
@@ -62,8 +62,8 @@ export default function LanguageSwitcher({
           </a>
           <a
             href={enPath}
-            className={`block px-3 py-2 text-xs hover:bg-cream-dark transition-colors ${
-              currentLocale === "en" ? "text-green-dark font-bold" : "text-pixel-gray"
+            className={`block px-3 py-2 text-xs hover:bg-bg-warm transition-colors ${
+              currentLocale === "en" ? "text-primary-dark font-bold" : "text-text-mid"
             }`}
             onClick={() => setOpen(false)}
           >

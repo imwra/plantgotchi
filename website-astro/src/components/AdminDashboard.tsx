@@ -200,10 +200,10 @@ const MILESTONES = [
 const STORAGE_KEY = "plantgotchi-admin-v1";
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
-  todo: "bg-pixel-gray/20 text-pixel-gray",
-  "in-progress": "bg-accent-blue/20 text-accent-blue",
-  done: "bg-green-plant/20 text-green-dark",
-  blocked: "bg-accent-red/20 text-accent-red",
+  todo: "bg-text-mid/20 text-text-mid",
+  "in-progress": "bg-water/20 text-water",
+  done: "bg-primary/20 text-primary-dark",
+  blocked: "bg-danger/20 text-danger",
 };
 
 const STATUS_LABELS: Record<TaskStatus, string> = {
@@ -406,8 +406,8 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
 
   if (!loaded) {
     return (
-      <div className={embedded ? "" : "min-h-screen bg-cream flex items-center justify-center"}>
-        <p className="pixel-font text-green-dark text-sm">Loading...</p>
+      <div className={embedded ? "" : "min-h-screen bg-bg flex items-center justify-center"}>
+        <p className="pixel-font text-primary-dark text-sm">Loading...</p>
       </div>
     );
   }
@@ -418,11 +418,11 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
         {/* ---- Summary Bar ---- */}
         <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
-            { label: "Total", value: stats.total, color: "bg-pixel-black text-cream" },
-            { label: "Done", value: stats.done, color: "bg-green-plant text-white" },
-            { label: "In Progress", value: stats.inProgress, color: "bg-accent-blue text-white" },
-            { label: "Blocked", value: stats.blocked, color: "bg-accent-red text-white" },
-            { label: "Todo", value: stats.todo, color: "bg-cream-dark text-pixel-black" },
+            { label: "Total", value: stats.total, color: "bg-text text-bg" },
+            { label: "Done", value: stats.done, color: "bg-primary text-white" },
+            { label: "In Progress", value: stats.inProgress, color: "bg-water text-white" },
+            { label: "Blocked", value: stats.blocked, color: "bg-danger text-white" },
+            { label: "Todo", value: stats.todo, color: "bg-bg-warm text-text" },
           ].map((s) => (
             <div
               key={s.label}
@@ -437,18 +437,18 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
         </section>
 
         {/* ---- Overall Progress ---- */}
-        <div className="bg-cream-dark rounded-xl p-4 shadow-sm">
+        <div className="bg-bg-warm rounded-xl p-4 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="pixel-font text-[10px] text-green-dark">
+            <span className="pixel-font text-[10px] text-primary-dark">
               OVERALL PROGRESS
             </span>
-            <span className="text-sm font-bold text-green-dark">
+            <span className="text-sm font-bold text-primary-dark">
               {stats.pct}%
             </span>
           </div>
-          <div className="w-full h-4 bg-white rounded-full overflow-hidden border border-green-light/40">
+          <div className="w-full h-4 bg-white rounded-full overflow-hidden border border-primary-light/40">
             <div
-              className="h-full bg-gradient-to-r from-green-plant to-green-light rounded-full transition-all duration-500"
+              className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-all duration-500"
               style={{ width: `${stats.pct}%` }}
             />
           </div>
@@ -457,47 +457,47 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
         {/* ---- Quick Stats & Milestones ---- */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Cost */}
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-cream-dark">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-bg-warm">
             <h3 className="pixel-font text-[10px] text-brown mb-3">
               ESTIMATED COSTS
             </h3>
-            <div className="text-3xl font-bold text-green-dark mb-1">
+            <div className="text-3xl font-bold text-primary-dark mb-1">
               $2,204
             </div>
-            <p className="text-xs text-pixel-gray">
+            <p className="text-xs text-text-mid">
               First production run (100 BLE + 50 Solo + 20 PlantCam + 10 Pro)
             </p>
-            <div className="mt-3 space-y-1 text-xs text-pixel-gray">
+            <div className="mt-3 space-y-1 text-xs text-text-mid">
               <div className="flex justify-between">
                 <span>PCB prototypes (5x)</span>
-                <span className="font-semibold text-pixel-black">~$120</span>
+                <span className="font-semibold text-text">~$120</span>
               </div>
               <div className="flex justify-between">
                 <span>3D cases (5x)</span>
-                <span className="font-semibold text-pixel-black">~$9</span>
+                <span className="font-semibold text-text">~$9</span>
               </div>
               <div className="flex justify-between">
                 <span>Batteries & misc</span>
-                <span className="font-semibold text-pixel-black">~$50</span>
+                <span className="font-semibold text-text">~$50</span>
               </div>
               <div className="flex justify-between">
                 <span>Production batch</span>
-                <span className="font-semibold text-pixel-black">~$2,024</span>
+                <span className="font-semibold text-text">~$2,024</span>
               </div>
             </div>
           </div>
 
           {/* Milestones */}
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-cream-dark">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-bg-warm">
             <h3 className="pixel-font text-[10px] text-brown mb-3">
               KEY MILESTONES
             </h3>
             <ul className="space-y-2">
               {MILESTONES.map((m) => (
                 <li key={m.label} className="flex items-center gap-3 text-sm">
-                  <span className="w-2 h-2 rounded-full bg-green-plant shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                   <span className="flex-1">{m.label}</span>
-                  <span className="text-xs text-pixel-gray font-semibold">
+                  <span className="text-xs text-text-mid font-semibold">
                     {m.target}
                   </span>
                 </li>
@@ -509,13 +509,13 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
         {/* ---- Timeline Toggle ---- */}
         <button
           onClick={() => setShowTimeline((v) => !v)}
-          className="text-sm text-accent-blue hover:text-accent-blue/80 underline underline-offset-2 cursor-pointer"
+          className="text-sm text-water hover:text-water/80 underline underline-offset-2 cursor-pointer"
         >
           {showTimeline ? "Hide timeline" : "Show timeline view"}
         </button>
 
         {showTimeline && (
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-cream-dark overflow-x-auto">
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-bg-warm overflow-x-auto">
             <h3 className="pixel-font text-[10px] text-brown mb-4">
               PHASE TIMELINE (WEEKS)
             </h3>
@@ -533,13 +533,13 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                   offset += p.estimatedWeeks;
                   const barColor =
                     ps.pct === 100
-                      ? "bg-green-plant"
+                      ? "bg-primary"
                       : ps.pct > 0
-                        ? "bg-accent-blue"
-                        : "bg-cream-dark";
+                        ? "bg-water"
+                        : "bg-bg-warm";
                   return (
                     <div key={p.id} className="flex items-center gap-2">
-                      <span className="w-20 text-[10px] text-pixel-gray truncate shrink-0">
+                      <span className="w-20 text-[10px] text-text-mid truncate shrink-0">
                         P{p.number}
                       </span>
                       <div className="flex-1 h-5 bg-gray-100 rounded relative">
@@ -551,7 +551,7 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                           }}
                         />
                         <span
-                          className="absolute text-[9px] text-pixel-black font-semibold leading-5 px-1 truncate"
+                          className="absolute text-[9px] text-text font-semibold leading-5 px-1 truncate"
                           style={{
                             left: `${left}%`,
                             width: `${width}%`,
@@ -565,7 +565,7 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                 });
               })()}
               {/* Week markers */}
-              <div className="flex-1 ml-[88px] flex justify-between text-[9px] text-pixel-gray pt-1">
+              <div className="flex-1 ml-[88px] flex justify-between text-[9px] text-text-mid pt-1">
                 <span>0</span>
                 <span>
                   {Math.round(
@@ -590,8 +590,8 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                 onClick={() => setFilter(f.value)}
                 className={`px-3 py-1.5 text-xs rounded-full border transition cursor-pointer ${
                   filter === f.value
-                    ? "bg-green-dark text-cream border-green-dark"
-                    : "bg-white text-pixel-gray border-cream-dark hover:border-green-light"
+                    ? "bg-primary-dark text-bg border-primary-dark"
+                    : "bg-white text-text-mid border-bg-warm hover:border-primary-light"
                 }`}
               >
                 {f.label}
@@ -606,7 +606,7 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
               placeholder="Search tasks..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-4 py-2 text-sm rounded-lg border border-cream-dark bg-white focus:outline-none focus:border-green-plant transition"
+              className="w-full px-4 py-2 text-sm rounded-lg border border-bg-warm bg-white focus:outline-none focus:border-primary transition"
             />
           </div>
 
@@ -614,14 +614,14 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
           <div className="flex gap-2">
             <button
               onClick={expandAll}
-              className="text-xs text-accent-blue hover:underline cursor-pointer"
+              className="text-xs text-water hover:underline cursor-pointer"
             >
               Expand all
             </button>
-            <span className="text-pixel-gray">/</span>
+            <span className="text-text-mid">/</span>
             <button
               onClick={collapseAll}
-              className="text-xs text-accent-blue hover:underline cursor-pointer"
+              className="text-xs text-water hover:underline cursor-pointer"
             >
               Collapse all
             </button>
@@ -639,16 +639,16 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
             return (
               <div
                 key={phase.id}
-                className="bg-white rounded-xl shadow-sm border border-cream-dark overflow-hidden"
+                className="bg-white rounded-xl shadow-sm border border-bg-warm overflow-hidden"
               >
                 {/* Phase Header */}
                 <button
                   onClick={() => toggleCollapse(phase.id)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-cream-dark/30 transition cursor-pointer"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-bg-warm/30 transition cursor-pointer"
                 >
                   {/* Chevron */}
                   <svg
-                    className={`w-4 h-4 text-pixel-gray transition-transform shrink-0 ${
+                    className={`w-4 h-4 text-text-mid transition-transform shrink-0 ${
                       phase.collapsed ? "" : "rotate-90"
                     }`}
                     fill="none"
@@ -664,24 +664,24 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                   </svg>
 
                   {/* Phase number badge */}
-                  <span className="pixel-font text-[10px] bg-green-dark text-cream w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
+                  <span className="pixel-font text-[10px] bg-primary-dark text-bg w-8 h-8 rounded-lg flex items-center justify-center shrink-0">
                     {phase.number}
                   </span>
 
                   {/* Title */}
                   <div className="flex-1 text-left">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="pixel-font text-xs text-pixel-black">
+                      <span className="pixel-font text-xs text-text">
                         {phase.title}
                       </span>
-                      <span className="text-[10px] text-pixel-gray">
+                      <span className="text-[10px] text-text-mid">
                         {phase.subtitle}
                       </span>
                     </div>
                     {/* Progress bar */}
-                    <div className="w-full max-w-xs h-1.5 bg-cream-dark rounded-full mt-1.5 overflow-hidden">
+                    <div className="w-full max-w-xs h-1.5 bg-bg-warm rounded-full mt-1.5 overflow-hidden">
                       <div
-                        className="h-full bg-green-plant rounded-full transition-all duration-300"
+                        className="h-full bg-primary rounded-full transition-all duration-300"
                         style={{ width: `${ps.pct}%` }}
                       />
                     </div>
@@ -689,10 +689,10 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
 
                   {/* Stats */}
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-green-dark">
+                    <span className="text-xs font-bold text-primary-dark">
                       {ps.done}/{ps.total}
                     </span>
-                    <span className="text-[10px] text-pixel-gray block">
+                    <span className="text-[10px] text-text-mid block">
                       {ps.pct}%
                     </span>
                   </div>
@@ -700,16 +700,16 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
 
                 {/* Tasks */}
                 {!phase.collapsed && (
-                  <div className="border-t border-cream-dark divide-y divide-cream-dark/50">
+                  <div className="border-t border-bg-warm divide-y divide-bg-warm/50">
                     {tasks.length === 0 && (
-                      <p className="px-4 py-3 text-xs text-pixel-gray italic">
+                      <p className="px-4 py-3 text-xs text-text-mid italic">
                         No matching tasks
                       </p>
                     )}
                     {tasks.map((task) => (
                       <div
                         key={task.id}
-                        className={`px-4 py-2.5 flex items-start gap-3 group hover:bg-cream/60 transition ${
+                        className={`px-4 py-2.5 flex items-start gap-3 group hover:bg-bg/60 transition ${
                           task.status === "done" ? "opacity-60" : ""
                         }`}
                       >
@@ -718,8 +718,8 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                           onClick={() => toggleDone(phase.id, task.id)}
                           className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition cursor-pointer ${
                             task.status === "done"
-                              ? "bg-green-plant border-green-plant text-white"
-                              : "border-pixel-gray/40 hover:border-green-plant"
+                              ? "bg-primary border-primary text-white"
+                              : "border-text-mid/40 hover:border-primary"
                           }`}
                         >
                           {task.status === "done" && (
@@ -745,14 +745,14 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                             <span
                               className={`text-sm ${
                                 task.status === "done"
-                                  ? "line-through text-pixel-gray"
+                                  ? "line-through text-text-mid"
                                   : ""
                               }`}
                             >
                               {task.title}
                             </span>
                             {task.critical && (
-                              <span className="text-[9px] px-1.5 py-0.5 bg-accent-orange/20 text-accent-orange rounded font-bold uppercase tracking-wider">
+                              <span className="text-[9px] px-1.5 py-0.5 bg-orange/20 text-orange rounded font-bold uppercase tracking-wider">
                                 Critical
                               </span>
                             )}
@@ -780,19 +780,19 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
                                 }
                                 if (e.key === "Escape") setEditingNote(null);
                               }}
-                              className="mt-1 w-full text-xs px-2 py-1 border border-green-light rounded focus:outline-none focus:border-green-plant"
+                              className="mt-1 w-full text-xs px-2 py-1 border border-primary-light rounded focus:outline-none focus:border-primary"
                             />
                           ) : task.notes ? (
                             <p
                               onClick={() => setEditingNote(task.id)}
-                              className="mt-1 text-xs text-pixel-gray cursor-pointer hover:text-pixel-black"
+                              className="mt-1 text-xs text-text-mid cursor-pointer hover:text-text"
                             >
                               {task.notes}
                             </p>
                           ) : (
                             <button
                               onClick={() => setEditingNote(task.id)}
-                              className="mt-1 text-[10px] text-pixel-gray/50 hover:text-pixel-gray cursor-pointer opacity-0 group-hover:opacity-100 transition"
+                              className="mt-1 text-[10px] text-text-mid/50 hover:text-text-mid cursor-pointer opacity-0 group-hover:opacity-100 transition"
                             >
                               + add note
                             </button>
@@ -819,8 +819,8 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
         </div>
 
         {/* ---- Footer ---- */}
-        <footer className="text-center text-xs text-pixel-gray py-8 border-t border-cream-dark mt-8">
-          <span className="pixel-font text-[8px] text-green-dark">
+        <footer className="text-center text-xs text-text-mid py-8 border-t border-bg-warm mt-8">
+          <span className="pixel-font text-[8px] text-primary-dark">
             PLANTGOTCHI
           </span>{" "}
           Internal Dashboard &middot; Data saved locally in your browser
@@ -833,21 +833,21 @@ export default function AdminDashboard({ embedded = false }: AdminDashboardProps
   }
 
   return (
-    <div className="min-h-screen bg-cream text-pixel-black">
+    <div className="min-h-screen bg-bg text-text">
       <SiteNav />
       {/* ---- Header ---- */}
-      <header className="bg-green-dark text-cream z-30 shadow-lg">
+      <header className="bg-primary-dark text-bg z-30 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <h1 className="pixel-font text-base sm:text-lg tracking-wide">
               PLANTGOTCHI
             </h1>
-            <p className="text-cream-dark text-xs mt-1 opacity-80">
+            <p className="text-bg-warm text-xs mt-1 opacity-80">
               Internal Product Launch Tracker
             </p>
           </div>
           <div className="flex items-center gap-3 text-xs">
-            <span className="bg-green-plant/30 px-3 py-1 rounded-full font-semibold">
+            <span className="bg-primary/30 px-3 py-1 rounded-full font-semibold">
               {stats.pct}% complete
             </span>
             <span className="opacity-70">{stats.done}/{stats.total} tasks</span>

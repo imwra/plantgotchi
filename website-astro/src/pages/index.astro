@@ -8,7 +8,7 @@ const t = useTranslations(locale);
 const content = await loadContent(locale, "landing") as any;
 const prefix = locale === "en" ? "/en" : "";
 
-const PRODUCT_COLORS = ["bg-green-light", "bg-green-plant", "bg-accent-blue", "bg-accent-purple"];
+const PRODUCT_COLORS = ["bg-primary-light", "bg-primary", "bg-water", "bg-purple"];
 const SETUP_ICONS = ["hub", "solo", "parent"];
 
 const GARDEN_PLANTS = [
@@ -26,21 +26,21 @@ const DETAIL_CHART = [60, 55, 70, 65, 45, 80, 72];
 const FOUND_SENSORS = ["Plantgotchi-A3F2", "Plantgotchi-B7E1"];
 
 const DETAIL_STATS = [
-  { label: "MOISTURE", value: "72%", color: "bg-accent-blue", pct: 72 },
-  { label: "LIGHT", value: "45%", color: "bg-accent-orange", pct: 45 },
-  { label: "TEMP", value: "22\u00B0C", color: "bg-accent-red", pct: 55 },
-  { label: "HP", value: "92%", color: "bg-green-plant", pct: 92 },
+  { label: "MOISTURE", value: "72%", color: "bg-water", pct: 72 },
+  { label: "LIGHT", value: "45%", color: "bg-orange", pct: 45 },
+  { label: "TEMP", value: "22\u00B0C", color: "bg-danger", pct: 55 },
+  { label: "HP", value: "92%", color: "bg-primary", pct: 92 },
 ];
 
 const VENT_LINES = [0, 1, 2, 3, 4, 5, 6];
 const LED_DOTS = [0, 1, 2];
 
-const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plant", "bg-accent-red", "bg-accent-blue"];
+const NOTIFICATION_ICONS = ["bg-orange", "bg-water", "bg-primary", "bg-danger", "bg-water"];
 
 ---
 
 <BaseLayout title={content.meta.title} description={content.meta.description}>
-  <div class="min-h-screen bg-cream text-pixel-black">
+  <div class="min-h-screen bg-bg text-text">
     <!-- STICKY NAV -->
     <SiteNav
       client:load
@@ -70,26 +70,26 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
             <!-- Leaves -->
             <div class="relative left-1/2 -translate-x-1/2 w-fit mb--2">
               <!-- center leaf -->
-              <div class="w-10 h-10 bg-green-plant rounded-sm pixel-border mx-auto relative">
-                <div class="absolute inset-1 bg-green-light opacity-40 rounded-sm"></div>
+              <div class="w-10 h-10 bg-primary rounded-sm pixel-border mx-auto relative">
+                <div class="absolute inset-1 bg-primary-light opacity-40 rounded-sm"></div>
               </div>
               <!-- left leaf -->
-              <div class="absolute -left-8 top-4 w-8 h-6 bg-green-plant rounded-sm rotate-[-20deg]">
-                <div class="absolute inset-1 bg-green-light opacity-30 rounded-sm"></div>
+              <div class="absolute -left-8 top-4 w-8 h-6 bg-primary rounded-sm rotate-[-20deg]">
+                <div class="absolute inset-1 bg-primary-light opacity-30 rounded-sm"></div>
               </div>
               <!-- right leaf -->
-              <div class="absolute -right-8 top-4 w-8 h-6 bg-green-plant rounded-sm rotate-[20deg]">
-                <div class="absolute inset-1 bg-green-light opacity-30 rounded-sm"></div>
+              <div class="absolute -right-8 top-4 w-8 h-6 bg-primary rounded-sm rotate-[20deg]">
+                <div class="absolute inset-1 bg-primary-light opacity-30 rounded-sm"></div>
               </div>
               <!-- Face -->
               <div class="absolute left-1/2 -translate-x-1/2 bottom-3 flex gap-2">
-                <div class="w-2 h-2 bg-pixel-black rounded-full"></div>
-                <div class="w-2 h-2 bg-pixel-black rounded-full"></div>
+                <div class="w-2 h-2 bg-text rounded-full"></div>
+                <div class="w-2 h-2 bg-text rounded-full"></div>
               </div>
-              <div class="absolute left-1/2 -translate-x-1/2 bottom-1 w-3 h-1.5 border-b-2 border-pixel-black rounded-b-full"></div>
+              <div class="absolute left-1/2 -translate-x-1/2 bottom-1 w-3 h-1.5 border-b-2 border-text rounded-b-full"></div>
             </div>
             <!-- Stem -->
-            <div class="mx-auto w-2 h-14 bg-green-dark -mt-2 relative z-10"></div>
+            <div class="mx-auto w-2 h-14 bg-primary-dark -mt-2 relative z-10"></div>
             <!-- Pot -->
             <div class="mx-auto w-20 h-10 bg-brown relative -mt-2">
               <div class="absolute -top-1 -left-1 w-22 h-3 bg-brown-light" style="width: calc(100% + 8px); left: -4px;"></div>
@@ -98,25 +98,25 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           </div>
         </div>
 
-        <h1 class="pixel-font text-lg sm:text-2xl md:text-3xl leading-relaxed text-green-dark max-w-3xl">
+        <h1 class="pixel-font text-lg sm:text-2xl md:text-3xl leading-relaxed text-primary-dark max-w-3xl">
           {content.hero.heading[0]} {content.hero.heading[1]}<br />
           {content.hero.heading[2]} {content.hero.heading[3]}
         </h1>
 
-        <p class="text-pixel-gray text-base sm:text-lg max-w-xl">
+        <p class="text-text-mid text-base sm:text-lg max-w-xl">
           {content.hero.tagline}
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4">
           <a
             href="#pricing"
-            class="pixel-font text-xs bg-green-plant text-cream px-8 py-4 pixel-border hover:bg-green-dark transition-colors"
+            class="pixel-font text-xs bg-primary text-bg px-8 py-4 pixel-border hover:bg-primary-dark transition-colors"
           >
             {content.hero.cta}
           </a>
           <a
             href="#how-it-works"
-            class="pixel-font text-xs border-2 border-pixel-black text-pixel-black px-8 py-4 hover:bg-cream-dark transition-colors"
+            class="pixel-font text-xs border-2 border-text text-text px-8 py-4 hover:bg-bg-warm transition-colors"
           >
             {content.hero.ctaSecondary}
           </a>
@@ -124,70 +124,70 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
       </div>
 
       <!-- decorative dots -->
-      <div class="absolute top-8 left-8 w-2 h-2 bg-accent-orange rounded-full animate-pulse-glow"></div>
-      <div class="absolute top-20 right-12 w-2 h-2 bg-accent-blue rounded-full animate-pulse-glow"></div>
-      <div class="absolute bottom-12 left-16 w-1.5 h-1.5 bg-accent-purple rounded-full animate-pulse-glow"></div>
+      <div class="absolute top-8 left-8 w-2 h-2 bg-orange rounded-full animate-pulse-glow"></div>
+      <div class="absolute top-20 right-12 w-2 h-2 bg-water rounded-full animate-pulse-glow"></div>
+      <div class="absolute bottom-12 left-16 w-1.5 h-1.5 bg-purple rounded-full animate-pulse-glow"></div>
     </section>
 
     <!-- HOW IT WORKS -->
-    <section id="how-it-works" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+    <section id="how-it-works" class="bg-bg-warm py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-14">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-14">
           {content.howItWorks.title}
         </h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6">
           <!-- Step 1 -->
           <div class="flex flex-col items-center text-center gap-4">
-            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+            <div class="w-20 h-20 bg-bg rounded-lg pixel-border flex items-center justify-center">
               <div class="w-16 h-16 flex items-center justify-center relative">
                 <div class="absolute bottom-0 left-0 right-0 h-6 bg-brown rounded-b-lg"></div>
-                <div class="w-2 h-10 bg-green-plant relative z-10 animate-bounce-plant"></div>
+                <div class="w-2 h-10 bg-primary relative z-10 animate-bounce-plant"></div>
                 <div class="absolute top-1 left-1/2 -translate-x-1/2 text-lg">
-                  <span class="pixel-font text-accent-orange text-[10px]">!</span>
+                  <span class="pixel-font text-orange text-[10px]">!</span>
                 </div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[0].label}</span>
-            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[0].title}</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[0].desc}</p>
+            <span class="pixel-font text-[10px] text-orange">{content.howItWorks.steps[0].label}</span>
+            <h3 class="pixel-font text-xs text-text">{content.howItWorks.steps[0].title}</h3>
+            <p class="text-text-mid text-sm max-w-xs">{content.howItWorks.steps[0].desc}</p>
           </div>
 
           <!-- Step 2 -->
           <div class="flex flex-col items-center text-center gap-4">
-            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+            <div class="w-20 h-20 bg-bg rounded-lg pixel-border flex items-center justify-center">
               <div class="w-16 h-16 flex items-center justify-center relative">
                 <div class="flex flex-col items-center gap-1">
-                  <div class="w-10 h-1.5 bg-accent-blue rounded-full opacity-40"></div>
-                  <div class="w-7 h-1.5 bg-accent-blue rounded-full opacity-60"></div>
-                  <div class="w-4 h-1.5 bg-accent-blue rounded-full opacity-80"></div>
-                  <div class="w-2 h-2 bg-accent-blue rounded-full animate-pulse-glow"></div>
+                  <div class="w-10 h-1.5 bg-water rounded-full opacity-40"></div>
+                  <div class="w-7 h-1.5 bg-water rounded-full opacity-60"></div>
+                  <div class="w-4 h-1.5 bg-water rounded-full opacity-80"></div>
+                  <div class="w-2 h-2 bg-water rounded-full animate-pulse-glow"></div>
                 </div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[1].label}</span>
-            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[1].title}</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[1].desc}</p>
+            <span class="pixel-font text-[10px] text-orange">{content.howItWorks.steps[1].label}</span>
+            <h3 class="pixel-font text-xs text-text">{content.howItWorks.steps[1].title}</h3>
+            <p class="text-text-mid text-sm max-w-xs">{content.howItWorks.steps[1].desc}</p>
           </div>
 
           <!-- Step 3 -->
           <div class="flex flex-col items-center text-center gap-4">
-            <div class="w-20 h-20 bg-cream rounded-lg pixel-border flex items-center justify-center">
+            <div class="w-20 h-20 bg-bg rounded-lg pixel-border flex items-center justify-center">
               <div class="w-16 h-16 flex items-center justify-center relative">
-                <div class="w-12 h-12 bg-green-plant pixel-border flex flex-col items-center justify-center gap-1">
+                <div class="w-12 h-12 bg-primary pixel-border flex flex-col items-center justify-center gap-1">
                   <div class="flex gap-2">
-                    <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
-                    <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                    <div class="w-1.5 h-1.5 bg-text rounded-full"></div>
+                    <div class="w-1.5 h-1.5 bg-text rounded-full"></div>
                   </div>
-                  <div class="w-4 h-1.5 border-b-2 border-pixel-black rounded-b-full"></div>
+                  <div class="w-4 h-1.5 border-b-2 border-text rounded-b-full"></div>
                 </div>
-                <div class="absolute -top-1 -right-1 text-accent-orange pixel-font text-[8px] animate-pulse-glow">*</div>
-                <div class="absolute -bottom-1 -left-1 text-accent-orange pixel-font text-[8px] animate-pulse-glow">*</div>
+                <div class="absolute -top-1 -right-1 text-orange pixel-font text-[8px] animate-pulse-glow">*</div>
+                <div class="absolute -bottom-1 -left-1 text-orange pixel-font text-[8px] animate-pulse-glow">*</div>
               </div>
             </div>
-            <span class="pixel-font text-[10px] text-accent-orange">{content.howItWorks.steps[2].label}</span>
-            <h3 class="pixel-font text-xs text-pixel-black">{content.howItWorks.steps[2].title}</h3>
-            <p class="text-pixel-gray text-sm max-w-xs">{content.howItWorks.steps[2].desc}</p>
+            <span class="pixel-font text-[10px] text-orange">{content.howItWorks.steps[2].label}</span>
+            <h3 class="pixel-font text-xs text-text">{content.howItWorks.steps[2].title}</h3>
+            <p class="text-text-mid text-sm max-w-xs">{content.howItWorks.steps[2].desc}</p>
           </div>
         </div>
       </div>
@@ -196,17 +196,17 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <!-- PRODUCT LINEUP -->
     <section id="products" class="py-16 sm:py-24">
       <div class="max-w-6xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.sections.productLineup}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-lg mx-auto">
           From a tiny soil sensor to a full AI-powered plant hub&nbsp;&mdash; pick what fits your jungle.
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {content.products.map((p: any, i: number) => (
             <div
-              class="bg-cream-dark rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
+              class="bg-bg-warm rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4 relative overflow-hidden"
             >
               <div class="flex items-center justify-center" style={`height: ${i === 3 ? 160 : 140}px`}>
                 {i === 0 && (
@@ -345,14 +345,14 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 )}
               </div>
 
-              <h3 class="pixel-font text-[10px] text-pixel-black">{p.name}</h3>
-              <span class="italic text-pixel-gray text-sm">&ldquo;{p.nickname}&rdquo;</span>
-              <span class="pixel-font text-xs text-green-dark">{p.price}</span>
+              <h3 class="pixel-font text-[10px] text-text">{p.name}</h3>
+              <span class="italic text-text-mid text-sm">&ldquo;{p.nickname}&rdquo;</span>
+              <span class="pixel-font text-xs text-primary-dark">{p.price}</span>
 
-              <ul class="text-sm text-pixel-gray space-y-1 mt-auto">
+              <ul class="text-sm text-text-mid space-y-1 mt-auto">
                 {p.specs.map((s: string) => (
                   <li class="flex items-center gap-1.5 justify-center">
-                    <span class="w-1.5 h-1.5 bg-green-plant inline-block"></span>
+                    <span class="w-1.5 h-1.5 bg-primary inline-block"></span>
                     {s}
                   </li>
                 ))}
@@ -364,12 +364,12 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     </section>
 
     <!-- ECOSYSTEM / SETUPS -->
-    <section class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+    <section class="bg-bg-warm py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.sections.setupConfigurations}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-md mx-auto">
           Mix and match to fit your space.
         </p>
 
@@ -377,7 +377,7 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           {content.setups.map((s: any, idx: number) => {
             const icon = SETUP_ICONS[idx];
             return (
-            <div class="bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4">
+            <div class="bg-bg rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-4">
               <div class="h-20 flex items-end justify-center gap-2">
                 {icon === "hub" && (
                   <Fragment>
@@ -497,9 +497,9 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 )}
               </div>
 
-              <h3 class="pixel-font text-[10px] text-pixel-black">{s.title}</h3>
-              <p class="text-sm text-pixel-gray">{s.desc}</p>
-              <span class="pixel-font text-[8px] text-green-dark bg-cream-dark px-3 py-1 rounded-full">
+              <h3 class="pixel-font text-[10px] text-text">{s.title}</h3>
+              <p class="text-sm text-text-mid">{s.desc}</p>
+              <span class="pixel-font text-[8px] text-primary-dark bg-bg-warm px-3 py-1 rounded-full">
                 {s.detail}
               </span>
             </div>
@@ -511,79 +511,79 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <!-- APP PREVIEW -->
     <section id="app" class="py-16 sm:py-24">
       <div class="max-w-5xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.sections.appExperience}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-md mx-auto">
           {content.appPreview.subtitle}
         </p>
 
         <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           <!-- PhoneMockup -->
           <div class="mx-auto w-56 sm:w-64 relative">
-            <div class="border-4 border-pixel-black rounded-2xl bg-cream-dark p-3 relative overflow-hidden scanlines">
-              <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg -mt-1 mb-3"></div>
+            <div class="border-4 border-text rounded-2xl bg-bg-warm p-3 relative overflow-hidden scanlines">
+              <div class="mx-auto w-20 h-3 bg-text rounded-b-lg -mt-1 mb-3"></div>
               <div class="flex justify-between items-center mb-3 px-1">
-                <span class="pixel-font text-[6px] text-pixel-gray">9:41</span>
-                <span class="pixel-font text-[6px] text-green-plant">Plantgotchi</span>
+                <span class="pixel-font text-[6px] text-text-mid">9:41</span>
+                <span class="pixel-font text-[6px] text-primary">Plantgotchi</span>
                 <div class="flex gap-0.5">
-                  <div class="w-2 h-1 bg-green-plant"></div>
-                  <div class="w-2 h-1.5 bg-green-plant"></div>
-                  <div class="w-2 h-2 bg-green-plant"></div>
+                  <div class="w-2 h-1 bg-primary"></div>
+                  <div class="w-2 h-1.5 bg-primary"></div>
+                  <div class="w-2 h-2 bg-primary"></div>
                 </div>
               </div>
-              <div class="bg-cream rounded-lg p-3 mb-2 pixel-border">
+              <div class="bg-bg rounded-lg p-3 mb-2 pixel-border">
                 <div class="flex items-end justify-center gap-2 mb-2">
-                  <div class="w-6 h-4 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                  <div class="w-3 h-8 bg-green-dark"></div>
-                  <div class="w-6 h-4 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                  <div class="w-6 h-4 bg-primary rounded-sm rotate-[-15deg]"></div>
+                  <div class="w-3 h-8 bg-primary-dark"></div>
+                  <div class="w-6 h-4 bg-primary rounded-sm rotate-[15deg]"></div>
                 </div>
                 <div class="mx-auto w-8 h-5 bg-brown rounded-sm"></div>
                 <div class="flex justify-center gap-1.5 -mt-6 mb-3">
-                  <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
-                  <div class="w-1.5 h-1.5 bg-pixel-black rounded-full"></div>
+                  <div class="w-1.5 h-1.5 bg-text rounded-full"></div>
+                  <div class="w-1.5 h-1.5 bg-text rounded-full"></div>
                 </div>
-                <p class="pixel-font text-[7px] text-center text-green-dark mt-1">Fern-ando</p>
+                <p class="pixel-font text-[7px] text-center text-primary-dark mt-1">Fern-ando</p>
               </div>
               <div class="mb-2">
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="pixel-font text-[6px] text-pixel-gray">{content.appPreview.phoneMockup.hp}</span>
-                  <span class="pixel-font text-[6px] text-green-plant">92%</span>
+                  <span class="pixel-font text-[6px] text-text-mid">{content.appPreview.phoneMockup.hp}</span>
+                  <span class="pixel-font text-[6px] text-primary">92%</span>
                 </div>
-                <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
-                  <div class="h-full bg-green-plant rounded-sm" style="width: 92%;"></div>
+                <div class="w-full h-2.5 bg-bg rounded-sm pixel-border">
+                  <div class="h-full bg-primary rounded-sm" style="width: 92%;"></div>
                 </div>
               </div>
               <div class="mb-2">
                 <div class="flex justify-between items-center mb-0.5">
-                  <span class="pixel-font text-[6px] text-pixel-gray">{content.appPreview.phoneMockup.moisture}</span>
-                  <span class="pixel-font text-[6px] text-accent-blue">67%</span>
+                  <span class="pixel-font text-[6px] text-text-mid">{content.appPreview.phoneMockup.moisture}</span>
+                  <span class="pixel-font text-[6px] text-water">67%</span>
                 </div>
-                <div class="w-full h-2.5 bg-cream rounded-sm pixel-border">
-                  <div class="h-full bg-accent-blue rounded-sm" style="width: 67%;"></div>
+                <div class="w-full h-2.5 bg-bg rounded-sm pixel-border">
+                  <div class="h-full bg-water rounded-sm" style="width: 67%;"></div>
                 </div>
               </div>
-              <div class="bg-cream rounded-lg p-2 mb-2 pixel-border">
-                <span class="pixel-font text-[5px] text-pixel-gray block mb-1">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
+              <div class="bg-bg rounded-lg p-2 mb-2 pixel-border">
+                <span class="pixel-font text-[5px] text-text-mid block mb-1">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
                 <div class="flex items-end gap-0.5 h-6">
                   {MOISTURE_CHART.map((v) => (
-                    <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
+                    <div class="flex-1 bg-water rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
                   ))}
                 </div>
               </div>
               <div class="flex gap-1.5">
-                <div class="flex-1 bg-accent-blue text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.water}</div>
-                <div class="flex-1 bg-accent-orange text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.photo}</div>
-                <div class="flex-1 bg-green-plant text-cream text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.history}</div>
+                <div class="flex-1 bg-water text-bg text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.water}</div>
+                <div class="flex-1 bg-orange text-bg text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.photo}</div>
+                <div class="flex-1 bg-primary text-bg text-center py-1 rounded-sm pixel-font text-[5px]">{content.appPreview.phoneMockup.history}</div>
               </div>
             </div>
           </div>
 
           <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
             {content.appFeatures.map((f: any) => (
-              <div class="bg-cream-dark rounded-lg pixel-border p-5">
-                <h3 class="pixel-font text-[9px] text-pixel-black mb-2">{f.title}</h3>
-                <p class="text-sm text-pixel-gray">{f.desc}</p>
+              <div class="bg-bg-warm rounded-lg pixel-border p-5">
+                <h3 class="pixel-font text-[9px] text-text mb-2">{f.title}</h3>
+                <p class="text-sm text-text-mid">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -592,18 +592,18 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     </section>
 
     <!-- DIGITAL GARDEN -->
-    <section id="garden" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+    <section id="garden" class="bg-bg-warm py-16 sm:py-24 relative scanlines">
       <div class="max-w-6xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.digitalGarden.title}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-lg mx-auto">
           {content.digitalGarden.subtitle}
         </p>
 
         <!-- Desktop mockup -->
         <div class="mb-10">
-          <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.desktopView}</div>
+          <div class="pixel-font text-[8px] text-center text-text-mid mb-3">{content.digitalGarden.desktopView}</div>
           <div class="rounded-xl overflow-hidden pixel-border shadow-lg">
             <img
               src="/garden-desktop.png"
@@ -616,9 +616,9 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
         <div class="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-14">
           <!-- Mobile mockup -->
           <div class="w-56 sm:w-64 shrink-0">
-            <div class="pixel-font text-[8px] text-center text-pixel-gray mb-3">{content.digitalGarden.mobileView}</div>
-            <div class="border-4 border-pixel-black rounded-[24px] bg-pixel-black p-1.5 shadow-lg">
-              <div class="mx-auto w-20 h-3 bg-pixel-black rounded-b-lg relative z-10"></div>
+            <div class="pixel-font text-[8px] text-center text-text-mid mb-3">{content.digitalGarden.mobileView}</div>
+            <div class="border-4 border-text rounded-[24px] bg-text p-1.5 shadow-lg">
+              <div class="mx-auto w-20 h-3 bg-text rounded-b-lg relative z-10"></div>
               <div class="rounded-[18px] overflow-hidden -mt-1.5">
                 <img
                   src="/garden-mobile.png"
@@ -626,27 +626,27 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                   class="w-full h-auto block"
                 />
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-gray/40 rounded-full mt-1.5"></div>
+              <div class="mx-auto w-12 h-1 bg-text-mid/40 rounded-full mt-1.5"></div>
             </div>
           </div>
 
           <div class="max-w-sm text-center sm:text-left">
-            <h3 class="pixel-font text-xs text-green-dark mb-3">{content.digitalGarden.allPlantsTitle}</h3>
-            <p class="text-sm text-pixel-gray mb-4">
+            <h3 class="pixel-font text-xs text-primary-dark mb-3">{content.digitalGarden.allPlantsTitle}</h3>
+            <p class="text-sm text-text-mid mb-4">
               {content.digitalGarden.allPlantsDesc}
             </p>
             <div class="space-y-2">
               {content.gardenFeatures.map((item: string) => (
                 <div class="flex items-center gap-2">
-                  <span class="w-1.5 h-1.5 bg-green-plant shrink-0"></span>
-                  <span class="text-sm text-pixel-gray">{item}</span>
+                  <span class="w-1.5 h-1.5 bg-primary shrink-0"></span>
+                  <span class="text-sm text-text-mid">{item}</span>
                 </div>
               ))}
             </div>
 
             <a
               href={`${prefix}/demo`}
-              class="inline-block mt-6 pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
+              class="inline-block mt-6 pixel-font text-[8px] bg-primary text-bg px-5 py-2.5 pixel-border hover:bg-primary-dark transition-colors"
             >
               {content.digitalGarden.tryDemo}
             </a>
@@ -658,10 +658,10 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <!-- iOS APP SCREENS -->
     <section id="screens" class="py-16 sm:py-24">
       <div class="max-w-6xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.iosScreens.title}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-lg mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-lg mx-auto">
           {content.iosScreens.subtitle}
         </p>
 
@@ -669,197 +669,197 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
 
           <!-- 1: Garden Overview -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-1">{content.iosScreens.myGarden}</div>
+                  <div class="pixel-font text-[5px] text-primary-dark mb-1">{content.iosScreens.myGarden}</div>
                   <div class="grid grid-cols-2 gap-1">
                     {GARDEN_PLANTS.slice(0, 4).map((p) => (
-                      <div class="bg-cream-dark rounded p-1 text-center">
+                      <div class="bg-bg-warm rounded p-1 text-center">
                         <div class="flex items-end justify-center gap-0.5 h-4">
-                          <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                          <div class="w-0.5 h-3 bg-green-dark"></div>
-                          <div class="w-1.5 h-1 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                          <div class="w-1.5 h-1 bg-primary rounded-sm rotate-[-15deg]"></div>
+                          <div class="w-0.5 h-3 bg-primary-dark"></div>
+                          <div class="w-1.5 h-1 bg-primary rounded-sm rotate-[15deg]"></div>
                         </div>
                         <div class="mx-auto w-2 h-1 bg-brown rounded-sm"></div>
-                        <p class="pixel-font text-[3px] text-green-dark mt-0.5 truncate">{p.name}</p>
-                        <div class="w-full h-0.5 bg-cream rounded-sm mt-0.5">
-                          <div class="h-full bg-accent-blue rounded-sm" style={`width: ${p.moisture}%;`}></div>
+                        <p class="pixel-font text-[3px] text-primary-dark mt-0.5 truncate">{p.name}</p>
+                        <div class="w-full h-0.5 bg-bg rounded-sm mt-0.5">
+                          <div class="h-full bg-water rounded-sm" style={`width: ${p.moisture}%;`}></div>
                         </div>
                       </div>
                     ))}
                   </div>
                   <div class="mt-1 text-center">
-                    <span class="pixel-font text-[3px] text-pixel-gray">{content.iosScreens.morePlants}</span>
+                    <span class="pixel-font text-[3px] text-text-mid">{content.iosScreens.morePlants}</span>
                   </div>
-                  <div class="flex justify-around mt-2 pt-1 border-t border-pixel-gray/20">
+                  <div class="flex justify-around mt-2 pt-1 border-t border-text-mid/20">
                     {content.iosScreens.tabLabels.map((label: string, i: number) => (
-                      <span class={`pixel-font text-[3px] ${i === 0 ? "text-green-dark" : "text-pixel-gray"}`}>{label}</span>
+                      <span class={`pixel-font text-[3px] ${i === 0 ? "text-primary-dark" : "text-text-mid"}`}>{label}</span>
                     ))}
                   </div>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[0]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[0]}</p>
           </div>
 
           <!-- 2: Plant Detail -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; {content.iosScreens.back}</div>
+                  <div class="pixel-font text-[4px] text-water mb-1">&larr; {content.iosScreens.back}</div>
                   <div class="flex items-end justify-center gap-1 h-8 mb-1">
-                    <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[-15deg]"></div>
-                    <div class="w-1.5 h-6 bg-green-dark"></div>
-                    <div class="w-3 h-2 bg-green-plant rounded-sm rotate-[15deg]"></div>
+                    <div class="w-3 h-2 bg-primary rounded-sm rotate-[-15deg]"></div>
+                    <div class="w-1.5 h-6 bg-primary-dark"></div>
+                    <div class="w-3 h-2 bg-primary rounded-sm rotate-[15deg]"></div>
                   </div>
                   <div class="mx-auto w-4 h-2 bg-brown rounded-sm -mt-0.5"></div>
-                  <p class="pixel-font text-[5px] text-center text-green-dark mt-1">Fern-ando</p>
-                  <p class="text-[4px] text-center text-pixel-gray">Boston Fern</p>
+                  <p class="pixel-font text-[5px] text-center text-primary-dark mt-1">Fern-ando</p>
+                  <p class="text-[4px] text-center text-text-mid">Boston Fern</p>
                   <div class="space-y-1 mt-2">
                     {DETAIL_STATS.map((st) => (
                       <div>
                         <div class="flex justify-between">
-                          <span class="pixel-font text-[3px] text-pixel-gray">{st.label}</span>
+                          <span class="pixel-font text-[3px] text-text-mid">{st.label}</span>
                           <span class="pixel-font text-[3px]">{st.value}</span>
                         </div>
-                        <div class="w-full h-1 bg-cream-dark rounded-sm">
+                        <div class="w-full h-1 bg-bg-warm rounded-sm">
                           <div class={`h-full ${st.color} rounded-sm`} style={`width: ${st.pct}%;`}></div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div class="bg-cream-dark rounded p-1 mt-2">
-                    <span class="pixel-font text-[3px] text-pixel-gray">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
+                  <div class="bg-bg-warm rounded p-1 mt-2">
+                    <span class="pixel-font text-[3px] text-text-mid">{content.appPreview.phoneMockup.sevenDayMoisture}</span>
                     <div class="flex items-end gap-px h-4 mt-0.5">
                       {DETAIL_CHART.map((v) => (
-                        <div class="flex-1 bg-accent-blue rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
+                        <div class="flex-1 bg-water rounded-t-sm opacity-70" style={`height: ${v}%;`}></div>
                       ))}
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[1]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[1]}</p>
           </div>
 
           <!-- 3: Photo Timeline -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[4px] text-accent-blue mb-1">&larr; {content.iosScreens.back}</div>
-                  <div class="pixel-font text-[5px] text-green-dark mb-1">{content.iosScreens.photoTimeline}</div>
+                  <div class="pixel-font text-[4px] text-water mb-1">&larr; {content.iosScreens.back}</div>
+                  <div class="pixel-font text-[5px] text-primary-dark mb-1">{content.iosScreens.photoTimeline}</div>
                   <div class="space-y-1">
                     {content.photoLabels.map((date: string, i: number) => (
                       <div>
-                        <span class="pixel-font text-[3px] text-pixel-gray">{date}</span>
+                        <span class="pixel-font text-[3px] text-text-mid">{date}</span>
                         <div class={`w-full h-8 rounded mt-0.5 ${
-                          i === 0 ? "bg-green-plant/30" : i === 1 ? "bg-green-plant/25" : i === 2 ? "bg-green-plant/20" : "bg-green-plant/15"
+                          i === 0 ? "bg-primary/30" : i === 1 ? "bg-primary/25" : i === 2 ? "bg-primary/20" : "bg-primary/15"
                         } flex items-center justify-center`}>
                           <div class="flex items-end justify-center gap-0.5">
-                            <div class="w-2 rounded-sm rotate-[-15deg] bg-green-plant" style={`height: ${6 + i * 1.5}px;`}></div>
-                            <div class="w-1 bg-green-dark" style={`height: ${12 + i * 2}px;`}></div>
-                            <div class="w-2 rounded-sm rotate-[15deg] bg-green-plant" style={`height: ${6 + i * 1.5}px;`}></div>
+                            <div class="w-2 rounded-sm rotate-[-15deg] bg-primary" style={`height: ${6 + i * 1.5}px;`}></div>
+                            <div class="w-1 bg-primary-dark" style={`height: ${12 + i * 2}px;`}></div>
+                            <div class="w-2 rounded-sm rotate-[15deg] bg-primary" style={`height: ${6 + i * 1.5}px;`}></div>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                   <div class="mt-1">
-                    <span class="pixel-font text-[3px] text-accent-blue text-center block">&#9654; {content.iosScreens.playTimelapse}</span>
+                    <span class="pixel-font text-[3px] text-water text-center block">&#9654; {content.iosScreens.playTimelapse}</span>
                   </div>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[2]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[2]}</p>
           </div>
 
           <!-- 4: Notifications -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2">{content.iosScreens.alerts}</div>
+                  <div class="pixel-font text-[5px] text-primary-dark mb-2">{content.iosScreens.alerts}</div>
                   <div class="space-y-1.5">
                     {content.notifications.map((n: any, ni: number) => (
-                      <div class="flex gap-1.5 items-start bg-cream-dark rounded p-1">
+                      <div class="flex gap-1.5 items-start bg-bg-warm rounded p-1">
                         <div class={`w-1.5 h-1.5 rounded-full ${NOTIFICATION_ICONS[ni]} shrink-0 mt-0.5`}></div>
                         <div class="flex-1 min-w-0">
                           <div class="flex justify-between">
-                            <span class="pixel-font text-[3px] text-pixel-black truncate">{n.title}</span>
-                            <span class="pixel-font text-[2.5px] text-pixel-gray shrink-0 ml-1">{n.time}</span>
+                            <span class="pixel-font text-[3px] text-text truncate">{n.title}</span>
+                            <span class="pixel-font text-[2.5px] text-text-mid shrink-0 ml-1">{n.time}</span>
                           </div>
-                          <span class="text-[3px] text-pixel-gray">{n.desc}</span>
+                          <span class="text-[3px] text-text-mid">{n.desc}</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[3]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[3]}</p>
           </div>
 
           <!-- 5: Sensor Pairing -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2 text-center">{content.iosScreens.addSensor}</div>
+                  <div class="pixel-font text-[5px] text-primary-dark mb-2 text-center">{content.iosScreens.addSensor}</div>
                   <div class="flex justify-center mb-2">
-                    <div class="w-12 h-12 rounded-full border-2 border-green-plant/30 flex items-center justify-center relative">
-                      <div class="w-8 h-8 rounded-full border-2 border-green-plant/50 flex items-center justify-center">
-                        <div class="w-4 h-4 rounded-full bg-green-plant/20 flex items-center justify-center">
-                          <div class="w-2 h-2 bg-green-plant rounded-full animate-pulse-glow"></div>
+                    <div class="w-12 h-12 rounded-full border-2 border-primary/30 flex items-center justify-center relative">
+                      <div class="w-8 h-8 rounded-full border-2 border-primary/50 flex items-center justify-center">
+                        <div class="w-4 h-4 rounded-full bg-primary/20 flex items-center justify-center">
+                          <div class="w-2 h-2 bg-primary rounded-full animate-pulse-glow"></div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <p class="pixel-font text-[4px] text-center text-pixel-gray mb-2">{content.iosScreens.scanning}</p>
+                  <p class="pixel-font text-[4px] text-center text-text-mid mb-2">{content.iosScreens.scanning}</p>
                   <div class="space-y-1">
                     {FOUND_SENSORS.map((sensor, i) => (
-                      <div class="flex items-center gap-1.5 bg-cream-dark rounded p-1.5">
-                        <div class={`w-2 h-2 rounded-full ${i === 0 ? "bg-green-plant animate-pulse-glow" : "bg-pixel-gray/30"}`}></div>
-                        <span class="pixel-font text-[3.5px] text-pixel-black flex-1">{sensor}</span>
-                        <span class="pixel-font text-[3px] text-cream bg-green-plant px-1.5 py-0.5 rounded">{content.iosScreens.pair}</span>
+                      <div class="flex items-center gap-1.5 bg-bg-warm rounded p-1.5">
+                        <div class={`w-2 h-2 rounded-full ${i === 0 ? "bg-primary animate-pulse-glow" : "bg-text-mid/30"}`}></div>
+                        <span class="pixel-font text-[3.5px] text-text flex-1">{sensor}</span>
+                        <span class="pixel-font text-[3px] text-bg bg-primary px-1.5 py-0.5 rounded">{content.iosScreens.pair}</span>
                       </div>
                     ))}
                   </div>
-                  <p class="text-[3px] text-pixel-gray text-center mt-2">{content.iosScreens.pairingInstructions}</p>
+                  <p class="text-[3px] text-text-mid text-center mt-2">{content.iosScreens.pairingInstructions}</p>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[4]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[4]}</p>
           </div>
 
           <!-- 6: Settings -->
           <div class="w-full max-w-[200px] mx-auto">
-            <div class="border-[3px] border-pixel-black rounded-[20px] bg-cream-dark p-2.5 relative overflow-hidden">
-              <div class="mx-auto w-16 h-2.5 bg-pixel-black rounded-full mb-2"></div>
-              <div class="bg-cream rounded-lg overflow-hidden">
+            <div class="border-[3px] border-text rounded-[20px] bg-bg-warm p-2.5 relative overflow-hidden">
+              <div class="mx-auto w-16 h-2.5 bg-text rounded-full mb-2"></div>
+              <div class="bg-bg rounded-lg overflow-hidden">
                 <div class="p-2">
-                  <div class="pixel-font text-[5px] text-green-dark mb-2">{content.iosScreens.settings}</div>
+                  <div class="pixel-font text-[5px] text-primary-dark mb-2">{content.iosScreens.settings}</div>
                   <div class="space-y-1">
                     {content.settingsGroups.map((group: any) => (
                       <div>
-                        <span class="pixel-font text-[3px] text-pixel-gray">{group.section}</span>
-                        <div class="bg-cream-dark rounded mt-0.5">
+                        <span class="pixel-font text-[3px] text-text-mid">{group.section}</span>
+                        <div class="bg-bg-warm rounded mt-0.5">
                           {group.items.map((item: string, i: number) => (
-                            <div class={`flex items-center justify-between px-1.5 py-1 ${i < group.items.length - 1 ? "border-b border-cream" : ""}`}>
-                              <span class="text-[3.5px] text-pixel-black">{item}</span>
-                              <div class="w-4 h-2 bg-green-plant rounded-full relative">
+                            <div class={`flex items-center justify-between px-1.5 py-1 ${i < group.items.length - 1 ? "border-b border-bg" : ""}`}>
+                              <span class="text-[3.5px] text-text">{item}</span>
+                              <div class="w-4 h-2 bg-primary rounded-full relative">
                                 <div class="absolute right-0.5 top-0.5 w-1 h-1 bg-white rounded-full"></div>
                               </div>
                             </div>
@@ -870,58 +870,58 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                   </div>
                 </div>
               </div>
-              <div class="mx-auto w-12 h-1 bg-pixel-black/30 rounded-full mt-2"></div>
+              <div class="mx-auto w-12 h-1 bg-text/30 rounded-full mt-2"></div>
             </div>
-            <p class="pixel-font text-[7px] text-center text-green-dark mt-2">{content.iosScreens.screenLabels[5]}</p>
+            <p class="pixel-font text-[7px] text-center text-primary-dark mt-2">{content.iosScreens.screenLabels[5]}</p>
           </div>
         </div>
 
         <!-- Coming to App Store badge -->
         <div class="flex flex-col items-center mt-12 gap-3">
-          <div class="bg-pixel-black text-cream rounded-xl px-6 py-3 flex items-center gap-3">
+          <div class="bg-text text-bg rounded-xl px-6 py-3 flex items-center gap-3">
             <div class="flex flex-col items-center">
-              <svg class="w-6 h-6 text-cream" viewBox="0 0 24 24" fill="currentColor">
+              <svg class="w-6 h-6 text-bg" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
               </svg>
             </div>
             <div>
-              <span class="pixel-font text-[6px] text-cream/60 block">{content.iosScreens.comingSoon}</span>
-              <span class="pixel-font text-[9px] text-cream">{content.iosScreens.downloadAppStore}</span>
+              <span class="pixel-font text-[6px] text-bg/60 block">{content.iosScreens.comingSoon}</span>
+              <span class="pixel-font text-[9px] text-bg">{content.iosScreens.downloadAppStore}</span>
             </div>
           </div>
-          <p class="text-xs text-pixel-gray">{content.iosScreens.nativeApp}</p>
+          <p class="text-xs text-text-mid">{content.iosScreens.nativeApp}</p>
         </div>
       </div>
     </section>
 
     <!-- PRICING / BUNDLES -->
-    <section id="pricing" class="bg-cream-dark py-16 sm:py-24 relative scanlines">
+    <section id="pricing" class="bg-bg-warm py-16 sm:py-24 relative scanlines">
       <div class="max-w-5xl mx-auto px-4">
-        <h2 class="pixel-font text-sm sm:text-base text-center text-green-dark mb-4">
+        <h2 class="pixel-font text-sm sm:text-base text-center text-primary-dark mb-4">
           {content.sections.preOrderBundles}
         </h2>
-        <p class="text-center text-pixel-gray mb-14 max-w-md mx-auto">
+        <p class="text-center text-text-mid mb-14 max-w-md mx-auto">
           {content.bundlesSection.subtitle}
         </p>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {content.bundles.map((b: any, i: number) => (
             <div
-              class={`bg-cream rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-3 ${
-                i === 1 ? "ring-2 ring-green-plant" : ""
+              class={`bg-bg rounded-lg pixel-border p-6 flex flex-col items-center text-center gap-3 ${
+                i === 1 ? "ring-2 ring-primary" : ""
               }`}
             >
               {i === 1 && (
-                <span class="pixel-font text-[7px] bg-green-plant text-cream px-2 py-0.5 -mt-3 mb-1">
+                <span class="pixel-font text-[7px] bg-primary text-bg px-2 py-0.5 -mt-3 mb-1">
                   {content.bundlesSection.bestValue}
                 </span>
               )}
-              <h3 class="pixel-font text-[10px] text-pixel-black">{b.name}</h3>
-              <span class="pixel-font text-xl text-green-dark">{b.price}</span>
-              <p class="text-sm text-pixel-gray">{b.contents}</p>
+              <h3 class="pixel-font text-[10px] text-text">{b.name}</h3>
+              <span class="pixel-font text-xl text-primary-dark">{b.price}</span>
+              <p class="text-sm text-text-mid">{b.contents}</p>
               <a
                 href="#"
-                class="mt-auto pixel-font text-[8px] bg-green-plant text-cream px-5 py-2.5 pixel-border hover:bg-green-dark transition-colors"
+                class="mt-auto pixel-font text-[8px] bg-primary text-bg px-5 py-2.5 pixel-border hover:bg-primary-dark transition-colors"
               >
                 {content.bundlesSection.preOrder}
               </a>
@@ -934,37 +934,37 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
     <!-- OPEN SOURCE -->
     <section class="py-12 sm:py-16">
       <div class="max-w-3xl mx-auto px-4 text-center">
-        <div class="bg-cream-dark rounded-lg pixel-border p-8 relative overflow-hidden scanlines">
-          <h2 class="pixel-font text-[10px] sm:text-xs text-green-dark mb-4">
+        <div class="bg-bg-warm rounded-lg pixel-border p-8 relative overflow-hidden scanlines">
+          <h2 class="pixel-font text-[10px] sm:text-xs text-primary-dark mb-4">
             {content.openSource.title}
           </h2>
-          <p class="text-sm text-pixel-gray mb-4 max-w-md mx-auto">
+          <p class="text-sm text-text-mid mb-4 max-w-md mx-auto">
             {content.openSourceSection.forkedFrom}{" "}
             <a
               href="https://github.com/rbaron/b-parasite"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-accent-blue underline hover:text-accent-blue/80"
+              class="text-water underline hover:text-water/80"
             >
               b-parasite
             </a>{" "}
             {content.openSourceSection.byRbaron}
           </p>
-          <div class="inline-flex items-center gap-2 bg-cream px-4 py-2 rounded-full pixel-border">
-            <span class="pixel-font text-[7px] text-pixel-gray">{content.openSourceSection.license}</span>
-            <span class="pixel-font text-[8px] text-green-dark">CC BY-SA 4.0</span>
+          <div class="inline-flex items-center gap-2 bg-bg px-4 py-2 rounded-full pixel-border">
+            <span class="pixel-font text-[7px] text-text-mid">{content.openSourceSection.license}</span>
+            <span class="pixel-font text-[8px] text-primary-dark">CC BY-SA 4.0</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-pixel-black text-cream py-12">
+    <footer class="bg-text text-bg py-12">
       <div class="max-w-5xl mx-auto px-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div>
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.stayInLoop}</h3>
-            <p class="text-sm text-cream/60 mb-4">
+            <h3 class="pixel-font text-[10px] text-primary-light mb-4">{content.footerSection.stayInLoop}</h3>
+            <p class="text-sm text-bg/60 mb-4">
               {content.footerSection.stayInLoopDesc}
             </p>
             <form class="flex gap-2">
@@ -972,11 +972,11 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
                 type="email"
                 placeholder={content.footerSection.emailPlaceholder}
                 aria-label={content.footerSection.emailAriaLabel}
-                class="flex-1 bg-pixel-gray/30 text-cream text-sm px-3 py-2 rounded-sm border border-pixel-gray/40 placeholder:text-cream/30 focus:outline-none focus:border-green-plant"
+                class="flex-1 bg-text-mid/30 text-bg text-sm px-3 py-2 rounded-sm border border-text-mid/40 placeholder:text-bg/30 focus:outline-none focus:border-primary"
               />
               <button
                 type="submit"
-                class="pixel-font text-[8px] bg-green-plant text-cream px-4 py-2 hover:bg-green-dark transition-colors"
+                class="pixel-font text-[8px] bg-primary text-bg px-4 py-2 hover:bg-primary-dark transition-colors"
               >
                 {content.footerSection.join}
               </button>
@@ -984,21 +984,21 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           </div>
 
           <div class="sm:text-center">
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.linksTitle}</h3>
-            <ul class="space-y-2 text-sm text-cream/60">
+            <h3 class="pixel-font text-[10px] text-primary-light mb-4">{content.footerSection.linksTitle}</h3>
+            <ul class="space-y-2 text-sm text-bg/60">
               {[["#how-it-works", content.footerSection.linkItems[0]], ["#products", content.footerSection.linkItems[1]], ["#pricing", content.footerSection.linkItems[2]], ["#app", content.footerSection.linkItems[3]], [`${prefix}/mocks`, content.footerSection.linkItems[4]]].map(([href, label]: string[]) => (
-                <li><a href={href} class="hover:text-cream transition-colors">{label}</a></li>
+                <li><a href={href} class="hover:text-bg transition-colors">{label}</a></li>
               ))}
             </ul>
           </div>
 
           <div class="sm:text-right">
-            <h3 class="pixel-font text-[10px] text-green-light mb-4">{content.footerSection.followUs}</h3>
+            <h3 class="pixel-font text-[10px] text-primary-light mb-4">{content.footerSection.followUs}</h3>
             <div class="flex sm:justify-end gap-4">
               {content.footerSection.socialLinks.map((s: string) => (
                 <a
                   href="#"
-                  class="text-sm text-cream/60 hover:text-cream transition-colors"
+                  class="text-sm text-bg/60 hover:text-bg transition-colors"
                 >
                   {s}
                 </a>
@@ -1007,8 +1007,8 @@ const NOTIFICATION_ICONS = ["bg-accent-orange", "bg-accent-blue", "bg-green-plan
           </div>
         </div>
 
-        <div class="border-t border-pixel-gray/30 mt-10 pt-6 text-center">
-          <p class="pixel-font text-[8px] text-cream/40">
+        <div class="border-t border-text-mid/30 mt-10 pt-6 text-center">
+          <p class="pixel-font text-[8px] text-bg/40">
             {content.footer.tagline} &bull; Plantgotchi &copy; 2026
           </p>
         </div>
