@@ -156,7 +156,7 @@ export default function NewConversationModal({
             value={searchQuery}
             onChange={(e) => handleSearch(e.target.value)}
             placeholder={labels.searchUsers}
-            className="w-full pixel-border px-3 py-2 font-pixel text-pixel-sm bg-white outline-none mb-3"
+            className="w-full pixel-border px-3 py-2 text-sm bg-white outline-none mb-3"
           />
 
           <div className="space-y-1">

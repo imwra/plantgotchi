@@ -54,7 +54,7 @@ export default function ConversationList({ conversations, activeId, onSelect, on
         <input
           type="text"
           placeholder={labels.searchPlaceholder}
-          className="w-full px-3 py-1.5 font-pixel text-pixel-xs bg-bg rounded-md border border-text-mid/20 outline-none focus:border-primary/50"
+          className="w-full px-3 py-1.5 text-sm bg-bg rounded-md border border-text-mid/20 outline-none focus:border-primary/50"
           readOnly
         />
       </div>
@@ -64,7 +64,7 @@ export default function ConversationList({ conversations, activeId, onSelect, on
           <div className="flex flex-col items-center justify-center h-full px-4 text-center">
             <span className="text-3xl mb-3">🌱</span>
             <p className="font-pixel text-pixel-sm text-text-mid">{labels.noConversations}</p>
-            <p className="text-xs text-text-mid mt-1">{labels.noConversationsDesc}</p>
+            <p className="text-sm text-text-mid mt-1">{labels.noConversationsDesc}</p>
           </div>
         ) : (
           <div className="divide-y divide-text-mid/10">

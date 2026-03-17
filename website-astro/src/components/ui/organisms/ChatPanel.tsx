@@ -80,7 +80,7 @@ export default function ChatPanel({
           <div className="flex flex-col items-center justify-center h-full bg-bg text-center px-4">
             <span className="text-4xl mb-3">🌿</span>
             <p className="font-pixel text-pixel-sm text-text-mid">{labels.selectConversation}</p>
-            <p className="text-xs text-text-mid mt-1">{labels.selectConversationDesc}</p>
+            <p className="text-sm text-text-mid mt-1">{labels.selectConversationDesc}</p>
           </div>
         )}
       </div>
