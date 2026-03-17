@@ -64,12 +64,13 @@ export const DEFAULT_CHAT_LABELS: ChatLabels = {
 
 export interface ChatAppProps {
   userName: string;
+  userId?: string;
   locale?: string;
   navLabels?: Record<string, string>;
   chatLabels?: ChatLabels;
 }
 
-export default function ChatApp({ userName, locale, navLabels, chatLabels }: ChatAppProps) {
+export default function ChatApp({ userName, userId, locale, navLabels, chatLabels }: ChatAppProps) {
   const labels = chatLabels ?? DEFAULT_CHAT_LABELS;
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>();
@@ -136,7 +137,7 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
           id: m.id,
           content: m.content,
           type: m.type ?? 'text',
-          isMine: m.is_mine ?? false,
+          isMine: userId ? m.sender_id === userId : false,
           timestamp: m.created_at ? relativeTime(m.created_at) : '',
           timestampRaw: m.created_at ?? '',
           senderName: m.sender_name ?? '',
@@ -195,7 +196,7 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
                   id: m.id,
                   content: m.content,
                   type: m.type ?? 'text',
-                  isMine: m.is_mine ?? false,
+                  isMine: userId ? m.sender_id === userId : false,
                   timestamp: m.created_at ? relativeTime(m.created_at) : '',
                   timestampRaw: m.created_at ?? '',
                   senderName: m.sender_name ?? '',
@@ -374,7 +375,7 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
               id: m.id,
               content: m.content,
               type: m.type ?? 'text',
-              isMine: m.is_mine ?? false,
+              isMine: userId ? m.sender_id === userId : false,
               timestamp: m.created_at ? relativeTime(m.created_at) : '',
               timestampRaw: m.created_at ?? '',
               senderName: m.sender_name ?? '',
@@ -406,7 +407,7 @@ export default function ChatApp({ userName, locale, navLabels, chatLabels }: Cha
               id: m.id,
               content: m.content,
               type: m.type ?? 'text',
-              isMine: m.is_mine ?? false,
+              isMine: userId ? m.sender_id === userId : false,
               timestamp: m.created_at ? relativeTime(m.created_at) : '',
               timestampRaw: m.created_at ?? '',
               senderName: m.sender_name ?? '',

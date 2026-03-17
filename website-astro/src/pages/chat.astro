@@ -13,12 +13,14 @@ if (!session) {
 }
 
 const userName = session.user.name || session.user.email;
+const userId = session.user.id;
 ---
 
 <BaseLayout title={t("chat.title")}>
   <ChatApp
     client:load
     userName={userName}
+    userId={userId}
     locale={locale}
     navLabels={{
       home: t("nav.home"),
