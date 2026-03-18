@@ -5,7 +5,7 @@ import BoardView from './BoardView';
 import ViewTabs from '../molecules/ViewTabs';
 import { useProjectViews } from '../../hooks/useProjectViews';
 import { useAutoSaveView } from '../../hooks/useAutoSaveView';
-import { Analytics } from '../../lib/analytics';
+import { Analytics } from '../../../lib/analytics';
 
 interface FieldDef {
   id: string;
