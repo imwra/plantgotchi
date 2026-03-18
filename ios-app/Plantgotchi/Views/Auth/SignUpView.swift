@@ -17,8 +17,11 @@ struct SignUpView: View {
 
             ScrollView {
                 VStack(spacing: 24) {
-                    Text("\u{1F331}")
-                        .font(.system(size: 48))
+                    Image("Mascot")
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
                         .padding(.top, 40)
                     Text("Create Account")
                         .font(PlantgotchiTheme.pixelFont(size: 20))

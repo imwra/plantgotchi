@@ -19,8 +19,11 @@ struct LoginView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         // Logo
-                        Text("\u{1F331}")
-                            .font(.system(size: 64))
+                        Image("Mascot")
+                            .resizable()
+                            .interpolation(.none)
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
                             .padding(.top, 60)
                         Text("Plantgotchi")
                             .font(PlantgotchiTheme.pixelFont(size: 24))

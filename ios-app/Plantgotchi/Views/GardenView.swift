@@ -116,8 +116,11 @@ struct GardenView: View {
 
     private var emptyState: some View {
         VStack(spacing: 20) {
-            Text("\u{1F331}")
-                .font(.system(size: 64))
+            Image("Mascot")
+                .resizable()
+                .interpolation(.none)
+                .scaledToFit()
+                .frame(width: 100, height: 100)
             Text(S.noPlantsYet)
                 .font(PlantgotchiTheme.pixelFont(size: 14))
                 .foregroundColor(PlantgotchiTheme.text)
