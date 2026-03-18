@@ -1,0 +1,845 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06C946500A93B1A353F77FC6 /* MenuBarSceneController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */; };
+		142A271B365F7F85340C7250 /* GardenWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59CD45B96DD08D6230022986 /* GardenWindowViewModelTests.swift */; };
+		1E3F8AFA9AD1075D6496EB7B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E70C9994B7630D18168495D /* AppDelegate.swift */; };
+		24BBA027C6380835B55C7EA1 /* PlantgotchiCore in Frameworks */ = {isa = PBXBuildFile; productRef = 30C89B325965F72A1E1DE37A /* PlantgotchiCore */; };
+		272FBC9856CE642ED9708CD0 /* SubsetGardenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22750E5972ACCAA4C95257A6 /* SubsetGardenWidget.swift */; };
+		2DBD43B96216ABD13EE39383 /* PlantgotchiWidgets.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */; };
+		3E54DF8A164473DF3C041FAE /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */; };
+		3F8B1B2F05986A59E39D8DB8 /* GardenWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D97459B460D0CF0BABF29C3B /* GardenWindowViewModel.swift */; };
+		43632FC680F6D33CC2078EDD /* PlantgotchiMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044637DDBB0844989C5054C5 /* PlantgotchiMacApp.swift */; };
+		43765D933B30BFDAE6AC0EED /* PlantgotchiMacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */; };
+		4E904C77A1B9FB33C5719A40 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
+		556A3BB474C505621CCE0DAE /* DigitalGardenScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C11E413FADD9C3B762C9865 /* DigitalGardenScene.swift */; };
+		5E6158FBCC5EB53B18D64A8F /* MacGardenTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 348BA63CC7C6A1761DD56223 /* MacGardenTheme.swift */; };
+		794C0DB5CC09D294AE33F21D /* GardenWidgetEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5A37793CE1791340E3FAE60 /* GardenWidgetEntry.swift */; };
+		7AE523B877EE5B7C044D3A71 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
+		7C6FABFA11AA542F8227AD46 /* PlantgotchiCore in Frameworks */ = {isa = PBXBuildFile; productRef = B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */; };
+		84BD4BF0682428B54B4D40EF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
+		88D3EBA3D160066F80163E8B /* GardenWidgetProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634F087DE629C9D09C5476D /* GardenWidgetProviderTests.swift */; };
+		9022F10307D396F406985FA8 /* WholeGardenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F14D18964D3E67C151D15C2 /* WholeGardenWidget.swift */; };
+		9B56FB9EA7FB7B6FA2EA50AB /* GardenWidgetIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE916916F3D81CA8825E9941 /* GardenWidgetIntent.swift */; };
+		A9A3BB2DBB17C491A386FAB4 /* SinglePlantWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE83DD06EADD156F36CF4823 /* SinglePlantWidget.swift */; };
+		AA0815E7E0F8F8DF7CD783CF /* MenuBarPanelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */; };
+		ABBFB8E6190C69722FA868E1 /* PlantgotchiCore in Frameworks */ = {isa = PBXBuildFile; productRef = D47FFA374F1344A099E799FD /* PlantgotchiCore */; };
+		AE2797A2957769D9F3B5E595 /* PlantgotchiWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9273AB71ED38472FB2EB5864 /* PlantgotchiWidgetsBundle.swift */; };
+		B3DA5265393790FB2B394F63 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81719EFAA9EAAB258781C5B7 /* Cocoa.framework */; };
+		C4D96A91AE13A528799A32D6 /* GardenWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E565723406D0A89D592E69F3 /* GardenWindowView.swift */; };
+		C63B4740B1FD62F2C587DB0A /* GardenWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBAA9ACCCC123C22BDB2030 /* GardenWidgetProvider.swift */; };
+		CEEF9EDE119BCBD1B6E3A08B /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A22EADB8E07163580FAC8A9 /* Config.plist */; };
+		D73F87493BA4E4697E065E4D /* PlantDetailSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C95769FB5802B3AEEFB18E /* PlantDetailSidebar.swift */; };
+		EA1A90CBC7007832420BE8E8 /* MenuBarPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */; };
+		FA7EFD17368D37131E150F51 /* MenuBarPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0229D1234714513FCC102B70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3541B43211BEB6DDBE53B968 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBAFBDE4E9653053EEF5DEC4;
+			remoteInfo = PlantgotchiWidgets;
+		};
+		8830AF90D8735855B6880C6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3541B43211BEB6DDBE53B968 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DBAFBDE4E9653053EEF5DEC4;
+			remoteInfo = PlantgotchiWidgets;
+		};
+		EDC0302A281138DF29C70EA8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3541B43211BEB6DDBE53B968 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3A1DEBEBC9F1D48554D78682;
+			remoteInfo = PlantgotchiMac;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EDB383CC897FEC9A85F1ABBC /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2DBD43B96216ABD13EE39383 /* PlantgotchiWidgets.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0421B2C799DA73D59EB08DFF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		044637DDBB0844989C5054C5 /* PlantgotchiMacApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiMacApp.swift; sourceTree = "<group>"; };
+		074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelViewModelTests.swift; sourceTree = "<group>"; };
+		07B04E9764637E1CC6986563 /* PlantgotchiMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlantgotchiMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A22EADB8E07163580FAC8A9 /* Config.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Config.plist; sourceTree = "<group>"; };
+		15C95769FB5802B3AEEFB18E /* PlantDetailSidebar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantDetailSidebar.swift; sourceTree = "<group>"; };
+		19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarSceneController.swift; sourceTree = "<group>"; };
+		22750E5972ACCAA4C95257A6 /* SubsetGardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SubsetGardenWidget.swift; sourceTree = "<group>"; };
+		2F5F94F66F0F46276A166405 /* PlantgotchiWidgets.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = PlantgotchiWidgets.entitlements; sourceTree = "<group>"; };
+		348BA63CC7C6A1761DD56223 /* MacGardenTheme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MacGardenTheme.swift; sourceTree = "<group>"; };
+		37C2F5CBAF09DB6922B42DCC /* PlantgotchiMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlantgotchiMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiMacTests.swift; sourceTree = "<group>"; };
+		3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
+		4634F087DE629C9D09C5476D /* GardenWidgetProviderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidgetProviderTests.swift; sourceTree = "<group>"; };
+		4E70C9994B7630D18168495D /* AppDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		59CD45B96DD08D6230022986 /* GardenWindowViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWindowViewModelTests.swift; sourceTree = "<group>"; };
+		7F14D18964D3E67C151D15C2 /* WholeGardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WholeGardenWidget.swift; sourceTree = "<group>"; };
+		81719EFAA9EAAB258781C5B7 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		9273AB71ED38472FB2EB5864 /* PlantgotchiWidgetsBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantgotchiWidgetsBundle.swift; sourceTree = "<group>"; };
+		9C11E413FADD9C3B762C9865 /* DigitalGardenScene.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DigitalGardenScene.swift; sourceTree = "<group>"; };
+		9CBAA9ACCCC123C22BDB2030 /* GardenWidgetProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidgetProvider.swift; sourceTree = "<group>"; };
+		A2120FCD238CE6AB029CCC09 /* PlantgotchiWidgetsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PlantgotchiWidgetsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PlantgotchiWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A8F2DC70841A22C3D541D14F /* PlantgotchiMac.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = PlantgotchiMac.entitlements; sourceTree = "<group>"; };
+		CE83DD06EADD156F36CF4823 /* SinglePlantWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SinglePlantWidget.swift; sourceTree = "<group>"; };
+		D5A37793CE1791340E3FAE60 /* GardenWidgetEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidgetEntry.swift; sourceTree = "<group>"; };
+		D97459B460D0CF0BABF29C3B /* GardenWindowViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWindowViewModel.swift; sourceTree = "<group>"; };
+		E565723406D0A89D592E69F3 /* GardenWindowView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWindowView.swift; sourceTree = "<group>"; };
+		ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelViewModel.swift; sourceTree = "<group>"; };
+		EE916916F3D81CA8825E9941 /* GardenWidgetIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidgetIntent.swift; sourceTree = "<group>"; };
+		FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		086DDBF5CBA16302DD03F448 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AE523B877EE5B7C044D3A71 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		11DCBC62B34D5FFA13BB70AF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B3DA5265393790FB2B394F63 /* Cocoa.framework in Frameworks */,
+				ABBFB8E6190C69722FA868E1 /* PlantgotchiCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6631DCF167BA11D8371F9CDA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E904C77A1B9FB33C5719A40 /* Cocoa.framework in Frameworks */,
+				7C6FABFA11AA542F8227AD46 /* PlantgotchiCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BD240F1E51B4071940241ADF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84BD4BF0682428B54B4D40EF /* Cocoa.framework in Frameworks */,
+				24BBA027C6380835B55C7EA1 /* PlantgotchiCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1BC91D094F7DED55BC6C143F /* PlantgotchiMac */ = {
+			isa = PBXGroup;
+			children = (
+				3E691CD3821C9B66A9125B0A /* App */,
+				915E94D39E5A2BB8D564CAF2 /* Support */,
+				CEBFCBB49779CDB51DF0EDD5 /* MenuBar */,
+				94D3A82127393EDD6D13AA6A /* GardenWindow */,
+				9179B59D61255DDC44D0682F /* Theme */,
+			);
+			name = PlantgotchiMac;
+			path = PlantgotchiMac;
+			sourceTree = "<group>";
+		};
+		3E691CD3821C9B66A9125B0A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				044637DDBB0844989C5054C5 /* PlantgotchiMacApp.swift */,
+				4E70C9994B7630D18168495D /* AppDelegate.swift */,
+			);
+			name = App;
+			path = App;
+			sourceTree = "<group>";
+		};
+		568165C962A931F9E529C4FD /* PlantgotchiWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				9273AB71ED38472FB2EB5864 /* PlantgotchiWidgetsBundle.swift */,
+				2F5F94F66F0F46276A166405 /* PlantgotchiWidgets.entitlements */,
+				0421B2C799DA73D59EB08DFF /* Info.plist */,
+				D5A37793CE1791340E3FAE60 /* GardenWidgetEntry.swift */,
+				EE916916F3D81CA8825E9941 /* GardenWidgetIntent.swift */,
+				9CBAA9ACCCC123C22BDB2030 /* GardenWidgetProvider.swift */,
+				7F14D18964D3E67C151D15C2 /* WholeGardenWidget.swift */,
+				CE83DD06EADD156F36CF4823 /* SinglePlantWidget.swift */,
+				22750E5972ACCAA4C95257A6 /* SubsetGardenWidget.swift */,
+			);
+			name = PlantgotchiWidgets;
+			path = PlantgotchiWidgets;
+			sourceTree = "<group>";
+		};
+		8CD458804ECDF2B052E18225 = {
+			isa = PBXGroup;
+			children = (
+				AAF67D7734289419C11507BA /* Products */,
+				F1BDCBF77E93969FD232F107 /* Frameworks */,
+				1BC91D094F7DED55BC6C143F /* PlantgotchiMac */,
+				568165C962A931F9E529C4FD /* PlantgotchiWidgets */,
+				AD8A8C35858AE360C4192BE1 /* PlantgotchiMacTests */,
+				96A889082873FB2EE3AFA1C0 /* PlantgotchiWidgetsTests */,
+			);
+			sourceTree = "<group>";
+		};
+		915E94D39E5A2BB8D564CAF2 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				0A22EADB8E07163580FAC8A9 /* Config.plist */,
+				A8F2DC70841A22C3D541D14F /* PlantgotchiMac.entitlements */,
+			);
+			name = Support;
+			path = Support;
+			sourceTree = "<group>";
+		};
+		9179B59D61255DDC44D0682F /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				348BA63CC7C6A1761DD56223 /* MacGardenTheme.swift */,
+			);
+			name = Theme;
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		94D3A82127393EDD6D13AA6A /* GardenWindow */ = {
+			isa = PBXGroup;
+			children = (
+				E565723406D0A89D592E69F3 /* GardenWindowView.swift */,
+				9C11E413FADD9C3B762C9865 /* DigitalGardenScene.swift */,
+				15C95769FB5802B3AEEFB18E /* PlantDetailSidebar.swift */,
+				D97459B460D0CF0BABF29C3B /* GardenWindowViewModel.swift */,
+			);
+			name = GardenWindow;
+			path = GardenWindow;
+			sourceTree = "<group>";
+		};
+		96A889082873FB2EE3AFA1C0 /* PlantgotchiWidgetsTests */ = {
+			isa = PBXGroup;
+			children = (
+				4634F087DE629C9D09C5476D /* GardenWidgetProviderTests.swift */,
+			);
+			name = PlantgotchiWidgetsTests;
+			path = PlantgotchiWidgetsTests;
+			sourceTree = "<group>";
+		};
+		AAF67D7734289419C11507BA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				07B04E9764637E1CC6986563 /* PlantgotchiMac.app */,
+				A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */,
+				37C2F5CBAF09DB6922B42DCC /* PlantgotchiMacTests.xctest */,
+				A2120FCD238CE6AB029CCC09 /* PlantgotchiWidgetsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AD8A8C35858AE360C4192BE1 /* PlantgotchiMacTests */ = {
+			isa = PBXGroup;
+			children = (
+				389EA1F1E45E0B724403A4E1 /* PlantgotchiMacTests.swift */,
+				074BA74B9D57A4C691960D7B /* MenuBarPanelViewModelTests.swift */,
+				59CD45B96DD08D6230022986 /* GardenWindowViewModelTests.swift */,
+			);
+			name = PlantgotchiMacTests;
+			path = PlantgotchiMacTests;
+			sourceTree = "<group>";
+		};
+		CEBFCBB49779CDB51DF0EDD5 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				19C96BFE8F45D3963EBF0C1C /* MenuBarSceneController.swift */,
+				3DF1C5295FCF7CEE52212862 /* MenuBarStatusView.swift */,
+				FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */,
+				ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */,
+			);
+			name = MenuBar;
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		DFAE94D9BCBE2840AFBEE101 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				81719EFAA9EAAB258781C5B7 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		F1BDCBF77E93969FD232F107 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DFAE94D9BCBE2840AFBEE101 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3A1DEBEBC9F1D48554D78682 /* PlantgotchiMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 711348F0ACF7607BFD057BA7 /* Build configuration list for PBXNativeTarget "PlantgotchiMac" */;
+			buildPhases = (
+				245BB3ABA4BE16D0DE8FA1AC /* Sources */,
+				6631DCF167BA11D8371F9CDA /* Frameworks */,
+				FFB8785456A38AE65AB03BC8 /* Resources */,
+				EDB383CC897FEC9A85F1ABBC /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85B064FBCD433200D59F49EE /* PBXTargetDependency */,
+			);
+			name = PlantgotchiMac;
+			packageProductDependencies = (
+				B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */,
+			);
+			productName = PlantgotchiMac;
+			productReference = 07B04E9764637E1CC6986563 /* PlantgotchiMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3FB66D7E25EE5C139AA71446 /* PlantgotchiMacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E4B66BC50B6F6D581CB80466 /* Build configuration list for PBXNativeTarget "PlantgotchiMacTests" */;
+			buildPhases = (
+				CFE4005E4690FCB1638C2B63 /* Sources */,
+				086DDBF5CBA16302DD03F448 /* Frameworks */,
+				6B713ED25CAC23761903C2DD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C8EC43731D674F3F9537C70D /* PBXTargetDependency */,
+			);
+			name = PlantgotchiMacTests;
+			productName = PlantgotchiMacTests;
+			productReference = 37C2F5CBAF09DB6922B42DCC /* PlantgotchiMacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		43AF7D423F99DC5362FE29A9 /* PlantgotchiWidgetsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3E72E0BBAEA115BF2D7E47FE /* Build configuration list for PBXNativeTarget "PlantgotchiWidgetsTests" */;
+			buildPhases = (
+				D13F05EF1A7F4DC308EE4A46 /* Sources */,
+				BD240F1E51B4071940241ADF /* Frameworks */,
+				C3DFAC663135EC59D3201B97 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F1565E9A97C81C0C63198C08 /* PBXTargetDependency */,
+			);
+			name = PlantgotchiWidgetsTests;
+			packageProductDependencies = (
+				30C89B325965F72A1E1DE37A /* PlantgotchiCore */,
+			);
+			productName = PlantgotchiWidgetsTests;
+			productReference = A2120FCD238CE6AB029CCC09 /* PlantgotchiWidgetsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		DBAFBDE4E9653053EEF5DEC4 /* PlantgotchiWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 26D89C894F1544EF88C57E5B /* Build configuration list for PBXNativeTarget "PlantgotchiWidgets" */;
+			buildPhases = (
+				5BC5C70D5E9AB1D867C3F04E /* Sources */,
+				11DCBC62B34D5FFA13BB70AF /* Frameworks */,
+				4C4CB6A18F8820483CF81E24 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PlantgotchiWidgets;
+			packageProductDependencies = (
+				D47FFA374F1344A099E799FD /* PlantgotchiCore */,
+			);
+			productName = PlantgotchiWidgets;
+			productReference = A6186B51880A0EA193EB8A19 /* PlantgotchiWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3541B43211BEB6DDBE53B968 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 2610;
+				LastUpgradeCheck = 2610;
+			};
+			buildConfigurationList = B32AF6AE64B445425D451E61 /* Build configuration list for PBXProject "PlantgotchiMac" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 8CD458804ECDF2B052E18225;
+			minimizedProjectReferenceProxies = 0;
+			packageReferences = (
+				A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AAF67D7734289419C11507BA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3A1DEBEBC9F1D48554D78682 /* PlantgotchiMac */,
+				DBAFBDE4E9653053EEF5DEC4 /* PlantgotchiWidgets */,
+				3FB66D7E25EE5C139AA71446 /* PlantgotchiMacTests */,
+				43AF7D423F99DC5362FE29A9 /* PlantgotchiWidgetsTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4C4CB6A18F8820483CF81E24 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6B713ED25CAC23761903C2DD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3DFAC663135EC59D3201B97 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FFB8785456A38AE65AB03BC8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEEF9EDE119BCBD1B6E3A08B /* Config.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		245BB3ABA4BE16D0DE8FA1AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43632FC680F6D33CC2078EDD /* PlantgotchiMacApp.swift in Sources */,
+				1E3F8AFA9AD1075D6496EB7B /* AppDelegate.swift in Sources */,
+				06C946500A93B1A353F77FC6 /* MenuBarSceneController.swift in Sources */,
+				3E54DF8A164473DF3C041FAE /* MenuBarStatusView.swift in Sources */,
+				FA7EFD17368D37131E150F51 /* MenuBarPanelView.swift in Sources */,
+				EA1A90CBC7007832420BE8E8 /* MenuBarPanelViewModel.swift in Sources */,
+				C4D96A91AE13A528799A32D6 /* GardenWindowView.swift in Sources */,
+				556A3BB474C505621CCE0DAE /* DigitalGardenScene.swift in Sources */,
+				D73F87493BA4E4697E065E4D /* PlantDetailSidebar.swift in Sources */,
+				3F8B1B2F05986A59E39D8DB8 /* GardenWindowViewModel.swift in Sources */,
+				5E6158FBCC5EB53B18D64A8F /* MacGardenTheme.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5BC5C70D5E9AB1D867C3F04E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AE2797A2957769D9F3B5E595 /* PlantgotchiWidgetsBundle.swift in Sources */,
+				794C0DB5CC09D294AE33F21D /* GardenWidgetEntry.swift in Sources */,
+				9B56FB9EA7FB7B6FA2EA50AB /* GardenWidgetIntent.swift in Sources */,
+				C63B4740B1FD62F2C587DB0A /* GardenWidgetProvider.swift in Sources */,
+				9022F10307D396F406985FA8 /* WholeGardenWidget.swift in Sources */,
+				A9A3BB2DBB17C491A386FAB4 /* SinglePlantWidget.swift in Sources */,
+				272FBC9856CE642ED9708CD0 /* SubsetGardenWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFE4005E4690FCB1638C2B63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				43765D933B30BFDAE6AC0EED /* PlantgotchiMacTests.swift in Sources */,
+				AA0815E7E0F8F8DF7CD783CF /* MenuBarPanelViewModelTests.swift in Sources */,
+				142A271B365F7F85340C7250 /* GardenWindowViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D13F05EF1A7F4DC308EE4A46 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				88D3EBA3D160066F80163E8B /* GardenWidgetProviderTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		85B064FBCD433200D59F49EE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PlantgotchiWidgets;
+			target = DBAFBDE4E9653053EEF5DEC4 /* PlantgotchiWidgets */;
+			targetProxy = 0229D1234714513FCC102B70 /* PBXContainerItemProxy */;
+		};
+		C8EC43731D674F3F9537C70D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PlantgotchiMac;
+			target = 3A1DEBEBC9F1D48554D78682 /* PlantgotchiMac */;
+			targetProxy = EDC0302A281138DF29C70EA8 /* PBXContainerItemProxy */;
+		};
+		F1565E9A97C81C0C63198C08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PlantgotchiWidgets;
+			target = DBAFBDE4E9653053EEF5DEC4 /* PlantgotchiWidgets */;
+			targetProxy = 8830AF90D8735855B6880C6B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1C1E52D7A3AAF306107D92EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac.tests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlantgotchiMac.app/Contents/MacOS/PlantgotchiMac";
+			};
+			name = Release;
+		};
+		1FD500334948ADCEE338A4E6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				DEFINES_MODULE = YES;
+				INFOPLIST_FILE = PlantgotchiWidgets/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac.widgets;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		68448E45E5868393666C1857 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.plantgotchi.mac.widget-tests";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		85906DD9B6DDC03725823962 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		87A701F6C4F94ABE9BA44BCD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEFINES_MODULE = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AAC5E065FD010E61AE6C7549 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.plantgotchi.mac.widget-tests";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CB8932F98EE9A5D157C7BE53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E11F6D6387CB1F0D78348CA5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				DEFINES_MODULE = YES;
+				INFOPLIST_FILE = PlantgotchiWidgets/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac.widgets;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E5E247EDAFBEFB299F1F32DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		F69A3A3606428397BA294810 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.plantgotchi.mac.tests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PlantgotchiMac.app/Contents/MacOS/PlantgotchiMac";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		26D89C894F1544EF88C57E5B /* Build configuration list for PBXNativeTarget "PlantgotchiWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FD500334948ADCEE338A4E6 /* Release */,
+				E11F6D6387CB1F0D78348CA5 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3E72E0BBAEA115BF2D7E47FE /* Build configuration list for PBXNativeTarget "PlantgotchiWidgetsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAC5E065FD010E61AE6C7549 /* Release */,
+				68448E45E5868393666C1857 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		711348F0ACF7607BFD057BA7 /* Build configuration list for PBXNativeTarget "PlantgotchiMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85906DD9B6DDC03725823962 /* Release */,
+				87A701F6C4F94ABE9BA44BCD /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B32AF6AE64B445425D451E61 /* Build configuration list for PBXProject "PlantgotchiMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB8932F98EE9A5D157C7BE53 /* Debug */,
+				E5E247EDAFBEFB299F1F32DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E4B66BC50B6F6D581CB80466 /* Build configuration list for PBXNativeTarget "PlantgotchiMacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C1E52D7A3AAF306107D92EE /* Release */,
+				F69A3A3606428397BA294810 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../ios-app";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		30C89B325965F72A1E1DE37A /* PlantgotchiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */;
+			productName = PlantgotchiCore;
+		};
+		B6DFAEEA325A6823C31D2135 /* PlantgotchiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */;
+			productName = PlantgotchiCore;
+		};
+		D47FFA374F1344A099E799FD /* PlantgotchiCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A2DDF0EEA3324ECE3CFCD76C /* XCLocalSwiftPackageReference "ios-app" */;
+			productName = PlantgotchiCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 3541B43211BEB6DDBE53B968 /* Project object */;
+}
