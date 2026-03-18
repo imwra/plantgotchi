@@ -35,6 +35,7 @@
 		C4D96A91AE13A528799A32D6 /* GardenWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E565723406D0A89D592E69F3 /* GardenWindowView.swift */; };
 		C63B4740B1FD62F2C587DB0A /* GardenWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBAA9ACCCC123C22BDB2030 /* GardenWidgetProvider.swift */; };
 		CEEF9EDE119BCBD1B6E3A08B /* Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A22EADB8E07163580FAC8A9 /* Config.plist */; };
+		AB12CD34EF56789012345678 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD34EF56AB12789012345678 /* Assets.xcassets */; };
 		D73F87493BA4E4697E065E4D /* PlantDetailSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C95769FB5802B3AEEFB18E /* PlantDetailSidebar.swift */; };
 		EA1A90CBC7007832420BE8E8 /* MenuBarPanelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */; };
 		FA7EFD17368D37131E150F51 /* MenuBarPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */; };
@@ -110,6 +111,7 @@
 		ED6A9457DA89473AD9F7828E /* MenuBarPanelViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelViewModel.swift; sourceTree = "<group>"; };
 		EE916916F3D81CA8825E9941 /* GardenWidgetIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidgetIntent.swift; sourceTree = "<group>"; };
 		FBD6B4A828CF355BF413078E /* MenuBarPanelView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MenuBarPanelView.swift; sourceTree = "<group>"; };
+		CD34EF56AB12789012345678 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +156,7 @@
 		1BC91D094F7DED55BC6C143F /* PlantgotchiMac */ = {
 			isa = PBXGroup;
 			children = (
+				CD34EF56AB12789012345678 /* Assets.xcassets */,
 				3E691CD3821C9B66A9125B0A /* App */,
 				915E94D39E5A2BB8D564CAF2 /* Support */,
 				CEBFCBB49779CDB51DF0EDD5 /* MenuBar */,
@@ -439,6 +442,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEEF9EDE119BCBD1B6E3A08B /* Config.plist in Resources */,
+				AB12CD34EF56789012345678 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
