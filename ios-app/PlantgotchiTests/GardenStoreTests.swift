@@ -44,6 +44,32 @@ final class GardenStoreTests: XCTestCase {
         XCTAssertEqual(snapshot, cached)
     }
 
+    func test_refreshDoesNotFallbackToCachedSnapshotWhenUnauthorized() async throws {
+        let cached = GardenSnapshot.generatedAt(
+            Date(timeIntervalSince1970: 500),
+            wholeGarden: .init(vitality: .medium, attentionCount: 1, unknownCount: 0),
+            subsets: [],
+            plants: [
+                PlantScope(
+                    id: "cached-plant",
+                    name: "Cached Plant",
+                    vitality: .medium,
+                    attentionState: .healthy
+                ),
+            ]
+        )
+        let client = MockPlantAPIClient(error: PlantAPIClientError.unauthorized)
+        let cache = InMemorySnapshotCache(savedSnapshot: cached)
+        let store = GardenStore(client: client, cache: cache, now: Date.init)
+
+        do {
+            _ = try await store.refresh()
+            XCTFail("Expected unauthorized refresh to throw")
+        } catch {
+            XCTAssertEqual(error as? PlantAPIClientError, .unauthorized)
+        }
+    }
+
     func test_plantAPIClientAddsBearerTokenWhenTokenProviderReturnsToken() async throws {
         let expectation = expectation(description: "request captured")
         PlantAPIClientURLProtocol.requestHandler = { request in

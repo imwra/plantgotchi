@@ -4,6 +4,11 @@ public protocol PlantAPIClientProtocol {
     func fetchPlants() async throws -> [APIPlantPayload]
 }
 
+public enum PlantAPIClientError: Error, Equatable {
+    case unauthorized
+    case badStatusCode(Int)
+}
+
 public final class PlantAPIClient: PlantAPIClientProtocol {
     private let baseURL: URL
     private let session: URLSession
@@ -30,8 +35,16 @@ public final class PlantAPIClient: PlantAPIClientProtocol {
         }
 
         let (data, response) = try await session.data(for: request)
-        guard let httpResponse = response as? HTTPURLResponse, 200..<300 ~= httpResponse.statusCode else {
+        guard let httpResponse = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
+        }
+
+        guard 200..<300 ~= httpResponse.statusCode else {
+            if httpResponse.statusCode == 401 {
+                throw PlantAPIClientError.unauthorized
+            }
+
+            throw PlantAPIClientError.badStatusCode(httpResponse.statusCode)
         }
 
         let decoder = JSONDecoder()

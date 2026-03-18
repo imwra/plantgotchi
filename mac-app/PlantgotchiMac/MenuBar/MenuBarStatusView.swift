@@ -3,8 +3,13 @@ import PlantgotchiCore
 
 struct MenuBarStatusView: View {
     let snapshot: GardenSnapshot?
+    let isAuthenticated: Bool
 
     private var title: String {
+        guard isAuthenticated else {
+            return "Sign In"
+        }
+
         guard let snapshot else {
             return "Plantgotchi"
         }

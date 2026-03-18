@@ -31,6 +31,10 @@ public final class GardenStore: ObservableObject {
             self.snapshot = snapshot
             return snapshot
         } catch {
+            if let error = error as? PlantAPIClientError, error == .unauthorized {
+                throw error
+            }
+
             if let cached = try cache.load() {
                 self.snapshot = cached
                 return cached
