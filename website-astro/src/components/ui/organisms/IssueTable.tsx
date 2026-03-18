@@ -5,7 +5,7 @@ import InlineEditor from '../atoms/InlineEditor';
 import FieldDropdown from '../atoms/FieldDropdown';
 import DatePicker from '../atoms/DatePicker';
 import UserPicker from '../atoms/UserPicker';
-import { Analytics } from '../../lib/analytics';
+import { Analytics } from '../../../lib/analytics';
 
 interface FieldDef {
   id: string;

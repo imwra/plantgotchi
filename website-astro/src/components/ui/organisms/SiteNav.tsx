@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LanguageSwitcher } from '../atoms';
-import { Analytics } from '../../lib/analytics';
+import { Analytics } from '../../../lib/analytics';
 
 export interface SiteNavProps {
   userName?: string;
