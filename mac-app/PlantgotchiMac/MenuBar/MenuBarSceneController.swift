@@ -36,13 +36,28 @@ final class MenuBarSceneController: ObservableObject {
             return
         }
 
+        Analytics.track("sync_started", properties: ["direction": "pull"])
         Task {
             do {
-                snapshot = try await store.refresh()
+                let refreshedSnapshot = try await store.refresh()
+                snapshot = refreshedSnapshot
+                Analytics.track("sync_completed", properties: [
+                    "direction": "pull",
+                    "item_count": refreshedSnapshot.plants.count,
+                ])
             } catch let error as PlantAPIClientError where error == .unauthorized {
+                Analytics.track("sync_failed", properties: [
+                    "direction": "pull",
+                    "error": "unauthorized",
+                ])
                 snapshot = nil
                 onUnauthorized()
             } catch {
+                Analytics.track("sync_failed", properties: [
+                    "direction": "pull",
+                    "error": error.localizedDescription,
+                ])
+                Analytics.captureException(error, context: ["operation": "refreshGarden"])
                 if snapshot == nil {
                     snapshot = MenuBarPanelViewModel.makeSnapshot(vitality: .medium, attentionCount: 0)
                 }

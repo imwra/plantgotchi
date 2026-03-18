@@ -22,6 +22,15 @@ struct PlantgotchiMacApp: App {
 
     init() {
         let baseURL = MenuBarSceneController.configuredBaseURL()
+        if let analyticsConfig = Self.analyticsConfiguration() {
+            Analytics.setup(
+                apiKey: analyticsConfig.apiKey,
+                host: analyticsConfig.host,
+                platform: Analytics.currentPlatform,
+                appVersion: analyticsConfig.appVersion
+            )
+        }
+
         let authService = AuthService(baseURL: baseURL.absoluteString)
         let controller = MenuBarSceneController(
             baseURL: baseURL,
@@ -34,6 +43,33 @@ struct PlantgotchiMacApp: App {
         _authService = StateObject(wrappedValue: authService)
         _authViewModel = StateObject(wrappedValue: MacAuthViewModel(authService: authService))
         _menuBarController = StateObject(wrappedValue: controller)
+
+        if authService.isAuthenticated,
+           let userId = UserDefaults.standard.string(forKey: "authUserId") {
+            var traits: [String: Any] = ["platform": Analytics.currentPlatform]
+            if let email = UserDefaults.standard.string(forKey: "authUserEmail") {
+                traits["email"] = email
+            }
+            if let name = UserDefaults.standard.string(forKey: "authUserName") {
+                traits["name"] = name
+            }
+            if let createdAt = UserDefaults.standard.string(forKey: "authUserCreatedAt") {
+                traits["created_at"] = createdAt
+            }
+            Analytics.identify(userId: userId, traits: traits)
+        }
+
+        NSSetUncaughtExceptionHandler { exception in
+            let error = NSError(
+                domain: exception.name.rawValue,
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: exception.reason ?? ""]
+            )
+            Analytics.captureException(error, context: [
+                "$exception_stack_trace_raw": exception.callStackSymbols.joined(separator: "\n"),
+            ])
+        }
+
         AppDelegate.refreshHandler = {
             guard authService.isAuthenticated else {
                 controller.clearSnapshot()
@@ -84,6 +120,27 @@ struct PlantgotchiMacApp: App {
     private var fallbackSnapshot: GardenSnapshot {
         MenuBarPanelViewModel.makeSnapshot(vitality: .medium, attentionCount: 0)
     }
+
+    private struct AnalyticsConfiguration {
+        let apiKey: String
+        let host: String
+        let appVersion: String
+    }
+
+    private static func analyticsConfiguration(bundle: Bundle = .main) -> AnalyticsConfiguration? {
+        guard
+            let configPath = bundle.path(forResource: "Config", ofType: "plist"),
+            let config = NSDictionary(contentsOfFile: configPath),
+            let apiKey = config["PostHogApiKey"] as? String,
+            !apiKey.isEmpty
+        else {
+            return nil
+        }
+
+        let host = (config["PostHogHost"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "https://us.i.posthog.com"
+        let appVersion = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0.0"
+        return AnalyticsConfiguration(apiKey: apiKey, host: host, appVersion: appVersion)
+    }
 }
 
 @MainActor
@@ -132,6 +189,10 @@ final class MacAuthViewModel: ObservableObject {
             do {
                 try await authService.signIn(email: email, password: password)
             } catch {
+                Analytics.track("auth_login_failed", properties: [
+                    "method": "email",
+                    "error": error.localizedDescription,
+                ])
                 errorMessage = error.localizedDescription
             }
         }
@@ -157,6 +218,10 @@ final class MacAuthViewModel: ObservableObject {
             do {
                 try await authService.signUp(email: email, password: password, name: name)
             } catch {
+                Analytics.track("auth_login_failed", properties: [
+                    "method": "email",
+                    "error": error.localizedDescription,
+                ])
                 errorMessage = error.localizedDescription
             }
         }
@@ -176,6 +241,10 @@ final class MacAuthViewModel: ObservableObject {
                 from: authorization,
                 nonce: currentNonce
             ) else {
+                Analytics.track("auth_login_failed", properties: [
+                    "method": "apple",
+                    "error": "Failed to get Apple credentials",
+                ])
                 errorMessage = "Failed to get Apple credentials"
                 return
             }
@@ -192,10 +261,18 @@ final class MacAuthViewModel: ObservableObject {
                         nonce: credentials.nonce
                     )
                 } catch {
+                    Analytics.track("auth_login_failed", properties: [
+                        "method": "apple",
+                        "error": error.localizedDescription,
+                    ])
                     errorMessage = error.localizedDescription
                 }
             }
         case .failure(let error):
+            Analytics.track("auth_login_failed", properties: [
+                "method": "apple",
+                "error": error.localizedDescription,
+            ])
             errorMessage = error.localizedDescription
         }
     }

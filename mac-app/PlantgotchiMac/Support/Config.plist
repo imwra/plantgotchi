@@ -4,5 +4,9 @@
 <dict>
 	<key>APIBaseURL</key>
 	<string>https://plantgotchi.pages.dev</string>
+	<key>PostHogApiKey</key>
+	<string>phc_o56jwiA3F2lrwGFEHaclwlspQCRoADk1cLMJ0Sf4pEB</string>
+	<key>PostHogHost</key>
+	<string>https://us.i.posthog.com</string>
 </dict>
 </plist>

@@ -54,6 +54,7 @@ public final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_signup", properties: ["method": "email"])
     }
 
     public func signIn(email: String, password: String) async throws {
@@ -79,6 +80,7 @@ public final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_login", properties: ["method": "email"])
     }
 
     public func signInWithApple(idToken: String, nonce: String) async throws {
@@ -107,11 +109,17 @@ public final class AuthService: ObservableObject {
         }
 
         try handleAuthResponse(data: responseData, headers: httpResponse)
+        Analytics.track("auth_login", properties: ["method": "apple"])
     }
 
     public func signOut() {
+        Analytics.track("auth_logout")
+        Analytics.reset()
         try? keychain.deleteToken()
         userDefaults.removeObject(forKey: "authUserId")
+        userDefaults.removeObject(forKey: "authUserEmail")
+        userDefaults.removeObject(forKey: "authUserName")
+        userDefaults.removeObject(forKey: "authUserCreatedAt")
         isAuthenticated = false
         userId = nil
     }
@@ -134,6 +142,28 @@ public final class AuthService: ObservableObject {
            let id = user["id"] as? String {
             userId = id
             userDefaults.set(id, forKey: "authUserId")
+
+            let email = user["email"] as? String ?? ""
+            let name = user["name"] as? String ?? ""
+            let createdAt = user["createdAt"] as? String ?? ""
+            if !email.isEmpty {
+                userDefaults.set(email, forKey: "authUserEmail")
+            }
+            if !name.isEmpty {
+                userDefaults.set(name, forKey: "authUserName")
+            }
+            if !createdAt.isEmpty {
+                userDefaults.set(createdAt, forKey: "authUserCreatedAt")
+            }
+
+            var traits: [String: Any] = [
+                "platform": Analytics.currentPlatform,
+                "is_creator": false,
+            ]
+            if !email.isEmpty { traits["email"] = email }
+            if !name.isEmpty { traits["name"] = name }
+            if !createdAt.isEmpty { traits["created_at"] = createdAt }
+            Analytics.identify(userId: id, traits: traits)
         }
 
         isAuthenticated = true

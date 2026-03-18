@@ -20,6 +20,16 @@ final class GardenWindowViewModel: ObservableObject {
 
     func selectPlant(id: String) {
         selectedPlantID = id
+
+        guard let plant = snapshot.plants.first(where: { $0.id == id }) else {
+            return
+        }
+
+        Analytics.track("plant_viewed", properties: [
+            "plant_id": plant.id,
+            "species": "",
+            "plant_name": plant.name,
+        ])
     }
 
     func update(snapshot: GardenSnapshot) {
