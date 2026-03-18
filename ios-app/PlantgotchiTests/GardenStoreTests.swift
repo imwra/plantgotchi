@@ -3,6 +3,11 @@ import XCTest
 
 @MainActor
 final class GardenStoreTests: XCTestCase {
+    override class func tearDown() {
+        URLProtocol.unregisterClass(PlantAPIClientURLProtocol.self)
+        super.tearDown()
+    }
+
     func test_refreshPersistsLatestSnapshotForWidgets() async throws {
         let client = MockPlantAPIClient(payload: [.fixture])
         let cache = InMemorySnapshotCache()
@@ -37,6 +42,42 @@ final class GardenStoreTests: XCTestCase {
         let snapshot = try await store.refresh()
 
         XCTAssertEqual(snapshot, cached)
+    }
+
+    func test_plantAPIClientAddsBearerTokenWhenTokenProviderReturnsToken() async throws {
+        let expectation = expectation(description: "request captured")
+        PlantAPIClientURLProtocol.requestHandler = { request in
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer stored-token")
+            XCTAssertEqual(request.url?.absoluteString, "https://plantgotchi.pages.dev/api/plants")
+            expectation.fulfill()
+
+            let response = HTTPURLResponse(
+                url: request.url!,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": "application/json"]
+            )!
+            return (response, Data("[]".utf8))
+        }
+
+        let session = URLSession(configuration: configuredSession())
+        let client = PlantAPIClient(
+            baseURL: URL(string: "https://plantgotchi.pages.dev")!,
+            session: session,
+            tokenProvider: { "stored-token" }
+        )
+
+        let payload = try await client.fetchPlants()
+
+        XCTAssertEqual(payload, [])
+        await fulfillment(of: [expectation], timeout: 1.0)
+    }
+
+    private func configuredSession() -> URLSessionConfiguration {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [PlantAPIClientURLProtocol.self]
+        URLProtocol.registerClass(PlantAPIClientURLProtocol.self)
+        return configuration
     }
 }
 
@@ -90,4 +131,34 @@ private extension APIPlantPayload {
         ),
         recentCareLogs: []
     )
+}
+
+private final class PlantAPIClientURLProtocol: URLProtocol {
+    static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        guard let handler = Self.requestHandler else {
+            XCTFail("Missing request handler")
+            return
+        }
+
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
 }
