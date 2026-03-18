@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '../../../lib/analytics';
 
 const CARE_ACTIONS = [
   { action: 'water', icon: '\uD83D\uDCA7', label: 'Water' },
@@ -33,6 +34,7 @@ export default function CareLogForm({ plantId, onLogged }: CareLogFormProps) {
         throw new Error(data.error || 'Failed to log');
       }
       setNotes('');
+      Analytics.track('care_logged', { plant_id: plantId, action });
       onLogged();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error');

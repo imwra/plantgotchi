@@ -1,7 +1,6 @@
 import Foundation
 import CoreBluetooth
 import Combine
-import PostHog
 
 /// Represents a discovered BLE sensor before pairing.
 struct DiscoveredSensor: Identifiable, Equatable {
@@ -50,6 +49,7 @@ final class BLEManager: NSObject, ObservableObject {
     private var centralManager: CBCentralManager!
     private var connectedPeripheral: CBPeripheral?
     private var discoveredPeripherals: [UUID: CBPeripheral] = [:]
+    private var lastReadingEventTime: [String: Date] = [:]
 
     override init() {
         super.init()
@@ -162,9 +162,7 @@ extension BLEManager: CBCentralManagerDelegate {
         state = .connected(peripheral.identifier)
         peripheral.delegate = self
         peripheral.discoverServices([BLEConstants.sensorServiceUUID])
-        PostHogSDK.shared.capture("sensor_connected", properties: [
-            "sensor_id": peripheral.identifier.uuidString,
-        ])
+        Analytics.track("sensor_paired", properties: ["sensor_id": peripheral.identifier.uuidString])
     }
 
     func centralManager(
@@ -180,9 +178,7 @@ extension BLEManager: CBCentralManagerDelegate {
         didDisconnectPeripheral peripheral: CBPeripheral,
         error: Error?
     ) {
-        PostHogSDK.shared.capture("sensor_disconnected", properties: [
-            "sensor_id": peripheral.identifier.uuidString,
-        ])
+        Analytics.track("sensor_disconnected", properties: ["sensor_id": peripheral.identifier.uuidString])
         resetConnectionState()
     }
 
@@ -260,9 +256,18 @@ extension BLEManager: CBPeripheralDelegate {
 
         // Notify callback with current values
         onReadingReceived?(latestMoisture, latestTemperature, latestLight, latestBattery)
-        PostHogSDK.shared.capture("reading_received", properties: [
-            "sensor_id": connectedPeripheral?.identifier.uuidString ?? "unknown",
-            "source": "ble",
-        ])
+
+        let sensorId = peripheral.identifier.uuidString
+        let now = Date()
+        if let last = lastReadingEventTime[sensorId], now.timeIntervalSince(last) < 60 {
+            // Rate limited — skip analytics event
+        } else {
+            lastReadingEventTime[sensorId] = now
+            Analytics.track("sensor_reading_received", properties: [
+                "sensor_id": sensorId,
+                "battery": latestBattery as Any,
+                "moisture": latestMoisture as Any,
+            ])
+        }
     }
 }

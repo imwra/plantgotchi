@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LanguageSwitcher } from '../atoms';
+import { Analytics } from '../../lib/analytics';
 
 export interface SiteNavProps {
   userName?: string;
@@ -141,6 +142,8 @@ export default function SiteNav({
                     <button
                       onClick={async () => {
                         await fetch('/api/auth/sign-out', { method: 'POST' });
+                        Analytics.track('auth_logout');
+                        Analytics.reset();
                         window.location.href = loginHref;
                       }}
                       className="block w-full text-left px-4 py-2 font-pixel text-[9px] text-danger hover:bg-danger/10 transition-colors"
@@ -211,6 +214,8 @@ export default function SiteNav({
                 <button
                   onClick={async () => {
                     await fetch('/api/auth/sign-out', { method: 'POST' });
+                    Analytics.track('auth_logout');
+                    Analytics.reset();
                     window.location.href = loginHref;
                   }}
                   className="font-pixel text-[8px] text-danger px-3 py-2.5 block w-full text-left"

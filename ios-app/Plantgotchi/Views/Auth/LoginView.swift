@@ -129,6 +129,7 @@ struct LoginView: View {
                 try await authService.signIn(email: email, password: password)
             } catch {
                 errorMessage = error.localizedDescription
+                Analytics.track("auth_login_failed", properties: ["method": "email", "error": error.localizedDescription])
             }
             isLoading = false
         }
@@ -152,11 +153,13 @@ struct LoginView: View {
                     )
                 } catch {
                     errorMessage = error.localizedDescription
+                    Analytics.track("auth_login_failed", properties: ["method": "apple", "error": error.localizedDescription])
                 }
                 isLoading = false
             }
         case .failure(let error):
             errorMessage = error.localizedDescription
+            Analytics.track("auth_login_failed", properties: ["method": "apple", "error": error.localizedDescription])
         }
     }
 }

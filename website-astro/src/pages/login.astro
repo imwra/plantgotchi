@@ -79,7 +79,7 @@ if (session) {
   </div>
 
   <script>
-    import posthog from 'posthog-js';
+    import { Analytics } from '../lib/analytics';
     const form = document.getElementById("login-form") as HTMLFormElement;
     const errorMsg = document.getElementById("error-msg") as HTMLDivElement;
     const submitBtn = form.querySelector("button[type=submit]") as HTMLButtonElement;
@@ -124,10 +124,15 @@ if (session) {
 
         const session = await res.json().catch(() => null);
         if (session?.user?.id) {
-          posthog.identify(session.user.id, {
-            email: session.user.email,
-            name: session.user.name,
+          const user = session.user;
+          Analytics.identify(user.id, {
+            email: user.email,
+            name: user.name,
+            platform: 'web',
+            is_creator: false,
+            created_at: user.createdAt,
           });
+          Analytics.track('auth_login', { method: 'email' });
         }
 
         window.location.href = "/garden";

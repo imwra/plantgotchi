@@ -3,6 +3,7 @@ import ModuleNavItem from '../molecules/ModuleNavItem';
 import VideoPlayer from '../molecules/VideoPlayer';
 import QuizBlock from '../molecules/QuizBlock';
 import ProgressRing from '../atoms/ProgressRing';
+import { Analytics } from '../../../lib/analytics';
 
 interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
 interface Module { id: string; title: string; is_preview: number; blocks: Block[] }
@@ -29,6 +30,8 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
       // Build completed set from progress
       if (progressData) {
         // We need per-module completion data; for now derive from counts
+        const progressPercent = Math.round((progressData.completed_modules / Math.max(progressData.total_modules, 1)) * 100);
+        Analytics.track('course_progress_viewed', { course_id: courseData.id, progress_pct: progressPercent });
       }
       setLoading(false);
     }).catch(() => setLoading(false));
@@ -37,6 +40,12 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
   const allModules = course?.phases.flatMap(p => p.modules) || [];
   const activeModule = allModules.find(m => m.id === activeModuleId);
 
+  useEffect(() => {
+    if (activeModuleId && course) {
+      Analytics.track('course_lesson_started', { course_id: course.id, module_id: activeModuleId });
+    }
+  }, [activeModuleId, course?.id]);
+
   const handleComplete = async (moduleId: string, quizAnswers?: unknown) => {
     const res = await fetch(`/api/courses/${slug}/modules/${moduleId}/complete`, {
       method: 'POST',
@@ -44,6 +53,7 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
       body: JSON.stringify({ quiz_answers: quizAnswers }),
     });
     if (res.ok) {
+      Analytics.track('course_lesson_completed', { course_id: course!.id, module_id: moduleId });
       setCompletedModules(prev => new Set(prev).add(moduleId));
       // Advance to next module
       const idx = allModules.findIndex(m => m.id === moduleId);
@@ -54,9 +64,15 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
   const renderBlock = (block: Block) => {
     const parsed = JSON.parse(block.content);
     switch (block.block_type) {
-      case 'video': return <VideoPlayer key={block.id} url={parsed.url} caption={parsed.caption} />;
+      case 'video':
+        Analytics.track('course_video_played', { course_id: course!.id, module_id: activeModuleId! });
+        return <VideoPlayer key={block.id} url={parsed.url} caption={parsed.caption} />;
       case 'text': return <div key={block.id} className="prose max-w-none"><p className="whitespace-pre-wrap text-sm text-text-mid">{parsed.markdown}</p></div>;
-      case 'quiz': return <QuizBlock key={block.id} question={parsed.question} options={parsed.options} correctIndex={parsed.correct_index} explanation={parsed.explanation} onAnswer={(idx) => handleComplete(activeModuleId!, { [block.id]: idx })} />;
+      case 'quiz': return <QuizBlock key={block.id} question={parsed.question} options={parsed.options} correctIndex={parsed.correct_index} explanation={parsed.explanation} onAnswer={(idx) => {
+        const quizScore = idx === parsed.correct_index ? 1 : 0;
+        Analytics.track('course_quiz_submitted', { course_id: course!.id, module_id: activeModuleId!, quiz_score: quizScore });
+        handleComplete(activeModuleId!, { [block.id]: idx });
+      }} />;
       default: return null;
     }
   };

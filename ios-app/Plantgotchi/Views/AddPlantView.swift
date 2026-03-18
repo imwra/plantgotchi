@@ -1,6 +1,5 @@
 #if os(iOS)
 import SwiftUI
-import PostHog
 
 /// Form for creating a new plant with name, species, emoji, light preference,
 /// and moisture/temperature thresholds.
@@ -261,10 +260,7 @@ struct AddPlantView: View {
 
                 if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let plantId = json["id"] as? String {
-                    PostHogSDK.shared.capture("plant_added", properties: [
-                        "plant_id": plantId,
-                        "species": species.isEmpty ? "" : species,
-                    ])
+                    Analytics.track("plant_created", properties: ["plant_id": plantId, "species": species, "emoji": selectedEmoji])
                 }
 
                 await MainActor.run {

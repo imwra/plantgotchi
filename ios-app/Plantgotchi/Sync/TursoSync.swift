@@ -30,74 +30,128 @@ final class TursoSync {
     func pushReadings(_ readings: [SensorReading]) async throws {
         guard !readings.isEmpty else { return }
 
-        for reading in readings {
-            let body: [String: Any] = [
-                "plant_id": reading.plantId,
-                "sensor_id": reading.sensorId,
-                "moisture": reading.moisture as Any,
-                "temperature": reading.temperature as Any,
-                "light": reading.light as Any,
-                "battery": reading.battery as Any,
-            ].compactMapValues { $0 }
+        let start = Date()
+        Analytics.log(level: .info, message: "Sync push started", context: ["method": "pushReadings"])
+        Analytics.track("sync_started", properties: ["direction": "push"])
+        do {
+            for reading in readings {
+                let body: [String: Any] = [
+                    "plant_id": reading.plantId,
+                    "sensor_id": reading.sensorId,
+                    "moisture": reading.moisture as Any,
+                    "temperature": reading.temperature as Any,
+                    "light": reading.light as Any,
+                    "battery": reading.battery as Any,
+                ].compactMapValues { $0 }
 
-            let data = try JSONSerialization.data(withJSONObject: body)
-            let (_, response) = try await httpClient.request(
-                path: "/api/readings",
-                method: "POST",
-                body: data
-            )
-            guard response.statusCode == 200 || response.statusCode == 201 else {
-                throw TursoSyncError.httpError(statusCode: response.statusCode)
+                let data = try JSONSerialization.data(withJSONObject: body)
+                let (_, response) = try await httpClient.request(
+                    path: "/api/readings",
+                    method: "POST",
+                    body: data
+                )
+                guard response.statusCode == 200 || response.statusCode == 201 else {
+                    throw TursoSyncError.httpError(statusCode: response.statusCode)
+                }
             }
+            let duration = Date().timeIntervalSince(start) * 1000
+            Analytics.track("sync_completed", properties: ["direction": "push", "item_count": readings.count, "duration_ms": Int(duration)])
+        } catch {
+            Analytics.track("sync_failed", properties: ["direction": "push", "error": error.localizedDescription])
+            Analytics.captureException(error, context: ["operation": "pushReadings"])
+            Analytics.log(level: .error, message: "Sync push failed", context: ["method": "pushReadings", "error": error.localizedDescription])
+            throw error
         }
     }
 
     func pushCareLogs(_ logs: [CareLog]) async throws {
         guard !logs.isEmpty else { return }
 
-        for log in logs {
-            let body: [String: Any] = [
-                "plant_id": log.plantId,
-                "action": log.action,
-                "notes": log.notes as Any,
-            ].compactMapValues { $0 }
+        let start = Date()
+        Analytics.log(level: .info, message: "Sync push started", context: ["method": "pushCareLogs"])
+        Analytics.track("sync_started", properties: ["direction": "push"])
+        do {
+            for log in logs {
+                let body: [String: Any] = [
+                    "plant_id": log.plantId,
+                    "action": log.action,
+                    "notes": log.notes as Any,
+                ].compactMapValues { $0 }
 
-            let data = try JSONSerialization.data(withJSONObject: body)
-            let (_, response) = try await httpClient.request(
-                path: "/api/care-logs",
-                method: "POST",
-                body: data
-            )
-            guard response.statusCode == 200 || response.statusCode == 201 else {
-                throw TursoSyncError.httpError(statusCode: response.statusCode)
+                let data = try JSONSerialization.data(withJSONObject: body)
+                let (_, response) = try await httpClient.request(
+                    path: "/api/care-logs",
+                    method: "POST",
+                    body: data
+                )
+                guard response.statusCode == 200 || response.statusCode == 201 else {
+                    throw TursoSyncError.httpError(statusCode: response.statusCode)
+                }
             }
+            let duration = Date().timeIntervalSince(start) * 1000
+            Analytics.track("sync_completed", properties: ["direction": "push", "item_count": logs.count, "duration_ms": Int(duration)])
+        } catch {
+            Analytics.track("sync_failed", properties: ["direction": "push", "error": error.localizedDescription])
+            Analytics.captureException(error, context: ["operation": "pushCareLogs"])
+            Analytics.log(level: .error, message: "Sync push failed", context: ["method": "pushCareLogs", "error": error.localizedDescription])
+            throw error
         }
     }
 
     // MARK: - Pull Operations
 
     func pullPlants(userId: String) async throws -> [Plant] {
-        let (data, response) = try await httpClient.request(path: "/api/plants?user_id=\(userId)")
-        guard response.statusCode == 200 else {
-            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        let start = Date()
+        Analytics.log(level: .info, message: "Sync pull started", context: ["method": "pullPlants"])
+        Analytics.track("sync_started", properties: ["direction": "pull"])
+        do {
+            let (data, response) = try await httpClient.request(path: "/api/plants?user_id=\(userId)")
+            guard response.statusCode == 200 else {
+                throw TursoSyncError.httpError(statusCode: response.statusCode)
+            }
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                let duration = Date().timeIntervalSince(start) * 1000
+                Analytics.track("sync_completed", properties: ["direction": "pull", "item_count": 0, "duration_ms": Int(duration)])
+                return []
+            }
+            let plants = json.compactMap { parsePlant(from: $0) }
+            let duration = Date().timeIntervalSince(start) * 1000
+            Analytics.track("sync_completed", properties: ["direction": "pull", "item_count": plants.count, "duration_ms": Int(duration)])
+            return plants
+        } catch {
+            Analytics.track("sync_failed", properties: ["direction": "pull", "error": error.localizedDescription])
+            Analytics.captureException(error, context: ["operation": "pullPlants"])
+            Analytics.log(level: .error, message: "Sync pull failed", context: ["method": "pullPlants", "error": error.localizedDescription])
+            throw error
         }
-        guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
-            return []
-        }
-        return json.compactMap { parsePlant(from: $0) }
     }
 
     func pullRecommendations(plantId: String) async throws -> [Recommendation] {
-        let (data, response) = try await httpClient.request(
-            path: "/api/recommendations?plant_id=\(plantId)"
-        )
-        guard response.statusCode == 200 else {
-            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        let start = Date()
+        Analytics.log(level: .info, message: "Sync pull started", context: ["method": "pullRecommendations"])
+        Analytics.track("sync_started", properties: ["direction": "pull"])
+        do {
+            let (data, response) = try await httpClient.request(
+                path: "/api/recommendations?plant_id=\(plantId)"
+            )
+            guard response.statusCode == 200 else {
+                throw TursoSyncError.httpError(statusCode: response.statusCode)
+            }
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                let duration = Date().timeIntervalSince(start) * 1000
+                Analytics.track("sync_completed", properties: ["direction": "pull", "item_count": 0, "duration_ms": Int(duration)])
+                return []
+            }
+            let recommendations = json.compactMap { parseRecommendation(from: $0) }
+            let duration = Date().timeIntervalSince(start) * 1000
+            Analytics.track("sync_completed", properties: ["direction": "pull", "item_count": recommendations.count, "duration_ms": Int(duration)])
+            return recommendations
+        } catch {
+            Analytics.track("sync_failed", properties: ["direction": "pull", "error": error.localizedDescription])
+            Analytics.captureException(error, context: ["operation": "pullRecommendations"])
+            Analytics.log(level: .error, message: "Sync pull failed", context: ["method": "pullRecommendations", "error": error.localizedDescription])
+            throw error
         }
-        guard let json = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
-            return []
-        }
-        return json.compactMap { parseRecommendation(from: $0) }
     }
 
     // MARK: - Parsing

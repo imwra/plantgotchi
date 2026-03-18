@@ -1,7 +1,6 @@
 #if os(iOS)
 import SwiftUI
 import GRDB
-import PostHog
 
 /// Main dashboard showing a grid of the user's plants.
 /// Pull-to-refresh reloads from the local database.
@@ -99,6 +98,9 @@ struct GardenView: View {
             }) {
                 SettingsView()
             }
+            .onAppear {
+                Analytics.track("screen_viewed", properties: ["screen_name": "garden"])
+            }
             .task {
                 await refreshPlants()
                 while !Task.isCancelled {
@@ -178,9 +180,7 @@ struct GardenView: View {
             plantViews = plants.map { plant in
                 toPlantView(plant: plant, latestReading: nil, recentCareLogs: [])
             }
-            PostHogSDK.shared.capture("garden_viewed", properties: [
-                "plant_count": plantViews.count,
-            ])
+            Analytics.track("garden_viewed", properties: ["plant_count": plants.count])
         } catch {
             print("[GardenView] Failed to load plants: \(error)")
         }

@@ -1,6 +1,7 @@
 package com.plantgotchi.app.auth
 
 import android.util.Log
+import com.plantgotchi.app.analytics.Analytics
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -41,6 +42,7 @@ class AuthService(
         }
 
         handleAuthResponse(response)
+        Analytics.track("auth_signup", mapOf("method" to "email"))
     }
 
     suspend fun signIn(email: String, password: String) {
@@ -66,9 +68,12 @@ class AuthService(
         }
 
         handleAuthResponse(response)
+        Analytics.track("auth_login", mapOf("method" to "email"))
     }
 
     fun signOut() {
+        Analytics.track("auth_logout")
+        Analytics.reset()
         tokenManager.clearToken()
         _isAuthenticated.value = false
     }
@@ -88,6 +93,20 @@ class AuthService(
         }
 
         _isAuthenticated.value = true
+
+        val email = user?.get("email")?.jsonPrimitive?.content
+        val name = user?.get("name")?.jsonPrimitive?.content
+        val createdAt = user?.get("createdAt")?.jsonPrimitive?.content
+        val uid = tokenManager.getUserId()
+        if (uid != null) {
+            Analytics.identify(uid, mapOf(
+                "email" to (email ?: ""),
+                "name" to (name ?: ""),
+                "platform" to "android",
+                "is_creator" to false,
+                "created_at" to (createdAt ?: ""),
+            ))
+        }
     }
 
     private fun parseError(body: String): String {

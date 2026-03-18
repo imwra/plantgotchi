@@ -74,6 +74,18 @@ class PlantgotchiApp : Application() {
             PostHog.register("platform", "android")
             PostHog.register("app_version", "1.0.0")
         }
+
+        // Global exception handler
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            com.plantgotchi.app.analytics.Analytics.captureException(throwable, mapOf("thread" to thread.name))
+            defaultHandler?.uncaughtException(thread, throwable)
+        }
+
+        val userId = tokenManager.getUserId()
+        if (tokenManager.getToken() != null && userId != null) {
+            com.plantgotchi.app.analytics.Analytics.identify(userId, mapOf("platform" to "android"))
+        }
     }
 
     private fun seedDemoDataIfNeeded() {

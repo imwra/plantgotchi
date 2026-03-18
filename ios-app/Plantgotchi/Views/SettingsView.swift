@@ -1,6 +1,5 @@
 #if os(iOS)
 import SwiftUI
-import PostHog
 
 /// App settings: Turso sync configuration, Claude API key,
 /// sensor management, and sign-out.
@@ -62,7 +61,10 @@ struct SettingsView: View {
             } message: {
                 Text(S.clearDataMsg)
             }
-            .onAppear { loadSettings() }
+            .onAppear {
+                loadSettings()
+                Analytics.track("screen_viewed", properties: ["screen_name": "settings"])
+            }
         }
     }
 
@@ -156,6 +158,9 @@ struct SettingsView: View {
                 Text("English").tag(AppLocale.en)
             }
             .pickerStyle(.segmented)
+            .onChange(of: localeManager.locale) { _, newLocale in
+                Analytics.track("language_changed", properties: ["locale": newLocale == .ptBR ? "pt_BR" : "en"])
+            }
         }
         .plantgotchiCard()
     }
@@ -182,6 +187,9 @@ struct SettingsView: View {
                 }
             }
             .tint(PlantgotchiTheme.retroGreen)
+            .onChange(of: themeManager.isRetro) { _, newValue in
+                Analytics.track("theme_toggled", properties: ["is_retro": newValue])
+            }
         }
         .plantgotchiCard()
     }
@@ -290,8 +298,9 @@ struct SettingsView: View {
     }
 
     private func saveSettings() {
+        let oldUserId = UserDefaults.standard.string(forKey: "userId") ?? ""
         UserDefaults.standard.set(userId, forKey: "userId")
-        PostHogSDK.shared.capture("settings_changed")
+        Analytics.track("settings_changed", properties: ["setting": "user_id", "old_value": oldUserId, "new_value": userId])
         showSaveConfirmation = true
     }
 
@@ -307,11 +316,10 @@ struct SettingsView: View {
         do {
             if enabled {
                 try AppDatabase.shared.loadDemoData(userId: uid)
-                PostHogSDK.shared.capture("demo_mode_enabled")
+                Analytics.track("demo_data_loaded")
                 showDemoLoadedAlert = true
             } else {
                 try AppDatabase.shared.clearAllData(userId: uid)
-                PostHogSDK.shared.capture("demo_mode_disabled")
             }
         } catch {
             print("[SettingsView] Demo mode toggle failed: \(error)")

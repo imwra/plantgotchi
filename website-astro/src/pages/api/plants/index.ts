@@ -7,6 +7,7 @@ import {
   createPlant,
 } from "../../../lib/db/queries";
 import { captureServerEvent } from "../../../lib/posthog";
+import { ServerAnalytics } from "../../../lib/analytics.server";
 
 
 export const GET: APIRoute = async ({ request }) => {
@@ -34,42 +35,51 @@ export const POST: APIRoute = async ({ request }) => {
   const session = await getSession(request);
   if (!session) return new Response("Unauthorized", { status: 401 });
 
-  const body = await request.json();
-  const { name, species, emoji, light_preference, moisture_min, moisture_max, temp_min, temp_max } = body;
+  try {
+    const body = await request.json();
+    const { name, species, emoji, light_preference, moisture_min, moisture_max, temp_min, temp_max } = body;
 
-  if (!name || !emoji) {
-    return new Response(JSON.stringify({ error: "Name and emoji are required" }), {
-      status: 400,
+    if (!name || !emoji) {
+      return new Response(JSON.stringify({ error: "Name and emoji are required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const plant = {
+      id: crypto.randomUUID(),
+      user_id: session.user.id,
+      name,
+      species: species || null,
+      emoji,
+      photo_url: null,
+      light_preference: light_preference || "medium",
+      moisture_min: moisture_min ?? 30,
+      moisture_max: moisture_max ?? 80,
+      temp_min: temp_min ?? 15,
+      temp_max: temp_max ?? 30,
+      garden_id: null,
+      catalog_id: null,
+      identification_confidence: null,
+    };
+
+    await createPlant(plant);
+
+    captureServerEvent(session.user.id, "plant_added", {
+      plant_id: plant.id,
+      species: plant.species,
+    });
+
+    return new Response(JSON.stringify(plant), {
+      status: 201,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    const userId = session.user.id ?? 'anonymous';
+    ServerAnalytics.captureException(userId, error instanceof Error ? error : new Error(String(error)), { endpoint: '/api/plants', method: 'POST' });
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-
-  const plant = {
-    id: crypto.randomUUID(),
-    user_id: session.user.id,
-    name,
-    species: species || null,
-    emoji,
-    photo_url: null,
-    light_preference: light_preference || "medium",
-    moisture_min: moisture_min ?? 30,
-    moisture_max: moisture_max ?? 80,
-    temp_min: temp_min ?? 15,
-    temp_max: temp_max ?? 30,
-    garden_id: null,
-    catalog_id: null,
-    identification_confidence: null,
-  };
-
-  await createPlant(plant);
-
-  captureServerEvent(session.user.id, "plant_added", {
-    plant_id: plant.id,
-    species: plant.species,
-  });
-
-  return new Response(JSON.stringify(plant), {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
-  });
 };

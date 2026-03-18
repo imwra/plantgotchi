@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plantgotchi.app.PlantgotchiApp
 import com.plantgotchi.app.R
-import com.posthog.PostHog
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.BuildConfig
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.SensorReading
@@ -98,6 +98,7 @@ fun GardenScreen(
     }
 
     LaunchedEffect(Unit) {
+        Analytics.track("screen_viewed", mapOf("screen_name" to "garden"))
         fetchPlants()
         while (true) {
             kotlinx.coroutines.delay(15_000)
@@ -108,9 +109,7 @@ fun GardenScreen(
     // Track garden view when plants change
     LaunchedEffect(plants) {
         if (plants.isNotEmpty()) {
-            PostHog.capture("garden_viewed", properties = mapOf(
-                "plant_count" to plants.size,
-            ))
+            Analytics.track("garden_viewed", mapOf("plant_count" to plants.size))
         }
     }
 

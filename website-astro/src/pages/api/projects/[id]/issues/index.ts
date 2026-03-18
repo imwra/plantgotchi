@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { requireAdmin } from "../../../../../lib/admin-guard";
 import { listProjectIssues, addIssueToProject, createIssueInProject } from "../../../../../lib/db/project-queries";
+import { ServerAnalytics } from "../../../../../lib/analytics.server";
 
 export const GET: APIRoute = async ({ request, params, url }) => {
   const auth = await requireAdmin(request);
@@ -39,6 +40,7 @@ export const POST: APIRoute = async ({ request, params }) => {
   }
 
   const issueId = await createIssueInProject(params.id!, body.title, body.status || "todo", body.parentIssueId || null, auth.userId);
+  ServerAnalytics.track(auth.userId, 'issue_created', { issue_id: issueId, project_id: params.id });
   return new Response(JSON.stringify({ id: issueId }), {
     status: 201,
     headers: { "Content-Type": "application/json" },

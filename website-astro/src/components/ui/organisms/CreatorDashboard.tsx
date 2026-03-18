@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import CoursePriceBadge from '../atoms/CoursePriceBadge';
+import { Analytics } from '../../../lib/analytics';
 
 interface CreatorCourse {
   id: string; title: string; slug: string; status: string;
@@ -16,6 +17,7 @@ export default function CreatorDashboard() {
       .then(r => r.json())
       .then(creator => {
         if (!creator) { setIsCreator(false); setLoading(false); return; }
+        Analytics.track('creator_dashboard_viewed', { creator_id: creator.id });
         return fetch('/api/courses?mine=true').then(r => r.json());
       })
       .then(data => { if (data) setCourses(data); setLoading(false); })

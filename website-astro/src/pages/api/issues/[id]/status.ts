@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { requireAdmin } from "../../../../lib/admin-guard";
-import { updateIssueStatus } from "../../../../lib/db/project-queries";
+import { updateIssueStatus, getIssue } from "../../../../lib/db/project-queries";
+import { ServerAnalytics } from "../../../../lib/analytics.server";
 
 const VALID_STATUSES = ["todo", "in_progress", "done", "blocked", "archived"];
 
@@ -17,7 +18,10 @@ export const PUT: APIRoute = async ({ request, params }) => {
     );
   }
 
+  const existingIssue = await getIssue(params.id!);
+  const oldStatus = existingIssue?.status ?? null;
   await updateIssueStatus(params.id!, body.status);
+  ServerAnalytics.track(auth.userId, 'issue_status_changed', { issue_id: params.id, old_status: oldStatus, new_status: body.status });
   return new Response(JSON.stringify({ success: true }), {
     headers: { "Content-Type": "application/json" },
   });

@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.auth.AuthService
 import kotlinx.coroutines.launch
 
@@ -106,6 +107,7 @@ fun SignUpScreen(
                         authService.signUp(email, password, name)
                     } catch (e: Exception) {
                         errorMessage = e.message
+                        Analytics.track("auth_login_failed", mapOf("method" to "email", "error" to (e.message ?: "unknown")))
                     }
                     isLoading = false
                 }
