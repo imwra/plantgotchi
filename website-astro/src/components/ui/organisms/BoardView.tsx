@@ -19,7 +19,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import BoardCard from '../molecules/BoardCard';
 import BoardColumn from '../molecules/BoardColumn';
-import { Analytics } from '../../lib/analytics';
+import { Analytics } from '../../../lib/analytics';
 
 // ---------------------------------------------------------------------------
 // Types
