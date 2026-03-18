@@ -20,6 +20,12 @@ struct GardenWindowView: View {
                 .frame(minWidth: 260, idealWidth: 320)
         }
         .background(MacGardenTheme.canvas.ignoresSafeArea())
+        .onAppear {
+            Analytics.track("screen_viewed", properties: ["screen_name": "garden"])
+        }
+        .task(id: snapshot.generatedAt) {
+            Analytics.track("garden_viewed", properties: ["plant_count": snapshot.plants.count])
+        }
         .onChange(of: snapshot) { _, newSnapshot in
             viewModel.update(snapshot: newSnapshot)
         }
