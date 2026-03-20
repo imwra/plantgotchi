@@ -51,6 +51,31 @@ enum S {
         isPt ? "Max: \(v)\(unit)" : "Max: \(v)\(unit)"
     }
     static var failedToSave: String { isPt ? "Falha ao salvar planta" : "Failed to save plant" }
+    static var back: String { isPt ? "Voltar" : "Back" }
+    static var next: String { isPt ? "Proximo" : "Next" }
+    static var strain: String { isPt ? "CEPA" : "STRAIN" }
+    static var selectStrain: String { isPt ? "Selecionar Cepa" : "Select Strain" }
+    static var customStrain: String { isPt ? "Cepa Personalizada" : "Custom Strain" }
+    static var strainName: String { isPt ? "Nome da cepa" : "Strain name" }
+    static var plantType: String { isPt ? "TIPO DE PLANTA" : "PLANT TYPE" }
+    static var photo: String { isPt ? "Foto" : "Photo" }
+    static var auto: String { isPt ? "Auto" : "Auto" }
+    static var environment: String { isPt ? "AMBIENTE" : "ENVIRONMENT" }
+    static var indoor: String { isPt ? "Indoor" : "Indoor" }
+    static var outdoor: String { isPt ? "Outdoor" : "Outdoor" }
+    static var thresholds: String { isPt ? "LIMIARES" : "THRESHOLDS" }
+    static var searchStrains: String { isPt ? "Buscar cepas..." : "Search strains..." }
+    static var builtInStrains: String { isPt ? "Cepas Integradas" : "Built-in Strains" }
+    static var noStrainsFound: String { isPt ? "Nenhuma cepa encontrada" : "No strains found" }
+    static var addCustomStrain: String { isPt ? "Adicionar Cepa Personalizada" : "Add Custom Strain" }
+    static var indica: String { "Indica" }
+    static var sativa: String { "Sativa" }
+    static var hybrid: String { isPt ? "Hibrida" : "Hybrid" }
+    static var type: String { isPt ? "TIPO" : "TYPE" }
+    static var add: String { isPt ? "Adicionar" : "Add" }
+    static func stepOf(_ current: Int, total: Int) -> String {
+        isPt ? "Passo \(current) de \(total)" : "Step \(current) of \(total)"
+    }
 
     // MARK: - Scan View
     static var scanSensors: String { isPt ? "Buscar Sensores" : "Scan Sensors" }
