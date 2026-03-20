@@ -17,6 +17,9 @@ export interface CareParams {
     seedling?: StageParams;
     vegetative?: StageParams;
     flowering?: StageParams;
+    drying?: StageParams;
+    curing?: StageParams;
+    processing?: StageParams;
   };
   sources: string[];
 }
@@ -70,7 +73,7 @@ export interface Garden {
   created_at: string;
 }
 
-export type GrowthStage = 'germination' | 'seedling' | 'vegetative' | 'flowering' | 'harvest';
+export type GrowthStage = 'germination' | 'seedling' | 'vegetative' | 'flowering' | 'harvest' | 'drying' | 'curing' | 'processing' | 'complete';
 
 export interface PlantStage {
   id: string;
