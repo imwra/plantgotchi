@@ -176,6 +176,7 @@ class TursoSync(
             actedOn = obj["acted_on"]?.jsonPrimitive?.booleanOrNull ?: false,
         )
     }
+
     suspend fun pullGrowLogs(plantId: String): List<GrowLog> {
         try {
             val response = httpClient.get("$baseURL/api/grow-logs") {
@@ -188,7 +189,7 @@ class TursoSync(
             return arr.mapNotNull { parseGrowLog(it.jsonObject) }
         } catch (e: Exception) {
             Analytics.captureException(e, mapOf("operation" to "pullGrowLogs"))
-            return emptyList()
+            throw e
         }
     }
 
