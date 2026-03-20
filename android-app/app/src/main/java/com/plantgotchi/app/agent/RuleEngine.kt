@@ -1,5 +1,6 @@
 package com.plantgotchi.app.agent
 
+import com.plantgotchi.app.model.Phase
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.Recommendation
 import com.plantgotchi.app.model.SensorReading
@@ -17,6 +18,79 @@ import kotlin.math.roundToInt
  */
 object RuleEngine {
 
+    data class ResolvedThresholds(
+        val tempMin: Double,
+        val tempMax: Double,
+        val moistureMin: Int,
+        val moistureMax: Int,
+    )
+
+    fun resolveThresholds(plant: Plant): ResolvedThresholds {
+        val phase = Phase.fromValue(plant.currentPhase)
+
+        // Always use plant-level moisture
+        val moistureMin = plant.moistureMin
+        val moistureMax = plant.moistureMax
+
+        // Use phase defaults for temp when phase is set
+        if (phase != null && phase != Phase.COMPLETE) {
+            val defaults = phase.defaults
+            if (defaults != null) {
+                return ResolvedThresholds(
+                    tempMin = defaults.tempMin,
+                    tempMax = defaults.tempMax,
+                    moistureMin = moistureMin,
+                    moistureMax = moistureMax,
+                )
+            }
+        }
+
+        return ResolvedThresholds(
+            tempMin = plant.tempMin,
+            tempMax = plant.tempMax,
+            moistureMin = moistureMin,
+            moistureMax = moistureMax,
+        )
+    }
+
+    fun getTransitionSuggestions(plant: Plant): List<Recommendation> {
+        val phase = Phase.fromValue(plant.currentPhase) ?: return emptyList()
+        val startedAt = plant.phaseStartedAt ?: return emptyList()
+
+        val daysInPhase = try {
+            val start = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").apply {
+                timeZone = java.util.TimeZone.getTimeZone("UTC")
+            }.parse(startedAt)?.time ?: return emptyList()
+            ((System.currentTimeMillis() - start) / 86400000).toInt()
+        } catch (_: Exception) {
+            return emptyList()
+        }
+
+        val recs = mutableListOf<Recommendation>()
+
+        if (phase == Phase.VEGETATIVE && daysInPhase >= 42) {
+            recs.add(Recommendation(
+                id = UUID.randomUUID().toString(),
+                plantId = plant.id,
+                source = "rules",
+                message = "${plant.name} has been in vegetative for $daysInPhase days — consider switching to flower (12/12 light cycle)",
+                severity = "info",
+            ))
+        }
+
+        if (phase == Phase.DRYING && daysInPhase >= 7) {
+            recs.add(Recommendation(
+                id = UUID.randomUUID().toString(),
+                plantId = plant.id,
+                source = "rules",
+                message = "${plant.name} has been drying for $daysInPhase days — check the stem snap test to see if it's ready for curing",
+                severity = "info",
+            ))
+        }
+
+        return recs
+    }
+
     /**
      * Evaluate a plant against its latest sensor reading and produce recommendations.
      *
@@ -25,56 +99,61 @@ object RuleEngine {
      * @return A list of recommendations (may be empty if everything is OK).
      */
     fun evaluatePlant(plant: Plant, reading: SensorReading): List<Recommendation> {
+        // Skip non-monitored phases
+        val phase = Phase.fromValue(plant.currentPhase)
+        if (phase != null && !phase.hasMonitoring) return emptyList()
+
+        val thresholds = resolveThresholds(plant)
         val recs = mutableListOf<Recommendation>()
 
         // Moisture too low
-        if (reading.moisture != null && reading.moisture < plant.moistureMin) {
+        if (reading.moisture != null && reading.moisture < thresholds.moistureMin) {
             recs.add(
                 Recommendation(
                     id = UUID.randomUUID().toString(),
                     plantId = plant.id,
                     source = "rules",
-                    message = "${plant.name} needs water! Soil moisture at ${reading.moisture}% (minimum: ${plant.moistureMin}%)",
+                    message = "${plant.name} needs water! Soil moisture at ${reading.moisture}% (minimum: ${thresholds.moistureMin}%)",
                     severity = if (reading.moisture < 20) "urgent" else "warning",
                 )
             )
         }
 
         // Moisture too high
-        if (reading.moisture != null && reading.moisture > plant.moistureMax) {
+        if (reading.moisture != null && reading.moisture > thresholds.moistureMax) {
             recs.add(
                 Recommendation(
                     id = UUID.randomUUID().toString(),
                     plantId = plant.id,
                     source = "rules",
-                    message = "${plant.name} may be overwatered — moisture at ${reading.moisture}% (maximum: ${plant.moistureMax}%)",
+                    message = "${plant.name} may be overwatered — moisture at ${reading.moisture}% (maximum: ${thresholds.moistureMax}%)",
                     severity = "warning",
                 )
             )
         }
 
         // Temperature too low
-        if (reading.temperature != null && reading.temperature < plant.tempMin) {
+        if (reading.temperature != null && reading.temperature < thresholds.tempMin) {
             recs.add(
                 Recommendation(
                     id = UUID.randomUUID().toString(),
                     plantId = plant.id,
                     source = "rules",
-                    message = "Too cold for ${plant.name}! Temperature at ${reading.temperature}\u00B0C (minimum: ${plant.tempMin}\u00B0C)",
-                    severity = if (reading.temperature < plant.tempMin - 5) "urgent" else "warning",
+                    message = "Too cold for ${plant.name}! Temperature at ${reading.temperature}\u00B0C (minimum: ${thresholds.tempMin}\u00B0C)",
+                    severity = if (reading.temperature < thresholds.tempMin - 5) "urgent" else "warning",
                 )
             )
         }
 
         // Temperature too high
-        if (reading.temperature != null && reading.temperature > plant.tempMax) {
+        if (reading.temperature != null && reading.temperature > thresholds.tempMax) {
             recs.add(
                 Recommendation(
                     id = UUID.randomUUID().toString(),
                     plantId = plant.id,
                     source = "rules",
-                    message = "Too hot for ${plant.name}! Temperature at ${reading.temperature}\u00B0C (maximum: ${plant.tempMax}\u00B0C)",
-                    severity = if (reading.temperature > plant.tempMax + 5) "urgent" else "warning",
+                    message = "Too hot for ${plant.name}! Temperature at ${reading.temperature}\u00B0C (maximum: ${thresholds.tempMax}\u00B0C)",
+                    severity = if (reading.temperature > thresholds.tempMax + 5) "urgent" else "warning",
                 )
             )
         }
@@ -92,18 +171,23 @@ object RuleEngine {
             )
         }
 
-        // High-light plant not getting enough light
+        // High-light plant not getting enough light — only in growing phases or no phase
         if (reading.light != null && plant.lightPreference == "high" && reading.light < 1000) {
-            recs.add(
-                Recommendation(
-                    id = UUID.randomUUID().toString(),
-                    plantId = plant.id,
-                    source = "rules",
-                    message = "${plant.name} prefers bright light but only getting ${reading.light} lux — consider moving to a sunnier spot",
-                    severity = "info",
+            if (phase == null || phase.isGrowing) {
+                recs.add(
+                    Recommendation(
+                        id = UUID.randomUUID().toString(),
+                        plantId = plant.id,
+                        source = "rules",
+                        message = "${plant.name} prefers bright light but only getting ${reading.light} lux — consider moving to a sunnier spot",
+                        severity = "info",
+                    )
                 )
-            )
+            }
         }
+
+        // Add transition suggestions
+        recs.addAll(getTransitionSuggestions(plant))
 
         return recs
     }
