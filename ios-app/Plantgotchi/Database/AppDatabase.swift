@@ -40,6 +40,7 @@ final class AppDatabase {
     private init(_ dbQueue: DatabaseQueue) throws {
         self.dbQueue = dbQueue
         try migrate()
+        try seedBuiltInStrains()
     }
 
     /// Run all registered migrations.
@@ -414,6 +415,38 @@ final class AppDatabase {
         }
     }
 
+    // MARK: - Strain Seeding
+
+    /// Seed built-in strain profiles if the table is empty.
+    func seedBuiltInStrains() throws {
+        try dbQueue.write { db in
+            let count = try StrainProfile.fetchCount(db)
+            guard count == 0 else { return }
+
+            let strains: [StrainProfile] = [
+                StrainProfile(name: "Northern Lights", type: .indica, flowerWeeksMin: 7, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "Blue Dream", type: .hybrid, flowerWeeksMin: 9, flowerWeeksMax: 10, difficulty: "intermediate"),
+                StrainProfile(name: "OG Kush", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Gorilla Glue", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Sour Diesel", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 11, difficulty: "advanced"),
+                StrainProfile(name: "Girl Scout Cookies", type: .hybrid, flowerWeeksMin: 9, flowerWeeksMax: 10, difficulty: "intermediate"),
+                StrainProfile(name: "White Widow", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "AK-47", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "Jack Herer", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 12, difficulty: "intermediate"),
+                StrainProfile(name: "Granddaddy Purple", type: .indica, flowerWeeksMin: 8, flowerWeeksMax: 11, difficulty: "intermediate"),
+                StrainProfile(name: "Amnesia Haze", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 12, difficulty: "advanced"),
+                StrainProfile(name: "Cheese", type: .indica, flowerWeeksMin: 7, flowerWeeksMax: 8, difficulty: "beginner"),
+                StrainProfile(name: "Gelato", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Wedding Cake", type: .hybrid, flowerWeeksMin: 7, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Zkittlez", type: .indica, flowerWeeksMin: 8, flowerWeeksMax: 10, difficulty: "intermediate"),
+            ]
+
+            for strain in strains {
+                try strain.insert(db)
+            }
+        }
+    }
+
     // MARK: - Demo Data
 
     /// Seed the database with realistic sample data for demo/preview purposes.
@@ -432,7 +465,9 @@ final class AppDatabase {
             (
                 Plant(userId: userId, name: "Northern Lights", species: "Indica", emoji: "\u{1F33F}",
                       moistureMin: 40, moistureMax: 70, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(720)),
+                      createdAt: ts(720),
+                      plantType: .photo, strainType: .indica, environment: .indoor,
+                      currentPhase: .vegetative, phaseStartedAt: ts(336)),
                 [(55, 24.5, 2200, 87, 0.5), (58, 24.0, 2100, 88, 6), (52, 24.8, 2300, 89, 12),
                  (60, 23.5, 2150, 90, 24), (48, 25.0, 2250, 91, 48)],
                 ["water", "fertilize"],
@@ -445,7 +480,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida (Sativa dominante)" : "Hybrid (Sativa-dominant)",
                       emoji: "\u{1F33B}",
                       moistureMin: 35, moistureMax: 65, tempMin: 21, tempMax: 30, lightPreference: "high",
-                      createdAt: ts(480)),
+                      createdAt: ts(480),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(168)),
                 [(38, 27.5, 2400, 72, 1), (42, 26.0, 2300, 73, 8), (35, 28.0, 2500, 74, 16),
                  (45, 26.5, 2200, 75, 32), (32, 27.0, 2350, 76, 56)],
                 ["water", "water", "prune"],
@@ -461,7 +498,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida (Indica dominante)" : "Indica-dominant Hybrid",
                       emoji: "\u{1FAB4}",
                       moistureMin: 35, moistureMax: 60, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(1200)),
+                      createdAt: ts(1200),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(504)),
                 [(50, 25.0, 2100, 95, 2), (48, 24.5, 2000, 95, 12), (52, 25.2, 2050, 96, 24),
                  (45, 24.0, 1900, 96, 48), (55, 25.5, 2200, 97, 96)],
                 ["water", "fertilize"],
@@ -474,7 +513,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida" : "Hybrid",
                       emoji: "\u{1F33F}",
                       moistureMin: 35, moistureMax: 65, tempMin: 20, tempMax: 29, lightPreference: "high",
-                      createdAt: ts(360)),
+                      createdAt: ts(360),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .seedling, phaseStartedAt: ts(120)),
                 [(25, 22.5, 1800, 45, 0.25), (30, 23.0, 1700, 46, 4), (28, 22.8, 1600, 47, 10),
                  (40, 23.5, 1850, 48, 20), (50, 24.0, 1900, 50, 36)],
                 ["water", "prune", "fertilize"],
@@ -491,7 +532,9 @@ final class AppDatabase {
             (
                 Plant(userId: userId, name: "Sour Diesel", species: "Sativa", emoji: "\u{1F343}",
                       moistureMin: 30, moistureMax: 65, tempMin: 21, tempMax: 30, lightPreference: "high",
-                      createdAt: ts(900)),
+                      createdAt: ts(900),
+                      plantType: .photo, strainType: .sativa, environment: .indoor,
+                      currentPhase: .vegetative, phaseStartedAt: ts(504)),
                 [(55, 26.0, 2500, 60, 3), (52, 25.5, 2400, 61, 9), (58, 26.3, 2550, 62, 18),
                  (50, 25.0, 2300, 63, 36), (60, 26.5, 2600, 65, 72)],
                 ["water", "prune"],
@@ -504,7 +547,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida" : "Hybrid",
                       emoji: "\u{1F335}",
                       moistureMin: 35, moistureMax: 60, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(1500)),
+                      createdAt: ts(1500),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(840)),
                 [(42, 24.0, 2300, 82, 4), (45, 23.5, 2200, 83, 16), (40, 24.5, 2400, 83, 36),
                  (48, 23.0, 2100, 84, 72), (38, 25.0, 2350, 85, 120)],
                 ["water", "fertilize"],
@@ -536,6 +581,19 @@ final class AppDatabase {
                         createdAt: ts(Double(i + 1) * 48)
                     )
                     try log.insert(db)
+                }
+
+                // Add grow log for lifecycle plants
+                if let phase = plant.currentPhase {
+                    let growLog = GrowLog(
+                        plantId: plant.id,
+                        userId: userId,
+                        phase: phase,
+                        logType: .watering,
+                        notes: "Demo watering log",
+                        createdAt: ts(24)
+                    )
+                    try growLog.insert(db)
                 }
 
                 for (source, message, severity) in recs {
