@@ -43,6 +43,7 @@ Each plant moves through these phases sequentially:
 - **Photoperiod**: Grower manually advances all phases. They decide when to flip to flower (light schedule change), when to chop, etc.
 - **Autoflower**: Germination through veg are manually advanced. The app can suggest "your auto is likely entering flower" based on typical strain timelines. Grower still confirms the transition.
 - Each transition is logged with a timestamp, optional notes, and optional photo.
+- **Harvest** is a transition event, not a separate phase. Chopping the plant creates a `phase_change` log (Flowering → Drying) and a `harvest` log (with wet weight). Both are recorded simultaneously.
 
 ### Phase Defaults
 
@@ -54,16 +55,23 @@ Each phase carries default ideal ranges for:
 - Available actions (e.g., topping only in veg, flushing in late flower)
 - Guidance prompts (what to watch for, what to do)
 
+All temperatures are stored in Celsius internally (matching existing schema) and converted for display based on user locale.
+
 Example defaults:
 
-| Phase | Temp (°F) | RH (%) | Light (indoor) |
+| Phase | Temp (°C) | RH (%) | Light (indoor) |
 |-------|-----------|--------|----------------|
-| Seedling | 72-80 | 65-70 | 18/6 |
-| Vegetative | 70-85 | 40-60 | 18/6 |
-| Flowering | 65-80 | 35-50 | 12/12 |
-| Late Flower | 65-75 | 30-40 | 12/12 |
-| Drying | 60-70 | 55-65 | Dark |
-| Curing | 60-70 | 58-65 | Dark |
+| Germination | 24-27 | 70-80 | 18/6 (low intensity) |
+| Seedling | 22-27 | 65-70 | 18/6 |
+| Vegetative | 21-29 | 40-60 | 18/6 |
+| Flowering (early) | 18-27 | 35-50 | 12/12 |
+| Flowering (late, weeks 6+) | 18-24 | 30-40 | 12/12 |
+| Drying | 16-21 | 55-65 | Dark |
+| Curing | 16-21 | 58-65 | Dark |
+| Processing | N/A | N/A | N/A |
+| Complete | N/A | N/A | N/A |
+
+"Late Flower" is not a separate phase — it is a time-based sub-range within Flowering. The rule engine checks `days_in_phase` to determine early vs. late flower thresholds (threshold switches at week 6). Processing and Complete phases have no sensor monitoring — the rule engine skips threshold checks for these phases.
 
 Strain profiles can override these defaults.
 
@@ -78,7 +86,8 @@ New columns added to the existing table:
 | Column | Type | Description |
 |--------|------|-------------|
 | `plant_type` | TEXT | `"photo"` or `"auto"` |
-| `strain_name` | TEXT | e.g., "Blue Dream", "Northern Lights" |
+| `strain_id` | TEXT | Optional FK to `strain_profiles` table |
+| `strain_name` | TEXT | e.g., "Blue Dream" — denormalized for display even if strain_id is null |
 | `strain_type` | TEXT | `"indica"`, `"sativa"`, `"hybrid"` |
 | `environment` | TEXT | `"indoor"` or `"outdoor"` |
 | `current_phase` | TEXT | Current lifecycle phase (enum string) |
@@ -102,6 +111,9 @@ Optional grouping container for plants sharing an environment.
 | `notes` | TEXT | Freeform notes |
 | `status` | TEXT | `"active"` or `"complete"` |
 | `created_at` | TEXT | Timestamp |
+| `updated_at` | TEXT | Timestamp |
+
+When a plant belongs to a grow, the grow's `environment` serves as the default. The plant's own `environment` field is only set if it differs (nullable when inherited from grow).
 
 ### New: `grow_logs` table
 
@@ -151,6 +163,7 @@ Built-in and user-created strain data.
 | `thresholds_by_phase` | TEXT | JSON — ideal temp/humidity/light per phase |
 | `notes` | TEXT | General growing notes |
 | `is_custom` | INTEGER | 0 = built-in, 1 = user-created |
+| `user_id` | TEXT | Owner for custom strains (NULL for built-in) |
 | `created_at` | TEXT | Timestamp |
 
 ### New: `achievements` table
@@ -161,17 +174,32 @@ Built-in and user-created strain data.
 | `user_id` | TEXT NOT NULL | Who earned it |
 | `achievement_key` | TEXT NOT NULL | Unique key (e.g., `"first_harvest"`) |
 | `unlocked_at` | TEXT NOT NULL | When earned |
+| `points` | INTEGER NOT NULL | Points awarded for this achievement |
 | `metadata` | TEXT | JSON with context (e.g., `{"plant_id": "...", "yield_g": 200}`) |
+
+Unique constraint on (`user_id`, `achievement_key`) — each achievement can only be unlocked once per user. Total points are derived by summing `points` across all achievements for a user (no separate points table).
 
 ### Unchanged tables
 
 - **`sensor_readings`** — continues as-is, but the rule engine becomes phase-aware when evaluating readings
 - **`recommendations`** — continues as-is, now populated with phase-aware rules
 
+### Indexes for new tables
+
+- `grow_logs`: `(plant_id, created_at DESC)`, `(plant_id, phase, created_at DESC)`
+- `achievements`: UNIQUE `(user_id, achievement_key)`
+- `strain_profiles`: `(name)`, `(user_id)` for custom strain lookups
+- `grows`: `(user_id, status)`
+
+### Photo storage
+
+`photo_url` fields store a single photo per entry (local file path or cloud URL, using the same storage mechanism as the existing `plants.photo_url`). Multiple photos per event can be logged as separate `photo` type entries linked by timestamp/notes.
+
 ### Migration strategy
 
 - New migration `v2_cannabis_lifecycle` adds new tables and ALTERs `plants`
-- Existing `care_logs` data is migrated into `grow_logs` with appropriate `log_type` mapping
+- Existing `care_logs` data is migrated into `grow_logs` with appropriate `log_type` mapping (e.g., action "water" becomes log_type "watering")
+- The `care_logs` table is kept read-only for backward compatibility but all new writes go to `grow_logs`. A future migration can drop it once all clients are updated.
 - Existing plants get `current_phase = "vegetative"` and `plant_type = "photo"` as defaults
 
 ---
@@ -190,7 +218,8 @@ The existing `RuleEngine` is extended to key all evaluations off the plant's cur
 
 - **Seedling**: Warn if humidity drops below 60%, suggest dome if not using one
 - **Vegetative**: Suggest topping after node 5-6, remind about training windows
-- **Flowering**: Warn about high humidity (bud rot risk), suggest flush timing in late flower
+- **Germination**: Alert if temp drops below 24°C, suggest keeping warm and dark
+- **Flowering**: Warn about high humidity (bud rot risk), suggest flush timing in late flower (week 6+ sub-range)
 - **Drying**: Alert if RH goes above 70% or below 45%, suggest when to check snap test
 - **Curing**: Remind to burp jars, alert if RH drifts outside 58-65%
 
@@ -248,11 +277,12 @@ Displayed on completed grows and available in-progress:
 - Growth chart: height over time (from measurement logs)
 - Environment summary: average temp/humidity per phase (from sensor readings)
 
-### Grow comparison
+### Grow comparison (deferred to post-launch)
 
 - Side-by-side view of two completed grows or two plants
 - Compare: phase durations, yield, environmental averages
 - Highlight deltas: "This run's veg was 10 days shorter but yielded 15% more"
+- Requires multiple completed grows to be useful — build after core lifecycle is shipped
 
 ### Achievements
 
