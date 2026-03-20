@@ -86,7 +86,7 @@ export async function addGrowLog(log: Omit<GrowLog, 'created_at'>): Promise<void
   await db.execute({
     sql: `INSERT INTO grow_logs (id, plant_id, user_id, phase, log_type, data, photo_url, notes)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    args: [log.id, log.plant_id, log.user_id, log.phase, log.log_type, log.data ? JSON.stringify(log.data) : null, log.photo_url, log.notes],
+    args: [log.id, log.plant_id, log.user_id, log.phase, log.log_type, log.data, log.photo_url, log.notes],
   });
 }
 
@@ -131,7 +131,7 @@ export async function createStrainProfile(strain: Omit<StrainProfile, 'created_a
       strain.flower_weeks_min,
       strain.flower_weeks_max,
       strain.difficulty,
-      strain.thresholds_by_phase ? JSON.stringify(strain.thresholds_by_phase) : null,
+      strain.thresholds_by_phase,
       strain.notes,
       strain.is_custom ? 1 : 0,
       strain.user_id,
@@ -204,7 +204,7 @@ export async function unlockAchievement(achievement: Omit<Achievement, 'unlocked
       achievement.user_id,
       achievement.achievement_key,
       achievement.points,
-      achievement.metadata ? JSON.stringify(achievement.metadata) : null,
+      achievement.metadata,
     ],
   });
 }
@@ -302,7 +302,7 @@ export async function seedBuiltInStrains(): Promise<number> {
         strain.flower_weeks_min,
         strain.flower_weeks_max,
         strain.difficulty,
-        strain.thresholds_by_phase ? JSON.stringify(strain.thresholds_by_phase) : null,
+        strain.thresholds_by_phase,
         strain.notes,
       ],
     });

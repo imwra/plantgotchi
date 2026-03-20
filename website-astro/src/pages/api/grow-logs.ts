@@ -12,34 +12,47 @@ export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request);
   if (!session) return new Response("Unauthorized", { status: 401 });
 
-  const url = new URL(request.url);
-  const plantId = url.searchParams.get("plantId");
-  const phase = url.searchParams.get("phase");
-  const logType = url.searchParams.get("logType");
-  const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+  try {
+    const url = new URL(request.url);
+    const plantId = url.searchParams.get("plantId");
+    const phase = url.searchParams.get("phase");
+    const logType = url.searchParams.get("logType");
+    const limit = parseInt(url.searchParams.get("limit") || "50", 10);
 
-  if (!plantId) {
-    return new Response(JSON.stringify({ error: "plantId required" }), {
-      status: 400,
+    if (!plantId) {
+      return new Response(JSON.stringify({ error: "plantId required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const plant = await getPlantForUser(plantId, session.user.id);
+    if (!plant) return new Response("Not found", { status: 404 });
+
+    let logs;
+    if (phase && PHASES.has(phase as Phase)) {
+      logs = await getGrowLogsByPhase(plantId, phase as Phase);
+    } else if (logType && logType in GROW_LOG_TYPE_LABELS) {
+      logs = await getGrowLogsByType(plantId, logType as GrowLogType);
+    } else {
+      logs = await getGrowLogs(plantId, limit);
+    }
+
+    return new Response(JSON.stringify(logs), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    const userId = session.user.id ?? "anonymous";
+    ServerAnalytics.captureException(
+      userId,
+      error instanceof Error ? error : new Error(String(error)),
+      { endpoint: "/api/grow-logs", method: "GET" }
+    );
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
-
-  const plant = await getPlantForUser(plantId, session.user.id);
-  if (!plant) return new Response("Not found", { status: 404 });
-
-  let logs;
-  if (phase && PHASES.has(phase as Phase)) {
-    logs = await getGrowLogsByPhase(plantId, phase as Phase);
-  } else if (logType && logType in GROW_LOG_TYPE_LABELS) {
-    logs = await getGrowLogsByType(plantId, logType as GrowLogType);
-  } else {
-    logs = await getGrowLogs(plantId, limit);
-  }
-
-  return new Response(JSON.stringify(logs), {
-    headers: { "Content-Type": "application/json" },
-  });
 };
 
 export const POST: APIRoute = async ({ request }) => {

@@ -49,7 +49,11 @@ export const POST: APIRoute = async ({ params, request }) => {
       { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    ServerAnalytics.captureException(error);
+    ServerAnalytics.captureException(
+      'unknown',
+      error instanceof Error ? error : new Error(String(error)),
+      { endpoint: '/api/plants/[id]/harvest', method: 'POST' }
+    );
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { "Content-Type": "application/json" } }

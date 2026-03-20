@@ -106,7 +106,7 @@ export const GROW_LOG_TYPE_LABELS: Record<GrowLogType, string> = {
   dryWeight: 'Dry Weight',
   dryCheck: 'Dry Check',
   cureCheck: 'Cure Check',
-  processingLog: 'Processing Log',
+  processingLog: 'Processing',
   pestTreatment: 'Pest Treatment',
   cloning: 'Cloning',
 };
@@ -141,8 +141,8 @@ export interface Grow {
   id: string;
   user_id: string;
   name: string;
-  environment: GrowEnvironment;
-  start_date: string;
+  environment: GrowEnvironment | null;
+  start_date: string | null;
   end_date: string | null;
   notes: string | null;
   status: string;
@@ -156,7 +156,7 @@ export interface GrowLog {
   user_id: string;
   phase: Phase;
   log_type: GrowLogType;
-  data: Record<string, unknown> | null;
+  data: string | null; // JSON string for structured data (weights, trichome stages, measurements)
   photo_url: string | null;
   notes: string | null;
   created_at: string;
@@ -165,11 +165,11 @@ export interface GrowLog {
 export interface StrainProfile {
   id: string;
   name: string;
-  type: StrainType;
-  flower_weeks_min: number;
-  flower_weeks_max: number;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  thresholds_by_phase: Record<Phase, PhaseDefaults | null> | null;
+  type: StrainType | null;
+  flower_weeks_min: number | null;
+  flower_weeks_max: number | null;
+  difficulty: string | null;
+  thresholds_by_phase: string | null; // JSON string
   notes: string | null;
   is_custom: boolean;
   user_id: string | null;
@@ -216,5 +216,5 @@ export interface Achievement {
   achievement_key: AchievementKey;
   points: number;
   unlocked_at: string;
-  metadata: Record<string, unknown> | null;
+  metadata: string | null; // JSON string
 }
