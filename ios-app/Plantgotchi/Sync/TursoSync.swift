@@ -174,7 +174,15 @@ final class TursoSync {
             tempMax: dict["temp_max"] as? Double ?? 30.0,
             lightPreference: dict["light_preference"] as? String ?? "medium",
             createdAt: dict["created_at"] as? String,
-            updatedAt: dict["updated_at"] as? String
+            updatedAt: dict["updated_at"] as? String,
+            plantType: (dict["plant_type"] as? String).flatMap(PlantType.init(rawValue:)),
+            strainId: dict["strain_id"] as? String,
+            strainName: dict["strain_name"] as? String,
+            strainType: (dict["strain_type"] as? String).flatMap(StrainType.init(rawValue:)),
+            environment: (dict["environment"] as? String).flatMap(GrowEnvironment.init(rawValue:)),
+            currentPhase: (dict["current_phase"] as? String).flatMap(Phase.init(rawValue:)),
+            phaseStartedAt: dict["phase_started_at"] as? String,
+            growId: dict["grow_id"] as? String
         )
     }
 
