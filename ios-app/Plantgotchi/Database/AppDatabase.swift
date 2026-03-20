@@ -169,6 +169,235 @@ final class AppDatabase {
         }
     }
 
+    // MARK: - Grow Queries
+
+    /// Insert or update a grow.
+    func saveGrow(_ grow: Grow) throws {
+        try dbQueue.write { db in
+            try grow.save(db)
+        }
+    }
+
+    /// Fetch a single grow by ID.
+    func getGrow(id: String) throws -> Grow? {
+        try dbQueue.read { db in
+            try Grow.fetchOne(db, key: id)
+        }
+    }
+
+    /// Fetch all grows for a user, ordered by creation date descending.
+    func getGrows(userId: String) throws -> [Grow] {
+        try dbQueue.read { db in
+            try Grow
+                .filter(Grow.Columns.userId == userId)
+                .order(Grow.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch active grows for a user.
+    func getActiveGrows(userId: String) throws -> [Grow] {
+        try dbQueue.read { db in
+            try Grow
+                .filter(Grow.Columns.userId == userId)
+                .filter(Grow.Columns.status == "active")
+                .order(Grow.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - GrowLog Queries
+
+    /// Insert a grow log entry.
+    func addGrowLog(_ log: GrowLog) throws {
+        try dbQueue.write { db in
+            try log.insert(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant, ordered by most recent first.
+    func getGrowLogs(plantId: String, limit: Int = 50) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .order(GrowLog.Columns.createdAt.desc)
+                .limit(limit)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant filtered by phase.
+    func getGrowLogs(plantId: String, phase: Phase) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .filter(GrowLog.Columns.phase == phase.rawValue)
+                .order(GrowLog.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant filtered by log type.
+    func getGrowLogs(plantId: String, logType: GrowLogType) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .filter(GrowLog.Columns.logType == logType.rawValue)
+                .order(GrowLog.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - StrainProfile Queries
+
+    /// Insert or update a strain profile.
+    func saveStrainProfile(_ profile: StrainProfile) throws {
+        try dbQueue.write { db in
+            try profile.save(db)
+        }
+    }
+
+    /// Fetch a single strain profile by ID.
+    func getStrainProfile(id: String) throws -> StrainProfile? {
+        try dbQueue.read { db in
+            try StrainProfile.fetchOne(db, key: id)
+        }
+    }
+
+    /// Search strain profiles by name (case-insensitive LIKE).
+    func searchStrainProfiles(query: String) throws -> [StrainProfile] {
+        try dbQueue.read { db in
+            try StrainProfile
+                .filter(StrainProfile.Columns.name.like("%\(query)%"))
+                .order(StrainProfile.Columns.name)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch built-in (non-custom) strain profiles.
+    func getBuiltInStrains() throws -> [StrainProfile] {
+        try dbQueue.read { db in
+            try StrainProfile
+                .filter(StrainProfile.Columns.isCustom == false)
+                .order(StrainProfile.Columns.name)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - Achievement Queries
+
+    /// Insert or update an achievement.
+    func saveAchievement(_ achievement: Achievement) throws {
+        try dbQueue.write { db in
+            try achievement.save(db)
+        }
+    }
+
+    /// Fetch all achievements for a user.
+    func getAchievements(userId: String) throws -> [Achievement] {
+        try dbQueue.read { db in
+            try Achievement
+                .filter(Achievement.Columns.userId == userId)
+                .order(Achievement.Columns.unlockedAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Check whether a user has unlocked a specific achievement.
+    func hasAchievement(userId: String, key: String) throws -> Bool {
+        try dbQueue.read { db in
+            let count = try Achievement
+                .filter(Achievement.Columns.userId == userId)
+                .filter(Achievement.Columns.achievementKey == key)
+                .fetchCount(db)
+            return count > 0
+        }
+    }
+
+    /// Get the total points for a user.
+    func getTotalPoints(userId: String) throws -> Int {
+        try dbQueue.read { db in
+            let sum = try Int.fetchOne(db, sql: """
+                SELECT COALESCE(SUM(points), 0) FROM achievements WHERE user_id = ?
+                """, arguments: [userId])
+            return sum ?? 0
+        }
+    }
+
+    // MARK: - Phase Transition
+
+    /// Transition a plant to a new phase, creating a phase_change grow log.
+    func transitionPlantPhase(plantId: String, to newPhase: Phase, userId: String, notes: String? = nil) throws {
+        try dbQueue.write { db in
+            guard var plant = try Plant.fetchOne(db, key: plantId) else { return }
+
+            let fmt = ISO8601DateFormatter()
+            fmt.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let now = fmt.string(from: Date())
+
+            let log = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: newPhase,
+                logType: .phaseChange,
+                data: nil,
+                notes: notes ?? "Transitioned to \(newPhase.rawValue)",
+                createdAt: now
+            )
+            try log.insert(db)
+
+            plant.currentPhase = newPhase
+            plant.phaseStartedAt = now
+            plant.updatedAt = now
+            try plant.update(db)
+        }
+    }
+
+    // MARK: - Harvest
+
+    /// Record a harvest: creates both a phase_change and harvest log, updates the plant.
+    func harvestPlant(plantId: String, userId: String, weightGrams: Double? = nil, notes: String? = nil) throws {
+        try dbQueue.write { db in
+            guard var plant = try Plant.fetchOne(db, key: plantId) else { return }
+
+            let fmt = ISO8601DateFormatter()
+            fmt.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let now = fmt.string(from: Date())
+
+            // Phase change log
+            let phaseLog = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: .drying,
+                logType: .phaseChange,
+                notes: "Harvested and moved to drying",
+                createdAt: now
+            )
+            try phaseLog.insert(db)
+
+            // Harvest log with optional weight data
+            var harvestData: String? = nil
+            if let w = weightGrams {
+                harvestData = "{\"weight_grams\":\(w)}"
+            }
+            let harvestLog = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: .flowering,
+                logType: .harvest,
+                data: harvestData,
+                notes: notes ?? "Harvest complete",
+                createdAt: now
+            )
+            try harvestLog.insert(db)
+
+            plant.currentPhase = .drying
+            plant.phaseStartedAt = now
+            plant.updatedAt = now
+            try plant.update(db)
+        }
+    }
+
     /// Delete all data for a user.
     func clearAllData(userId: String) throws {
         try dbQueue.write { db in
@@ -176,9 +405,12 @@ final class AppDatabase {
             for plant in plants {
                 try SensorReading.filter(SensorReading.Columns.plantId == plant.id).deleteAll(db)
                 try CareLog.filter(CareLog.Columns.plantId == plant.id).deleteAll(db)
+                try GrowLog.filter(GrowLog.Columns.plantId == plant.id).deleteAll(db)
                 try Recommendation.filter(Recommendation.Columns.plantId == plant.id).deleteAll(db)
             }
             try Plant.filter(Plant.Columns.userId == userId).deleteAll(db)
+            try Grow.filter(Grow.Columns.userId == userId).deleteAll(db)
+            try Achievement.filter(Achievement.Columns.userId == userId).deleteAll(db)
         }
     }
 
