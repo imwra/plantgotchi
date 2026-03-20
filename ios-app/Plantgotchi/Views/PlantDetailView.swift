@@ -11,6 +11,7 @@ struct PlantDetailView: View {
     @State private var careLogs: [CareLog] = []
     @State private var recommendations: [Recommendation] = []
     @State private var plantView: PlantView?
+    @State private var showPhaseTransition = false
 
     private let userId = UserDefaults.standard.string(forKey: "userId") ?? "default-user"
 
@@ -20,6 +21,11 @@ struct PlantDetailView: View {
                 VStack(spacing: 20) {
                     // Header
                     headerSection(plant: plant, pv: pv)
+
+                    // Phase banner + timeline
+                    if plant.currentPhase != nil {
+                        phaseSection(plant: plant)
+                    }
 
                     // Sensor readings
                     readingsSection(pv: pv)
@@ -51,6 +57,110 @@ struct PlantDetailView: View {
         }
         .task {
             await loadData()
+        }
+        .sheet(isPresented: $showPhaseTransition) {
+            if let plant = plant, let currentPhase = plant.currentPhase, let nextPhase = currentPhase.next {
+                PhaseTransitionView(plant: plant, targetPhase: nextPhase) {
+                    Task { await loadData() }
+                }
+            }
+        }
+    }
+
+    // MARK: - Phase
+
+    private func phaseSection(plant: Plant) -> some View {
+        let currentPhase = plant.currentPhase!
+        let allPhases = Phase.allCases
+        let currentIdx = allPhases.firstIndex(of: currentPhase) ?? 0
+
+        return VStack(alignment: .leading, spacing: 12) {
+            // Phase banner
+            HStack {
+                Image(systemName: "leaf.circle.fill")
+                    .foregroundColor(PlantgotchiTheme.green)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(currentPhase.rawValue.capitalized)
+                        .font(PlantgotchiTheme.pixelFont(size: 11))
+                        .foregroundColor(PlantgotchiTheme.text)
+                    if let startStr = plant.phaseStartedAt {
+                        let days = daysInPhase(from: startStr)
+                        Text("Day \(days)")
+                            .font(PlantgotchiTheme.captionFont)
+                            .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
+                    }
+                }
+                Spacer()
+            }
+
+            // Phase timeline bar
+            HStack(spacing: 2) {
+                ForEach(Array(allPhases.enumerated()), id: \.offset) { idx, phase in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(
+                            idx < currentIdx
+                                ? PlantgotchiTheme.green.opacity(0.3)
+                                : idx == currentIdx
+                                    ? PlantgotchiTheme.green
+                                    : PlantgotchiTheme.text.opacity(0.1)
+                        )
+                        .frame(height: 6)
+                }
+            }
+
+            // Phase labels
+            HStack(spacing: 2) {
+                ForEach(Array(allPhases.enumerated()), id: \.offset) { idx, phase in
+                    Text(phaseAbbrev(phase))
+                        .font(.system(size: 6, weight: .medium, design: .rounded))
+                        .foregroundColor(
+                            idx <= currentIdx
+                                ? PlantgotchiTheme.green
+                                : PlantgotchiTheme.text.opacity(0.3)
+                        )
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            // Advance button
+            if let nextPhase = currentPhase.next {
+                Button {
+                    showPhaseTransition = true
+                } label: {
+                    HStack {
+                        Image(systemName: "arrow.right.circle.fill")
+                        Text("Advance to \(nextPhase.rawValue.capitalized)")
+                    }
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(PlantgotchiTheme.green)
+                    .cornerRadius(8)
+                }
+            }
+        }
+        .plantgotchiCard()
+    }
+
+    private func daysInPhase(from isoString: String) -> Int {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = formatter.date(from: isoString)
+                ?? ISO8601DateFormatter().date(from: isoString) else { return 0 }
+        return max(0, Int(Date().timeIntervalSince(date) / 86400))
+    }
+
+    private func phaseAbbrev(_ phase: Phase) -> String {
+        switch phase {
+        case .germination: return "GRM"
+        case .seedling:    return "SDL"
+        case .vegetative:  return "VEG"
+        case .flowering:   return "FLR"
+        case .drying:      return "DRY"
+        case .curing:      return "CUR"
+        case .processing:  return "PRC"
+        case .complete:    return "DON"
         }
     }
 
