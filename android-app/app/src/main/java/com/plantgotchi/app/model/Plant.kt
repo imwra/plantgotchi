@@ -39,6 +39,29 @@ data class Plant(
     @ColumnInfo(name = "light_preference")
     val lightPreference: String = "medium",
 
+    @ColumnInfo(name = "plant_type")
+    val plantType: String? = null,
+
+    @ColumnInfo(name = "strain_id")
+    val strainId: String? = null,
+
+    @ColumnInfo(name = "strain_name")
+    val strainName: String? = null,
+
+    @ColumnInfo(name = "strain_type")
+    val strainType: String? = null,
+
+    val environment: String? = null,
+
+    @ColumnInfo(name = "current_phase")
+    val currentPhase: String? = null,
+
+    @ColumnInfo(name = "phase_started_at")
+    val phaseStartedAt: String? = null,
+
+    @ColumnInfo(name = "grow_id")
+    val growId: String? = null,
+
     @ColumnInfo(name = "created_at")
     val createdAt: String? = null,
 
