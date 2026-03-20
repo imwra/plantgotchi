@@ -16,6 +16,16 @@ struct PlantCardView: View {
                 Spacer()
 
                 StatusBadge(status: plantView.status)
+
+                if let phaseName = plantView.phase {
+                    Text(phaseName.capitalized)
+                        .font(.system(size: 8, weight: .medium, design: .rounded))
+                        .foregroundColor(PlantgotchiTheme.green)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(PlantgotchiTheme.green.opacity(0.1))
+                        .cornerRadius(4)
+                }
             }
 
             // Name
@@ -116,7 +126,8 @@ struct StatusBadge: View {
         moistureMin: 30,
         moistureMax: 80,
         tempMin: 15.0,
-        tempMax: 30.0
+        tempMax: 30.0,
+        phase: nil
     ))
     .frame(width: 180)
     .padding()

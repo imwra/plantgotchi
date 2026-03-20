@@ -1,6 +1,27 @@
 import Foundation
 import GRDB
 
+// MARK: - Plant-Related Enums
+
+/// Photoperiod vs autoflower.
+enum PlantType: String, Codable, Equatable {
+    case photo = "photo"
+    case auto  = "auto"
+}
+
+/// Strain lineage.
+enum StrainType: String, Codable, Equatable {
+    case indica = "indica"
+    case sativa = "sativa"
+    case hybrid = "hybrid"
+}
+
+/// Indoor vs outdoor grow.
+enum GrowEnvironment: String, Codable, Equatable {
+    case indoor  = "indoor"
+    case outdoor = "outdoor"
+}
+
 /// A plant owned by a user, matching the `plants` table in the web schema.
 struct Plant: Codable, Identifiable, Equatable {
     var id: String
@@ -17,6 +38,16 @@ struct Plant: Codable, Identifiable, Equatable {
     var createdAt: String?
     var updatedAt: String?
 
+    // Cannabis lifecycle fields (all optional for backward compat)
+    var plantType: PlantType?
+    var strainId: String?
+    var strainName: String?
+    var strainType: StrainType?
+    var environment: GrowEnvironment?
+    var currentPhase: Phase?
+    var phaseStartedAt: String?
+    var growId: String?
+
     /// Create a new plant with defaults matching the SQL schema.
     init(
         id: String = UUID().uuidString,
@@ -31,7 +62,15 @@ struct Plant: Codable, Identifiable, Equatable {
         tempMax: Double = 30.0,
         lightPreference: String = "medium",
         createdAt: String? = nil,
-        updatedAt: String? = nil
+        updatedAt: String? = nil,
+        plantType: PlantType? = nil,
+        strainId: String? = nil,
+        strainName: String? = nil,
+        strainType: StrainType? = nil,
+        environment: GrowEnvironment? = nil,
+        currentPhase: Phase? = nil,
+        phaseStartedAt: String? = nil,
+        growId: String? = nil
     ) {
         self.id = id
         self.userId = userId
@@ -46,6 +85,14 @@ struct Plant: Codable, Identifiable, Equatable {
         self.lightPreference = lightPreference
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.plantType = plantType
+        self.strainId = strainId
+        self.strainName = strainName
+        self.strainType = strainType
+        self.environment = environment
+        self.currentPhase = currentPhase
+        self.phaseStartedAt = phaseStartedAt
+        self.growId = growId
     }
 }
 
@@ -69,6 +116,14 @@ extension Plant: TableRecord, FetchableRecord, PersistableRecord {
         case lightPreference = "light_preference"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case plantType = "plant_type"
+        case strainId = "strain_id"
+        case strainName = "strain_name"
+        case strainType = "strain_type"
+        case environment
+        case currentPhase = "current_phase"
+        case phaseStartedAt = "phase_started_at"
+        case growId = "grow_id"
     }
 
     enum CodingKeys: String, CodingKey {
@@ -85,5 +140,13 @@ extension Plant: TableRecord, FetchableRecord, PersistableRecord {
         case lightPreference = "light_preference"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
+        case plantType = "plant_type"
+        case strainId = "strain_id"
+        case strainName = "strain_name"
+        case strainType = "strain_type"
+        case environment
+        case currentPhase = "current_phase"
+        case phaseStartedAt = "phase_started_at"
+        case growId = "grow_id"
     }
 }

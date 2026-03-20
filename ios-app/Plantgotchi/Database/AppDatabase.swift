@@ -40,6 +40,7 @@ final class AppDatabase {
     private init(_ dbQueue: DatabaseQueue) throws {
         self.dbQueue = dbQueue
         try migrate()
+        try seedBuiltInStrains()
     }
 
     /// Run all registered migrations.
@@ -169,6 +170,235 @@ final class AppDatabase {
         }
     }
 
+    // MARK: - Grow Queries
+
+    /// Insert or update a grow.
+    func saveGrow(_ grow: Grow) throws {
+        try dbQueue.write { db in
+            try grow.save(db)
+        }
+    }
+
+    /// Fetch a single grow by ID.
+    func getGrow(id: String) throws -> Grow? {
+        try dbQueue.read { db in
+            try Grow.fetchOne(db, key: id)
+        }
+    }
+
+    /// Fetch all grows for a user, ordered by creation date descending.
+    func getGrows(userId: String) throws -> [Grow] {
+        try dbQueue.read { db in
+            try Grow
+                .filter(Grow.Columns.userId == userId)
+                .order(Grow.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch active grows for a user.
+    func getActiveGrows(userId: String) throws -> [Grow] {
+        try dbQueue.read { db in
+            try Grow
+                .filter(Grow.Columns.userId == userId)
+                .filter(Grow.Columns.status == "active")
+                .order(Grow.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - GrowLog Queries
+
+    /// Insert a grow log entry.
+    func addGrowLog(_ log: GrowLog) throws {
+        try dbQueue.write { db in
+            try log.insert(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant, ordered by most recent first.
+    func getGrowLogs(plantId: String, limit: Int = 50) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .order(GrowLog.Columns.createdAt.desc)
+                .limit(limit)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant filtered by phase.
+    func getGrowLogs(plantId: String, phase: Phase) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .filter(GrowLog.Columns.phase == phase.rawValue)
+                .order(GrowLog.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch grow logs for a plant filtered by log type.
+    func getGrowLogs(plantId: String, logType: GrowLogType) throws -> [GrowLog] {
+        try dbQueue.read { db in
+            try GrowLog
+                .filter(GrowLog.Columns.plantId == plantId)
+                .filter(GrowLog.Columns.logType == logType.rawValue)
+                .order(GrowLog.Columns.createdAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - StrainProfile Queries
+
+    /// Insert or update a strain profile.
+    func saveStrainProfile(_ profile: StrainProfile) throws {
+        try dbQueue.write { db in
+            try profile.save(db)
+        }
+    }
+
+    /// Fetch a single strain profile by ID.
+    func getStrainProfile(id: String) throws -> StrainProfile? {
+        try dbQueue.read { db in
+            try StrainProfile.fetchOne(db, key: id)
+        }
+    }
+
+    /// Search strain profiles by name (case-insensitive LIKE).
+    func searchStrainProfiles(query: String) throws -> [StrainProfile] {
+        try dbQueue.read { db in
+            try StrainProfile
+                .filter(StrainProfile.Columns.name.like("%\(query)%"))
+                .order(StrainProfile.Columns.name)
+                .fetchAll(db)
+        }
+    }
+
+    /// Fetch built-in (non-custom) strain profiles.
+    func getBuiltInStrains() throws -> [StrainProfile] {
+        try dbQueue.read { db in
+            try StrainProfile
+                .filter(StrainProfile.Columns.isCustom == false)
+                .order(StrainProfile.Columns.name)
+                .fetchAll(db)
+        }
+    }
+
+    // MARK: - Achievement Queries
+
+    /// Insert or update an achievement.
+    func saveAchievement(_ achievement: Achievement) throws {
+        try dbQueue.write { db in
+            try achievement.save(db)
+        }
+    }
+
+    /// Fetch all achievements for a user.
+    func getAchievements(userId: String) throws -> [Achievement] {
+        try dbQueue.read { db in
+            try Achievement
+                .filter(Achievement.Columns.userId == userId)
+                .order(Achievement.Columns.unlockedAt.desc)
+                .fetchAll(db)
+        }
+    }
+
+    /// Check whether a user has unlocked a specific achievement.
+    func hasAchievement(userId: String, key: String) throws -> Bool {
+        try dbQueue.read { db in
+            let count = try Achievement
+                .filter(Achievement.Columns.userId == userId)
+                .filter(Achievement.Columns.achievementKey == key)
+                .fetchCount(db)
+            return count > 0
+        }
+    }
+
+    /// Get the total points for a user.
+    func getTotalPoints(userId: String) throws -> Int {
+        try dbQueue.read { db in
+            let sum = try Int.fetchOne(db, sql: """
+                SELECT COALESCE(SUM(points), 0) FROM achievements WHERE user_id = ?
+                """, arguments: [userId])
+            return sum ?? 0
+        }
+    }
+
+    // MARK: - Phase Transition
+
+    /// Transition a plant to a new phase, creating a phase_change grow log.
+    func transitionPlantPhase(plantId: String, to newPhase: Phase, userId: String, notes: String? = nil) throws {
+        try dbQueue.write { db in
+            guard var plant = try Plant.fetchOne(db, key: plantId) else { return }
+
+            let fmt = ISO8601DateFormatter()
+            fmt.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let now = fmt.string(from: Date())
+
+            let log = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: newPhase,
+                logType: .phaseChange,
+                data: nil,
+                notes: notes ?? "Transitioned to \(newPhase.rawValue)",
+                createdAt: now
+            )
+            try log.insert(db)
+
+            plant.currentPhase = newPhase
+            plant.phaseStartedAt = now
+            plant.updatedAt = now
+            try plant.update(db)
+        }
+    }
+
+    // MARK: - Harvest
+
+    /// Record a harvest: creates both a phase_change and harvest log, updates the plant.
+    func harvestPlant(plantId: String, userId: String, weightGrams: Double? = nil, notes: String? = nil) throws {
+        try dbQueue.write { db in
+            guard var plant = try Plant.fetchOne(db, key: plantId) else { return }
+
+            let fmt = ISO8601DateFormatter()
+            fmt.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let now = fmt.string(from: Date())
+
+            // Phase change log
+            let phaseLog = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: .drying,
+                logType: .phaseChange,
+                notes: "Harvested and moved to drying",
+                createdAt: now
+            )
+            try phaseLog.insert(db)
+
+            // Harvest log with optional weight data
+            var harvestData: String? = nil
+            if let w = weightGrams {
+                harvestData = "{\"weight_grams\":\(w)}"
+            }
+            let harvestLog = GrowLog(
+                plantId: plantId,
+                userId: userId,
+                phase: .flowering,
+                logType: .harvest,
+                data: harvestData,
+                notes: notes ?? "Harvest complete",
+                createdAt: now
+            )
+            try harvestLog.insert(db)
+
+            plant.currentPhase = .drying
+            plant.phaseStartedAt = now
+            plant.updatedAt = now
+            try plant.update(db)
+        }
+    }
+
     /// Delete all data for a user.
     func clearAllData(userId: String) throws {
         try dbQueue.write { db in
@@ -176,9 +406,44 @@ final class AppDatabase {
             for plant in plants {
                 try SensorReading.filter(SensorReading.Columns.plantId == plant.id).deleteAll(db)
                 try CareLog.filter(CareLog.Columns.plantId == plant.id).deleteAll(db)
+                try GrowLog.filter(GrowLog.Columns.plantId == plant.id).deleteAll(db)
                 try Recommendation.filter(Recommendation.Columns.plantId == plant.id).deleteAll(db)
             }
             try Plant.filter(Plant.Columns.userId == userId).deleteAll(db)
+            try Grow.filter(Grow.Columns.userId == userId).deleteAll(db)
+            try Achievement.filter(Achievement.Columns.userId == userId).deleteAll(db)
+        }
+    }
+
+    // MARK: - Strain Seeding
+
+    /// Seed built-in strain profiles if the table is empty.
+    func seedBuiltInStrains() throws {
+        try dbQueue.write { db in
+            let count = try StrainProfile.fetchCount(db)
+            guard count == 0 else { return }
+
+            let strains: [StrainProfile] = [
+                StrainProfile(name: "Northern Lights", type: .indica, flowerWeeksMin: 7, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "Blue Dream", type: .hybrid, flowerWeeksMin: 9, flowerWeeksMax: 10, difficulty: "intermediate"),
+                StrainProfile(name: "OG Kush", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Gorilla Glue", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Sour Diesel", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 11, difficulty: "advanced"),
+                StrainProfile(name: "Girl Scout Cookies", type: .hybrid, flowerWeeksMin: 9, flowerWeeksMax: 10, difficulty: "intermediate"),
+                StrainProfile(name: "White Widow", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "AK-47", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "beginner"),
+                StrainProfile(name: "Jack Herer", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 12, difficulty: "intermediate"),
+                StrainProfile(name: "Granddaddy Purple", type: .indica, flowerWeeksMin: 8, flowerWeeksMax: 11, difficulty: "intermediate"),
+                StrainProfile(name: "Amnesia Haze", type: .sativa, flowerWeeksMin: 10, flowerWeeksMax: 12, difficulty: "advanced"),
+                StrainProfile(name: "Cheese", type: .indica, flowerWeeksMin: 7, flowerWeeksMax: 8, difficulty: "beginner"),
+                StrainProfile(name: "Gelato", type: .hybrid, flowerWeeksMin: 8, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Wedding Cake", type: .hybrid, flowerWeeksMin: 7, flowerWeeksMax: 9, difficulty: "intermediate"),
+                StrainProfile(name: "Zkittlez", type: .indica, flowerWeeksMin: 8, flowerWeeksMax: 10, difficulty: "intermediate"),
+            ]
+
+            for strain in strains {
+                try strain.insert(db)
+            }
         }
     }
 
@@ -200,7 +465,9 @@ final class AppDatabase {
             (
                 Plant(userId: userId, name: "Northern Lights", species: "Indica", emoji: "\u{1F33F}",
                       moistureMin: 40, moistureMax: 70, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(720)),
+                      createdAt: ts(720),
+                      plantType: .photo, strainType: .indica, environment: .indoor,
+                      currentPhase: .vegetative, phaseStartedAt: ts(336)),
                 [(55, 24.5, 2200, 87, 0.5), (58, 24.0, 2100, 88, 6), (52, 24.8, 2300, 89, 12),
                  (60, 23.5, 2150, 90, 24), (48, 25.0, 2250, 91, 48)],
                 ["water", "fertilize"],
@@ -213,7 +480,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida (Sativa dominante)" : "Hybrid (Sativa-dominant)",
                       emoji: "\u{1F33B}",
                       moistureMin: 35, moistureMax: 65, tempMin: 21, tempMax: 30, lightPreference: "high",
-                      createdAt: ts(480)),
+                      createdAt: ts(480),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(168)),
                 [(38, 27.5, 2400, 72, 1), (42, 26.0, 2300, 73, 8), (35, 28.0, 2500, 74, 16),
                  (45, 26.5, 2200, 75, 32), (32, 27.0, 2350, 76, 56)],
                 ["water", "water", "prune"],
@@ -229,7 +498,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida (Indica dominante)" : "Indica-dominant Hybrid",
                       emoji: "\u{1FAB4}",
                       moistureMin: 35, moistureMax: 60, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(1200)),
+                      createdAt: ts(1200),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(504)),
                 [(50, 25.0, 2100, 95, 2), (48, 24.5, 2000, 95, 12), (52, 25.2, 2050, 96, 24),
                  (45, 24.0, 1900, 96, 48), (55, 25.5, 2200, 97, 96)],
                 ["water", "fertilize"],
@@ -242,7 +513,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida" : "Hybrid",
                       emoji: "\u{1F33F}",
                       moistureMin: 35, moistureMax: 65, tempMin: 20, tempMax: 29, lightPreference: "high",
-                      createdAt: ts(360)),
+                      createdAt: ts(360),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .seedling, phaseStartedAt: ts(120)),
                 [(25, 22.5, 1800, 45, 0.25), (30, 23.0, 1700, 46, 4), (28, 22.8, 1600, 47, 10),
                  (40, 23.5, 1850, 48, 20), (50, 24.0, 1900, 50, 36)],
                 ["water", "prune", "fertilize"],
@@ -259,7 +532,9 @@ final class AppDatabase {
             (
                 Plant(userId: userId, name: "Sour Diesel", species: "Sativa", emoji: "\u{1F343}",
                       moistureMin: 30, moistureMax: 65, tempMin: 21, tempMax: 30, lightPreference: "high",
-                      createdAt: ts(900)),
+                      createdAt: ts(900),
+                      plantType: .photo, strainType: .sativa, environment: .indoor,
+                      currentPhase: .vegetative, phaseStartedAt: ts(504)),
                 [(55, 26.0, 2500, 60, 3), (52, 25.5, 2400, 61, 9), (58, 26.3, 2550, 62, 18),
                  (50, 25.0, 2300, 63, 36), (60, 26.5, 2600, 65, 72)],
                 ["water", "prune"],
@@ -272,7 +547,9 @@ final class AppDatabase {
                       species: isPt ? "Hibrida" : "Hybrid",
                       emoji: "\u{1F335}",
                       moistureMin: 35, moistureMax: 60, tempMin: 20, tempMax: 28, lightPreference: "high",
-                      createdAt: ts(1500)),
+                      createdAt: ts(1500),
+                      plantType: .photo, strainType: .hybrid, environment: .indoor,
+                      currentPhase: .flowering, phaseStartedAt: ts(840)),
                 [(42, 24.0, 2300, 82, 4), (45, 23.5, 2200, 83, 16), (40, 24.5, 2400, 83, 36),
                  (48, 23.0, 2100, 84, 72), (38, 25.0, 2350, 85, 120)],
                 ["water", "fertilize"],
@@ -304,6 +581,19 @@ final class AppDatabase {
                         createdAt: ts(Double(i + 1) * 48)
                     )
                     try log.insert(db)
+                }
+
+                // Add grow log for lifecycle plants
+                if let phase = plant.currentPhase {
+                    let growLog = GrowLog(
+                        plantId: plant.id,
+                        userId: userId,
+                        phase: phase,
+                        logType: .watering,
+                        notes: "Demo watering log",
+                        createdAt: ts(24)
+                    )
+                    try growLog.insert(db)
                 }
 
                 for (source, message, severity) in recs {

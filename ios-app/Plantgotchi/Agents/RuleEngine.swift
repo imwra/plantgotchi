@@ -100,6 +100,7 @@ struct PlantView {
     let moistureMax: Int
     let tempMin: Double
     let tempMax: Double
+    let phase: String?
 }
 
 /// Build a `PlantView` from a plant, its latest reading, and recent care logs.
@@ -144,61 +145,189 @@ func toPlantView(
         moistureMin: plant.moistureMin,
         moistureMax: plant.moistureMax,
         tempMin: plant.tempMin,
-        tempMax: plant.tempMax
+        tempMax: plant.tempMax,
+        phase: plant.currentPhase?.rawValue
     )
 }
 
 // MARK: - Rule Engine (ported from website-astro/src/lib/agents/rules.ts)
 
+/// Resolved thresholds used by the rule engine.
+struct ResolvedThresholds {
+    let tempMin: Double
+    let tempMax: Double
+    let moistureMin: Int
+    let moistureMax: Int
+}
+
 /// Offline rule engine. Evaluates a plant + reading against threshold rules
 /// and returns any generated recommendations. No network required.
 enum RuleEngine {
 
+    // MARK: - Threshold Resolution
+
+    /// Returns effective thresholds for a plant, taking its current phase into account.
+    /// - If the plant has a phase with monitoring: use phase defaults for temp, plant-level for moisture.
+    /// - For flowering phase: if phaseStartedAt is >= 6 weeks ago, use lateFlowerDefaults for temp.
+    /// - If no phase (nil): fall back to plant-level thresholds (backward compat).
+    static func resolveThresholds(plant: Plant) -> ResolvedThresholds {
+        guard let phase = plant.currentPhase else {
+            // No phase set — backward compat: use plant-level thresholds
+            return ResolvedThresholds(
+                tempMin: plant.tempMin,
+                tempMax: plant.tempMax,
+                moistureMin: plant.moistureMin,
+                moistureMax: plant.moistureMax
+            )
+        }
+
+        guard phase.hasMonitoring else {
+            // Non-monitored phases still return plant-level (won't be used since
+            // evaluatePlant returns early, but keeps the API consistent)
+            return ResolvedThresholds(
+                tempMin: plant.tempMin,
+                tempMax: plant.tempMax,
+                moistureMin: plant.moistureMin,
+                moistureMax: plant.moistureMax
+            )
+        }
+
+        // Determine which phase defaults to use for temperature
+        let phaseDefaults: PhaseDefaults
+        if phase == .flowering, let startStr = plant.phaseStartedAt {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            let startDate = formatter.date(from: startStr)
+                ?? ISO8601DateFormatter().date(from: startStr)
+            if let start = startDate {
+                let sixWeeks = TimeInterval(6 * 7 * 24 * 60 * 60)
+                if Date().timeIntervalSince(start) >= sixWeeks {
+                    phaseDefaults = Phase.lateFlowerDefaults
+                } else {
+                    phaseDefaults = phase.defaults
+                }
+            } else {
+                phaseDefaults = phase.defaults
+            }
+        } else {
+            phaseDefaults = phase.defaults
+        }
+
+        return ResolvedThresholds(
+            tempMin: phaseDefaults.tempMinC,
+            tempMax: phaseDefaults.tempMaxC,
+            moistureMin: plant.moistureMin,
+            moistureMax: plant.moistureMax
+        )
+    }
+
+    // MARK: - Transition Suggestions
+
+    /// Returns lifecycle transition suggestions based on phase duration and plant type.
+    static func transitionSuggestions(plant: Plant) -> [Recommendation] {
+        guard let phase = plant.currentPhase,
+              let startStr = plant.phaseStartedAt else {
+            return []
+        }
+
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let startDate = formatter.date(from: startStr)
+                ?? ISO8601DateFormatter().date(from: startStr) else {
+            return []
+        }
+
+        let daysInPhase = Int(Date().timeIntervalSince(startDate) / 86400)
+        var recs: [Recommendation] = []
+
+        switch phase {
+        case .vegetative:
+            if plant.plantType == .photo, daysInPhase >= 42 {
+                recs.append(Recommendation(
+                    plantId: plant.id,
+                    source: "rules",
+                    message: "\(plant.name) has been in veg for \(daysInPhase) days \u{2014} ready to flip to flower?",
+                    severity: "info"
+                ))
+            }
+            if plant.plantType == .auto, daysInPhase >= 21 {
+                recs.append(Recommendation(
+                    plantId: plant.id,
+                    source: "rules",
+                    message: "\(plant.name) has been in veg for \(daysInPhase) days \u{2014} most autos start flowering around now",
+                    severity: "info"
+                ))
+            }
+        case .drying:
+            if daysInPhase >= 7 {
+                recs.append(Recommendation(
+                    plantId: plant.id,
+                    source: "rules",
+                    message: "\(plant.name) has been drying for \(daysInPhase) days \u{2014} check if small stems snap cleanly",
+                    severity: "info"
+                ))
+            }
+        default:
+            break
+        }
+
+        return recs
+    }
+
+    // MARK: - Evaluate
+
     /// Evaluate a plant against a sensor reading and return recommendations.
-    /// Ported from `evaluatePlant()` in rules.ts.
+    /// Phase-aware: skips sensor checks for non-monitored phases and uses
+    /// phase-specific thresholds when available.
     static func evaluatePlant(
         plant: Plant,
         reading: SensorReading
     ) -> [Recommendation] {
+        // Skip all sensor checks for non-monitored phases
+        if let phase = plant.currentPhase, !phase.hasMonitoring {
+            return []
+        }
+
+        let thresholds = resolveThresholds(plant: plant)
         var recs: [Recommendation] = []
 
         // Moisture too low
-        if let moisture = reading.moisture, moisture < plant.moistureMin {
+        if let moisture = reading.moisture, moisture < thresholds.moistureMin {
             recs.append(Recommendation(
                 plantId: plant.id,
                 source: "rules",
-                message: "\(plant.name) needs water! Soil moisture at \(moisture)% (minimum: \(plant.moistureMin)%)",
+                message: "\(plant.name) needs water! Soil moisture at \(moisture)% (minimum: \(thresholds.moistureMin)%)",
                 severity: moisture < 20 ? "urgent" : "warning"
             ))
         }
 
         // Moisture too high
-        if let moisture = reading.moisture, moisture > plant.moistureMax {
+        if let moisture = reading.moisture, moisture > thresholds.moistureMax {
             recs.append(Recommendation(
                 plantId: plant.id,
                 source: "rules",
-                message: "\(plant.name) may be overwatered \u{2014} moisture at \(moisture)% (maximum: \(plant.moistureMax)%)",
+                message: "\(plant.name) may be overwatered \u{2014} moisture at \(moisture)% (maximum: \(thresholds.moistureMax)%)",
                 severity: "warning"
             ))
         }
 
         // Temperature too low
-        if let temp = reading.temperature, temp < plant.tempMin {
+        if let temp = reading.temperature, temp < thresholds.tempMin {
             recs.append(Recommendation(
                 plantId: plant.id,
                 source: "rules",
-                message: "Too cold for \(plant.name)! Temperature at \(temp)\u{00B0}C (minimum: \(plant.tempMin)\u{00B0}C)",
-                severity: temp < plant.tempMin - 5 ? "urgent" : "warning"
+                message: "Too cold for \(plant.name)! Temperature at \(temp)\u{00B0}C (minimum: \(thresholds.tempMin)\u{00B0}C)",
+                severity: temp < thresholds.tempMin - 5 ? "urgent" : "warning"
             ))
         }
 
         // Temperature too high
-        if let temp = reading.temperature, temp > plant.tempMax {
+        if let temp = reading.temperature, temp > thresholds.tempMax {
             recs.append(Recommendation(
                 plantId: plant.id,
                 source: "rules",
-                message: "Too hot for \(plant.name)! Temperature at \(temp)\u{00B0}C (maximum: \(plant.tempMax)\u{00B0}C)",
-                severity: temp > plant.tempMax + 5 ? "urgent" : "warning"
+                message: "Too hot for \(plant.name)! Temperature at \(temp)\u{00B0}C (maximum: \(thresholds.tempMax)\u{00B0}C)",
+                severity: temp > thresholds.tempMax + 5 ? "urgent" : "warning"
             ))
         }
 
@@ -212,8 +341,9 @@ enum RuleEngine {
             ))
         }
 
-        // High-light plant in low light
-        if let light = reading.light, plant.lightPreference == "high", light < 1000 {
+        // High-light plant in low light — only in growing phases or when phase is nil (backward compat)
+        let applyLightRule = plant.currentPhase == nil || (plant.currentPhase?.isGrowing ?? false)
+        if applyLightRule, let light = reading.light, plant.lightPreference == "high", light < 1000 {
             recs.append(Recommendation(
                 plantId: plant.id,
                 source: "rules",
@@ -221,6 +351,9 @@ enum RuleEngine {
                 severity: "info"
             ))
         }
+
+        // Append transition suggestions
+        recs.append(contentsOf: transitionSuggestions(plant: plant))
 
         return recs
     }

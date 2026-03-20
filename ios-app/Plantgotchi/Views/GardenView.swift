@@ -16,6 +16,8 @@ struct GardenView: View {
     @State private var showAddPlant = false
     @State private var showScan = false
     @State private var showSettings = false
+    @State private var showGrows = false
+    @State private var showAchievements = false
 
     private var userId: String { authService.userId ?? "default-user" }
 
@@ -79,9 +81,19 @@ struct GardenView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape")
-                            .foregroundColor(PlantgotchiTheme.text)
+                    HStack(spacing: 12) {
+                        Button(action: { showGrows = true }) {
+                            Image(systemName: "leaf.circle")
+                                .foregroundColor(PlantgotchiTheme.text)
+                        }
+                        Button(action: { showAchievements = true }) {
+                            Image(systemName: "trophy")
+                                .foregroundColor(PlantgotchiTheme.text)
+                        }
+                        Button(action: { showSettings = true }) {
+                            Image(systemName: "gearshape")
+                                .foregroundColor(PlantgotchiTheme.text)
+                        }
                     }
                 }
             }
@@ -97,6 +109,16 @@ struct GardenView: View {
                 Task { await refreshPlants() }
             }) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showGrows) {
+                NavigationStack {
+                    GrowView()
+                }
+            }
+            .sheet(isPresented: $showAchievements) {
+                NavigationStack {
+                    AchievementsView()
+                }
             }
             .onAppear {
                 Analytics.track("screen_viewed", properties: ["screen_name": "garden"])
@@ -177,7 +199,14 @@ struct GardenView: View {
                     moistureMax: p["moisture_max"] as? Int ?? 80,
                     tempMin: p["temp_min"] as? Double ?? 15.0,
                     tempMax: p["temp_max"] as? Double ?? 30.0,
-                    lightPreference: p["light_preference"] as? String ?? "medium"
+                    lightPreference: p["light_preference"] as? String ?? "medium",
+                    plantType: (p["plant_type"] as? String).flatMap { PlantType(rawValue: $0) },
+                    strainName: p["strain_name"] as? String,
+                    strainType: (p["strain_type"] as? String).flatMap { StrainType(rawValue: $0) },
+                    environment: (p["environment"] as? String).flatMap { GrowEnvironment(rawValue: $0) },
+                    currentPhase: (p["current_phase"] as? String).flatMap { Phase(rawValue: $0) },
+                    phaseStartedAt: p["phase_started_at"] as? String,
+                    growId: p["grow_id"] as? String
                 )
             }
             plantViews = plants.map { plant in
