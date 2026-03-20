@@ -1510,16 +1510,17 @@ static func evaluatePlant(
     return recs
 }
 
+// Also add to AppDatabase.swift (alongside transitionPlantPhase):
+
 /// Transition a plant from Flowering to Drying (harvest), logging both
 /// a phase_change and a harvest entry with wet weight.
-static func harvestPlant(
+func harvestPlant(
     plantId: String,
     userId: String,
     wetWeightG: Double?,
-    notes: String?,
-    db: AppDatabase
+    notes: String?
 ) throws {
-    try db.dbQueue.write { dbConn in
+    try dbQueue.write { dbConn in
         guard var plant = try Plant.fetchOne(dbConn, key: plantId) else { return }
 
         // Phase change log
@@ -1897,17 +1898,36 @@ if let phaseName = plantView.phase {
 
 This requires adding a `phase: String?` field to `PlantView` and updating `toPlantView()` in `RuleEngine.swift`:
 
-In `PlantView` struct (RuleEngine.swift), add after `hp`:
+Update `PlantView` struct in `RuleEngine.swift` (add `phase` as the last field):
+
 ```swift
-let phase: String?
+struct PlantView {
+    let id: String
+    let name: String
+    let species: String
+    let emoji: String
+    let moisture: Int?
+    let temp: Double?
+    let light: Int?
+    let lightLabel: String
+    let lastWatered: String?
+    let status: PlantStatus
+    let hp: Int
+    let moistureMin: Int
+    let moistureMax: Int
+    let tempMin: Double
+    let tempMax: Double
+    let phase: String?  // <-- NEW
+}
 ```
 
-In `toPlantView()`, add to the return:
-```swift
-phase: plant.currentPhase?.rawValue
-```
+Update `toPlantView()` return to include `phase: plant.currentPhase?.rawValue` as the last argument.
 
-Update all existing call sites and the `#Preview` in `PlantCardView.swift` to include `phase: nil`.
+Update all call sites that construct `PlantView` directly to add `phase: nil` (or the actual phase):
+- `PlantCardView.swift` line 104 (`#Preview`) — add `phase: nil`
+- `GardenView.swift` line 184 (`toPlantView()` call is fine, it goes through the function)
+- `PlantDetailView.swift` line 270 (same, goes through function)
+- `PlantViewTests.swift` — all `PlantView(...)` constructors need `phase: nil` appended
 
 - [ ] **Step 3: Commit**
 
