@@ -13,7 +13,10 @@ public struct GardenVitalityEngine {
                 id: input.id,
                 name: input.name,
                 vitality: .medium,
-                attentionState: .unknown
+                attentionState: .unknown,
+                currentPhase: input.currentPhase,
+                strainName: input.strainName,
+                environment: input.environment
             )
         }
 
@@ -36,7 +39,10 @@ public struct GardenVitalityEngine {
             id: input.id,
             name: input.name,
             vitality: vitality,
-            attentionState: attentionState
+            attentionState: attentionState,
+            currentPhase: input.currentPhase,
+            strainName: input.strainName,
+            environment: input.environment
         )
     }
 

@@ -65,7 +65,10 @@ public final class GardenStore: ObservableObject {
                 freshnessScore: freshnessScore(
                     timestamp: entry.latestReading?.timestamp,
                     now: now
-                )
+                ),
+                currentPhase: entry.plant.currentPhase,
+                strainName: entry.plant.strainName,
+                environment: entry.plant.environment
             )
         }
 
