@@ -1,5 +1,6 @@
 import { processReading } from './rules';
 import { runOnlineAgent } from './claude';
+import { checkAndUnlock } from './achievement-engine';
 import type { Plant, SensorReading } from '../db/queries';
 
 /**
@@ -25,6 +26,13 @@ export async function runPeriodicCheck(userId: string): Promise<void> {
     } catch (error) {
       console.error(`Online agent failed for plant ${plant.id}:`, error);
     }
+  }
+
+  // Check achievements after full evaluation
+  try {
+    await checkAndUnlock(userId);
+  } catch (error) {
+    console.error('Achievement check failed:', error);
   }
 }
 
