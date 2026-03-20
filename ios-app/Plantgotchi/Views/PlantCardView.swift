@@ -116,7 +116,8 @@ struct StatusBadge: View {
         moistureMin: 30,
         moistureMax: 80,
         tempMin: 15.0,
-        tempMax: 30.0
+        tempMax: 30.0,
+        phase: nil
     ))
     .frame(width: 180)
     .padding()
