@@ -15,6 +15,14 @@ export interface Plant {
   light_preference: string;
   garden_id: string | null;
   catalog_id: string | null;
+  plant_type: string | null;
+  strain_id: string | null;
+  strain_name: string | null;
+  strain_type: string | null;
+  environment: string | null;
+  current_phase: string | null;
+  phase_started_at: string | null;
+  grow_id: string | null;
   identification_confidence: 'exact' | 'probable' | 'guess' | 'unknown';
   created_at: string;
   updated_at: string;
