@@ -30,15 +30,26 @@ struct PlantDetailView: View {
                     // Sensor readings
                     readingsSection(pv: pv)
 
-                    // Quick actions
-                    actionsSection(plant: plant)
+                    // Quick actions (phase-aware or legacy)
+                    if plant.currentPhase != nil {
+                        QuickLogView(plant: plant) {
+                            Task { await loadData() }
+                        }
+                    } else {
+                        actionsSection(plant: plant)
+                    }
 
                     // Recommendations
                     if !recommendations.isEmpty {
                         recommendationsSection
                     }
 
-                    // Care log
+                    // Grow journal (phase-aware plants)
+                    if plant.currentPhase != nil {
+                        GrowLogView(plantId: plant.id)
+                    }
+
+                    // Care log (legacy)
                     if !careLogs.isEmpty {
                         careLogSection
                     }
