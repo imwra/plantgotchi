@@ -21,6 +21,14 @@ public struct APIPlant: Codable, Equatable {
     public let tempMin: Double
     public let tempMax: Double
     public let lightPreference: String
+    public let plantType: String?
+    public let strainId: String?
+    public let strainName: String?
+    public let strainType: String?
+    public let environment: String?
+    public let currentPhase: String?
+    public let phaseStartedAt: String?
+    public let growId: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -33,6 +41,14 @@ public struct APIPlant: Codable, Equatable {
         case tempMin = "temp_min"
         case tempMax = "temp_max"
         case lightPreference = "light_preference"
+        case plantType = "plant_type"
+        case strainId = "strain_id"
+        case strainName = "strain_name"
+        case strainType = "strain_type"
+        case environment
+        case currentPhase = "current_phase"
+        case phaseStartedAt = "phase_started_at"
+        case growId = "grow_id"
     }
 
     public init(
@@ -45,7 +61,15 @@ public struct APIPlant: Codable, Equatable {
         moistureMax: Double,
         tempMin: Double,
         tempMax: Double,
-        lightPreference: String
+        lightPreference: String,
+        plantType: String? = nil,
+        strainId: String? = nil,
+        strainName: String? = nil,
+        strainType: String? = nil,
+        environment: String? = nil,
+        currentPhase: String? = nil,
+        phaseStartedAt: String? = nil,
+        growId: String? = nil
     ) {
         self.id = id
         self.userID = userID
@@ -57,6 +81,14 @@ public struct APIPlant: Codable, Equatable {
         self.tempMin = tempMin
         self.tempMax = tempMax
         self.lightPreference = lightPreference
+        self.plantType = plantType
+        self.strainId = strainId
+        self.strainName = strainName
+        self.strainType = strainType
+        self.environment = environment
+        self.currentPhase = currentPhase
+        self.phaseStartedAt = phaseStartedAt
+        self.growId = growId
     }
 }
 
