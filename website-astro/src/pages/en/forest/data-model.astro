@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import SiteNav from "../../../components/ui/organisms/SiteNav";
+import DataModelExplorer from "../../../components/ui/organisms/DataModelExplorer";
+import { getLocaleFromPath, useTranslations } from "../../../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const t = useTranslations(locale);
+
+const title = "Data Model - Plantgotchi";
+const description = "Explore the Plantgotchi app data model and flows interactively.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="min-h-screen bg-bg text-text">
+    <SiteNav
+      client:load
+      locale={locale}
+      currentPath={Astro.url.pathname}
+      labels={{
+        home: t("nav.home"),
+        garden: t("nav.garden"),
+        chat: t("nav.chat"),
+        help: t("nav.help"),
+        admin: t("nav.admin"),
+        login: t("nav.login"),
+        logout: t("nav.logout"),
+        toggleMenu: t("nav.toggleMenu"),
+        langPtbr: t("lang.pt-br"),
+        langEn: t("lang.en"),
+        langCurrentPtbr: t("lang.current.pt-br"),
+        langCurrentEn: t("lang.current.en"),
+      }}
+    />
+
+    <DataModelExplorer client:load locale={locale} />
+  </div>
+</BaseLayout>
