@@ -24,6 +24,14 @@ CREATE TABLE IF NOT EXISTS plants (
   light_preference TEXT DEFAULT 'medium',
   garden_id TEXT REFERENCES gardens(id),
   catalog_id TEXT REFERENCES plant_catalog(id),
+  plant_type TEXT,
+  strain_id TEXT,
+  strain_name TEXT,
+  strain_type TEXT,
+  environment TEXT,
+  current_phase TEXT,
+  phase_started_at TEXT,
+  grow_id TEXT,
   identification_confidence TEXT DEFAULT 'unknown',
   created_at TEXT DEFAULT (datetime('now')),
   updated_at TEXT DEFAULT (datetime('now'))
@@ -105,7 +113,7 @@ CREATE TABLE IF NOT EXISTS plant_source_mappings (
 CREATE TABLE IF NOT EXISTS plant_stages (
   id TEXT PRIMARY KEY,
   plant_id TEXT NOT NULL REFERENCES plants(id),
-  stage TEXT NOT NULL CHECK(stage IN ('germination', 'seedling', 'vegetative', 'flowering', 'harvest')),
+  stage TEXT NOT NULL CHECK(stage IN ('germination', 'seedling', 'vegetative', 'flowering', 'harvest', 'drying', 'curing', 'processing', 'complete')),
   started_at TEXT NOT NULL,
   ended_at TEXT,
   notes TEXT,
@@ -163,6 +171,66 @@ CREATE INDEX IF NOT EXISTS idx_rel_from ON plant_relationships(from_plant_id);
 CREATE INDEX IF NOT EXISTS idx_rel_to ON plant_relationships(to_plant_id);
 CREATE INDEX IF NOT EXISTS idx_source_plant ON plant_source_mappings(plant_id);
 CREATE INDEX IF NOT EXISTS idx_stages_plant ON plant_stages(plant_id, started_at DESC);
+
+-- Grow sessions
+CREATE TABLE IF NOT EXISTS grows (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  environment TEXT,
+  start_date TEXT,
+  end_date TEXT,
+  notes TEXT,
+  status TEXT NOT NULL DEFAULT 'active',
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Grow journal entries
+CREATE TABLE IF NOT EXISTS grow_logs (
+  id TEXT PRIMARY KEY,
+  plant_id TEXT NOT NULL REFERENCES plants(id),
+  user_id TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  log_type TEXT NOT NULL,
+  data TEXT,
+  photo_url TEXT,
+  notes TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Strain library
+CREATE TABLE IF NOT EXISTS strain_profiles (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT,
+  flower_weeks_min INTEGER,
+  flower_weeks_max INTEGER,
+  difficulty TEXT,
+  thresholds_by_phase TEXT,
+  notes TEXT,
+  is_custom INTEGER NOT NULL DEFAULT 0,
+  user_id TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- User achievements
+CREATE TABLE IF NOT EXISTS achievements (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  achievement_key TEXT NOT NULL,
+  points INTEGER NOT NULL DEFAULT 0,
+  unlocked_at TEXT DEFAULT (datetime('now')),
+  metadata TEXT,
+  UNIQUE(user_id, achievement_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_grow_logs_plant_time ON grow_logs(plant_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_grow_logs_plant_phase_time ON grow_logs(plant_id, phase, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_achievements_user_key ON achievements(user_id, achievement_key);
+CREATE INDEX IF NOT EXISTS idx_grows_user_status ON grows(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_strain_profiles_name ON strain_profiles(name);
+CREATE INDEX IF NOT EXISTS idx_strain_profiles_user ON strain_profiles(user_id);
 
 -- Chat: Conversations (DMs and groups)
 CREATE TABLE IF NOT EXISTS conversations (

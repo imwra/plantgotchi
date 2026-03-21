@@ -3,6 +3,7 @@ package com.plantgotchi.app.sync
 import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.analytics.LogLevel
 import com.plantgotchi.app.model.CareLog
+import com.plantgotchi.app.model.GrowLog
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.Recommendation
 import com.plantgotchi.app.model.SensorReading
@@ -148,6 +149,15 @@ class TursoSync(
             tempMin = obj["temp_min"]?.jsonPrimitive?.doubleOrNull ?: 15.0,
             tempMax = obj["temp_max"]?.jsonPrimitive?.doubleOrNull ?: 30.0,
             lightPreference = obj["light_preference"]?.jsonPrimitive?.contentOrNull ?: "medium",
+            // Lifecycle fields
+            plantType = obj["plant_type"]?.jsonPrimitive?.contentOrNull,
+            strainId = obj["strain_id"]?.jsonPrimitive?.contentOrNull,
+            strainName = obj["strain_name"]?.jsonPrimitive?.contentOrNull,
+            strainType = obj["strain_type"]?.jsonPrimitive?.contentOrNull,
+            environment = obj["environment"]?.jsonPrimitive?.contentOrNull,
+            currentPhase = obj["current_phase"]?.jsonPrimitive?.contentOrNull,
+            phaseStartedAt = obj["phase_started_at"]?.jsonPrimitive?.contentOrNull,
+            growId = obj["grow_id"]?.jsonPrimitive?.contentOrNull,
         )
     }
 
@@ -164,6 +174,64 @@ class TursoSync(
             message = message,
             severity = obj["severity"]?.jsonPrimitive?.contentOrNull ?: "info",
             actedOn = obj["acted_on"]?.jsonPrimitive?.booleanOrNull ?: false,
+        )
+    }
+
+    suspend fun pullGrowLogs(plantId: String): List<GrowLog> {
+        try {
+            val response = httpClient.get("$baseURL/api/grow-logs") {
+                parameter("plantId", plantId)
+            }
+            if (response.status != HttpStatusCode.OK) return emptyList()
+
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            return arr.mapNotNull { parseGrowLog(it.jsonObject) }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pullGrowLogs"))
+            throw e
+        }
+    }
+
+    suspend fun pushGrowLog(log: GrowLog) {
+        try {
+            val response = httpClient.post("$baseURL/api/grow-logs") {
+                contentType(ContentType.Application.Json)
+                setBody(buildJsonObject {
+                    put("plant_id", log.plantId)
+                    put("phase", log.phase)
+                    put("log_type", log.logType)
+                    log.data?.let { put("data", json.parseToJsonElement(it)) }
+                    log.photoUrl?.let { put("photo_url", it) }
+                    log.notes?.let { put("notes", it) }
+                }.toString())
+            }
+            if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
+                throw TursoSyncException("Push grow log failed: HTTP ${response.status.value}")
+            }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pushGrowLog"))
+            throw e
+        }
+    }
+
+    private fun parseGrowLog(obj: JsonObject): GrowLog? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val plantId = obj["plant_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val userId = obj["user_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val phase = obj["phase"]?.jsonPrimitive?.contentOrNull ?: return null
+        val logType = obj["log_type"]?.jsonPrimitive?.contentOrNull ?: return null
+
+        return GrowLog(
+            id = id,
+            plantId = plantId,
+            userId = userId,
+            phase = phase,
+            logType = logType,
+            data = obj["data"]?.toString(),
+            photoUrl = obj["photo_url"]?.jsonPrimitive?.contentOrNull,
+            notes = obj["notes"]?.jsonPrimitive?.contentOrNull,
+            createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
         )
     }
 }

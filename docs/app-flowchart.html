@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plantgotchi — App Flowchart</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f172a;--bg2:#1e293b;--bg3:#334155;--bg4:#475569;
+  --fg:#e2e8f0;--fg2:#94a3b8;--fg3:#64748b;
+  --purple:#a78bfa;--purple-dim:#7c3aed;
+  --green:#4ade80;--green-dim:#16a34a;
+  --blue:#60a5fa;--blue-dim:#2563eb;
+  --cyan:#22d3ee;--cyan-dim:#0891b2;
+  --amber:#fbbf24;--amber-dim:#d97706;
+  --red:#f87171;--red-dim:#dc2626;
+  --pink:#f472b6;--pink-dim:#db2777;
+  --radius:8px;--transition:0.25s ease;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+
+/* Header */
+.header{background:var(--bg2);border-bottom:1px solid var(--bg3);padding:1rem 2rem;display:flex;align-items:center;gap:1.5rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.header h1{font-size:1.3rem;font-weight:700;white-space:nowrap}
+.header h1 span{color:var(--green)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:var(--radius);padding:3px}
+.tab-btn{padding:0.5rem 1.2rem;border:none;background:transparent;color:var(--fg2);font-size:0.85rem;font-weight:600;border-radius:6px;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.tab-btn:hover{color:var(--fg);background:var(--bg3)}
+.tab-btn.active{background:var(--bg3);color:var(--fg)}
+
+/* Container */
+.container{max-width:1400px;margin:0 auto;padding:1.5rem 2rem 4rem}
+.view{display:none}
+.view.active{display:block}
+
+/* ===== TREE VIEW ===== */
+.tree-section{margin-bottom:0.5rem}
+.tree-toggle{width:100%;text-align:left;padding:0.75rem 1rem;background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);color:var(--fg);font-size:0.95rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.75rem;transition:var(--transition)}
+.tree-toggle:hover{background:var(--bg3)}
+.tree-toggle .arrow{transition:transform 0.3s ease;font-size:0.7rem;color:var(--fg3)}
+.tree-section.open>.tree-toggle .arrow{transform:rotate(90deg)}
+.tree-toggle .badge{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.tree-content{overflow:hidden;max-height:0;transition:max-height 0.4s ease;padding-left:1.25rem}
+.tree-section.open>.tree-content{max-height:5000px}
+.tree-leaf{padding:0.4rem 0.75rem;color:var(--fg2);font-size:0.87rem;border-left:2px solid var(--bg3);margin:2px 0;transition:var(--transition)}
+.tree-leaf:hover{color:var(--fg);border-left-color:var(--fg3)}
+.tree-leaf b{color:var(--fg);font-weight:600}
+
+/* Color badges */
+.c-purple{background:var(--purple)}.c-green{background:var(--green)}.c-blue{background:var(--blue)}
+.c-cyan{background:var(--cyan)}.c-amber{background:var(--amber)}.c-red{background:var(--red)}.c-pink{background:var(--pink)}
+
+/* ===== FLOWCHART VIEW ===== */
+.flowchart-container{position:relative;overflow:hidden;height:calc(100vh - 160px);border:1px solid var(--bg3);border-radius:var(--radius);cursor:grab;background:var(--bg)}
+.flowchart-container.grabbing{cursor:grabbing}
+.fc-controls{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.fc-filter{padding:0.4rem 0.9rem;border:1px solid var(--bg3);background:var(--bg2);color:var(--fg2);border-radius:20px;font-size:0.8rem;cursor:pointer;transition:var(--transition)}
+.fc-filter:hover,.fc-filter.active{border-color:var(--fg3);color:var(--fg)}
+.fc-zoom{display:flex;align-items:center;gap:0.4rem;margin-left:auto}
+.fc-zoom button{width:32px;height:32px;border:1px solid var(--bg3);background:var(--bg2);color:var(--fg);border-radius:6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--transition)}
+.fc-zoom button:hover{background:var(--bg3)}
+.fc-zoom-label{font-size:0.8rem;color:var(--fg2);min-width:40px;text-align:center}
+.fc-svg{position:absolute;top:0;left:0;transform-origin:0 0}
+.fc-node{cursor:pointer;transition:opacity 0.3s ease}
+.fc-node rect{rx:10;ry:10;stroke-width:2.5;transition:all 0.3s ease}
+.fc-node text{font-family:inherit;font-size:13px;fill:var(--fg);pointer-events:none;font-weight:600}
+.fc-node:hover rect{filter:brightness(1.3);stroke-width:3}
+.fc-node.dimmed{opacity:0.15}
+.fc-node.highlighted rect{stroke-width:4;filter:brightness(1.5)}
+.fc-edge{transition:opacity 0.3s ease}
+.fc-edge.dimmed{opacity:0.06}
+.fc-edge.highlighted{opacity:1}
+.fc-edge path{stroke-width:2;fill:none}
+.fc-edge polygon{stroke:none}
+.fc-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:0.75rem;padding:0.75rem;background:var(--bg2);border-radius:var(--radius)}
+.fc-legend-item{display:flex;align-items:center;gap:0.4rem;font-size:0.8rem;color:var(--fg2)}
+.fc-legend-color{width:14px;height:14px;border-radius:3px}
+/* Minimap */
+.fc-minimap{position:absolute;bottom:12px;right:12px;width:200px;height:140px;background:var(--bg2);border:1px solid var(--bg3);border-radius:6px;overflow:hidden;opacity:0.85;z-index:10}
+.fc-minimap:hover{opacity:1}
+.fc-minimap svg{width:100%;height:100%}
+.fc-minimap-viewport{fill:rgba(96,165,250,0.15);stroke:var(--blue);stroke-width:2;rx:2;ry:2;cursor:pointer}
+/* Tooltip */
+.fc-tooltip{position:absolute;background:var(--bg2);border:1px solid var(--bg3);border-radius:6px;padding:0.5rem 0.75rem;font-size:0.8rem;color:var(--fg);pointer-events:none;z-index:20;max-width:240px;box-shadow:0 4px 12px rgba(0,0,0,0.4);opacity:0;transition:opacity 0.15s ease}
+.fc-tooltip.visible{opacity:1}
+
+/* ===== WALKTHROUGH VIEW ===== */
+.wt-progress{background:var(--bg2);border-radius:var(--radius);padding:1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem}
+.wt-bar-bg{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.wt-bar{height:100%;background:var(--green);border-radius:3px;transition:width 0.4s ease}
+.wt-counter{font-size:0.85rem;color:var(--fg2);white-space:nowrap;min-width:80px;text-align:right}
+.wt-card{background:var(--bg2);border:1px solid var(--bg3);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;display:none}
+.wt-card.active{display:block;animation:fadeSlide 0.35s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.wt-card h2{font-size:1.15rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.6rem}
+.wt-card h2 .step-badge{font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:20px;font-weight:700}
+.wt-card p,.wt-card ul{color:var(--fg2);font-size:0.9rem;margin-bottom:0.5rem}
+.wt-card ul{padding-left:1.2rem}
+.wt-card li{margin-bottom:0.3rem}
+.wt-card .detail-box{background:var(--bg);border:1px solid var(--bg3);border-radius:6px;padding:0.75rem 1rem;margin:0.75rem 0;font-size:0.85rem;color:var(--fg2)}
+.wt-card .detail-box b{color:var(--fg)}
+.wt-nav{display:flex;gap:0.75rem;justify-content:center;margin-top:1rem}
+.wt-btn{padding:0.6rem 1.5rem;border:1px solid var(--bg3);background:var(--bg2);color:var(--fg);border-radius:var(--radius);cursor:pointer;font-size:0.9rem;font-weight:600;transition:var(--transition)}
+.wt-btn:hover{background:var(--bg3)}
+.wt-btn:disabled{opacity:0.3;cursor:not-allowed}
+.wt-btn.primary{background:var(--green-dim);border-color:var(--green-dim);color:#fff}
+.wt-btn.primary:hover{background:var(--green)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1><span>&#127793;</span> Plantgotchi <span>Flowchart</span></h1>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tree">Expandable Tree</button>
+    <button class="tab-btn" data-tab="flowchart">Flowchart</button>
+    <button class="tab-btn" data-tab="walkthrough">Walkthrough</button>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ==================== TREE VIEW ==================== -->
+<div id="tree" class="view active">
+
+<!-- 1. Authentication -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-purple"></span> 1. Authentication</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Sign Up</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Email + Password</b> — User enters email, password, confirms password</div>
+        <div class="tree-leaf">Validated client-side, POST to /api/auth/signup</div>
+        <div class="tree-leaf">Returns bearer token, stored in keychain/secure storage</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Sign In</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Email + Password</b> — POST /api/auth/signin</div>
+        <div class="tree-leaf"><b>Apple Sign-In</b> — ASAuthorization flow, sends identity token to server</div>
+        <div class="tree-leaf">Returns bearer token on success</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Token Management</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Bearer token sent in Authorization header for all API calls</div>
+        <div class="tree-leaf">Token stored in Keychain (iOS/macOS), EncryptedSharedPrefs (Android), httpOnly cookie (Web)</div>
+        <div class="tree-leaf">Auto-refresh on 401 or token expiry</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Sign Out</b> — Clears token, resets local state, returns to auth screen</div>
+  </div>
+</div>
+
+<!-- 2. Garden View -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-green"></span> 2. Garden View</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Plant Grid</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>iOS:</b> 2-column LazyVGrid</div>
+        <div class="tree-leaf"><b>macOS:</b> Adaptive grid (split view in Garden window)</div>
+        <div class="tree-leaf"><b>Android:</b> RecyclerView with GridLayoutManager</div>
+        <div class="tree-leaf"><b>Web:</b> CSS Grid (auto-fill, minmax)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Plant Card</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Emoji icon (large, centered)</div>
+        <div class="tree-leaf">Plant name + species</div>
+        <div class="tree-leaf">Status badge (healthy / needs attention / critical)</div>
+        <div class="tree-leaf">HP health bar (color-coded: green &gt; yellow &gt; red)</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Pull-to-refresh</b> — Triggers full sync (pull plants, recommendations, grow logs)</div>
+    <div class="tree-leaf"><b>Empty state</b> — Illustration + "Add your first plant" CTA</div>
+  </div>
+</div>
+
+<!-- 3. Add Plant -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-green"></span> 3. Add Plant (Multi-Step Flow)</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>Step 1:</b> Name, species, emoji selection (grid of emojis)</div>
+    <div class="tree-leaf"><b>Step 2:</b> Plant type — Regular Plant vs Cannabis (toggle)</div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Step 3: Strain Selection (Cannabis only)</button>
+      <div class="tree-content">
+        <div class="tree-leaf">15 built-in strains: Northern Lights, Blue Dream, OG Kush, Girl Scout Cookies, Gorilla Glue, etc.</div>
+        <div class="tree-leaf">Custom strain entry: name, type (indica/sativa/hybrid), flower weeks, difficulty</div>
+        <div class="tree-leaf">Search/filter strains by name or type</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Step 4 (Cannabis):</b> Environment — Indoor / Outdoor toggle</div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Step 5: Thresholds</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Moisture min/max (0-100%)</div>
+        <div class="tree-leaf">Temperature min/max (°C)</div>
+        <div class="tree-leaf">Light preference (low / medium / high)</div>
+        <div class="tree-leaf">Cannabis plants: defaults populated from strain + phase data</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Save:</b> Creates plant in local DB (GRDB/Room/SQLite), queues sync to API</div>
+  </div>
+</div>
+
+<!-- 4. Plant Detail -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-green"></span> 4. Plant Detail View</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Header</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Large emoji + plant name</div>
+        <div class="tree-leaf">Species label</div>
+        <div class="tree-leaf">Status badge (healthy / needs attention / critical)</div>
+        <div class="tree-leaf">HP health bar with numeric value</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Sensor Readings</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Moisture % (with threshold indicators)</div>
+        <div class="tree-leaf">Temperature °C</div>
+        <div class="tree-leaf">Light (lux)</div>
+        <div class="tree-leaf">Battery % (sensor battery)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Phase Banner (Cannabis)</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Current phase name + icon</div>
+        <div class="tree-leaf">Days in current phase</div>
+        <div class="tree-leaf">Phase timeline (horizontal progress bar across all 8 phases)</div>
+        <div class="tree-leaf">"Advance Phase" button → PhaseTransitionView</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Quick Actions (Phase-Aware)</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Grid of available actions for the current phase</div>
+        <div class="tree-leaf">Each action opens QuickLogView to record the log entry</div>
+        <div class="tree-leaf">Actions vary by phase (see Cannabis Lifecycle section)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Legacy Actions (Non-Cannabis)</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Water, Fertilize, Prune, Repot</div>
+        <div class="tree-leaf">Each creates a care log entry</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Recommendations</button>
+      <div class="tree-content">
+        <div class="tree-leaf">List of active recommendations from Rule Engine</div>
+        <div class="tree-leaf">Severity colors: <b style="color:var(--blue)">info</b> / <b style="color:var(--amber)">warning</b> / <b style="color:var(--red)">urgent</b></div>
+        <div class="tree-leaf">Tap checkmark to dismiss / act on recommendation</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Grow Log History</b> — Chronological list of all grow log entries</div>
+    <div class="tree-leaf"><b>Care Log History</b> — Legacy care actions (non-cannabis plants)</div>
+  </div>
+</div>
+
+<!-- 5. Cannabis Lifecycle -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-blue"></span> 5. Cannabis Lifecycle — 8 Phases</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Germination</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 22-28°C, 70-90% RH, 18/6 light</div>
+        <div class="tree-leaf"><b>Actions:</b> watering, environmental, measurement, photo, note</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Seedling</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 20-26°C, 60-70% RH, 18/6 light</div>
+        <div class="tree-leaf"><b>Actions:</b> + feeding, transplant, pest treatment</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Vegetative</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 20-28°C, 40-60% RH, 18/6 light</div>
+        <div class="tree-leaf"><b>Actions:</b> + topping, FIMming, LST, defoliation, cloning</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Flowering</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 18-26°C, 40-50% RH, 12/12 light (Late flower: 30-40% RH)</div>
+        <div class="tree-leaf"><b>Actions:</b> + flushing, trichome check, harvest</div>
+        <div class="tree-leaf"><b>Harvest:</b> Records wet weight → advances to Drying</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Drying</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 18-22°C, 55-65% RH, 0/24 (dark)</div>
+        <div class="tree-leaf"><b>Actions:</b> dry check, environmental, photo, note</div>
+        <div class="tree-leaf">Daily dry checks, stem snap test, 7+ days suggested → advance to Curing</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Curing</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 18-22°C, 58-65% RH, 0/24 (dark)</div>
+        <div class="tree-leaf"><b>Actions:</b> cure check, environmental, photo, note</div>
+        <div class="tree-leaf">Regular burping, 2+ weeks → advance to Processing</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Processing</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Env:</b> 18-24°C, 40-60% RH, 0/24 (dark)</div>
+        <div class="tree-leaf"><b>Actions:</b> processing log, dry weight, photo, note</div>
+        <div class="tree-leaf">Final trim, packaging, record dry weight → advance to Complete</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Complete</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Actions:</b> photo, note only</div>
+        <div class="tree-leaf">Grow is finished. Summary stats available.</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Phase Transitions</button>
+      <div class="tree-content">
+        <div class="tree-leaf">"Advance Phase" button on Plant Detail</div>
+        <div class="tree-leaf">Opens PhaseTransitionView — shows current → next phase</div>
+        <div class="tree-leaf">Confirmation dialog with phase summary</div>
+        <div class="tree-leaf">Updates plant record, creates phase change grow log</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Grow Sessions -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-blue"></span> 6. Grow Sessions</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>Create Grow:</b> Name + environment (indoor/outdoor)</div>
+    <div class="tree-leaf"><b>View Active Grows:</b> List of ongoing grows with plant count</div>
+    <div class="tree-leaf"><b>Assign Plants:</b> Add/remove plants from a grow session</div>
+    <div class="tree-leaf"><b>Complete/Archive:</b> Mark grow as finished, moves to history</div>
+  </div>
+</div>
+
+<!-- 7. Grow Logging -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-blue"></span> 7. Grow Logging (21 Log Types)</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> All Log Types</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Phase Change, Watering, Feeding, Topping, FIMming, LST</div>
+        <div class="tree-leaf">Defoliation, Transplant, Flushing, Trichome Check, Measurement</div>
+        <div class="tree-leaf">Environmental, Photo, Note, Harvest, Dry Weight</div>
+        <div class="tree-leaf">Dry Check, Cure Check, Processing Log, Pest Treatment, Cloning</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Quick Log View</button>
+      <div class="tree-content">
+        <div class="tree-leaf">4-column grid of available actions filtered by current phase</div>
+        <div class="tree-leaf">Each action tile: icon + label</div>
+        <div class="tree-leaf">Tapping opens log entry form</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Log Entry Data</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>plantId:</b> UUID of the plant</div>
+        <div class="tree-leaf"><b>phase:</b> Current phase at time of logging</div>
+        <div class="tree-leaf"><b>logType:</b> One of the 21 types</div>
+        <div class="tree-leaf"><b>data:</b> JSON blob (type-specific fields)</div>
+        <div class="tree-leaf"><b>photoUrl:</b> Optional attached photo</div>
+        <div class="tree-leaf"><b>notes:</b> Free-text notes</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. Measurements -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-cyan"></span> 8. Measurements</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>Height:</b> in/cm (AddMeasurementView)</div>
+    <div class="tree-leaf"><b>pH:</b> 0-14 scale</div>
+    <div class="tree-leaf"><b>EC/PPM:</b> Electrical conductivity / parts per million</div>
+    <div class="tree-leaf"><b>Weight:</b> g/oz</div>
+    <div class="tree-leaf">Stored as GrowLog with logType=measurement, data contains type + value + unit</div>
+  </div>
+</div>
+
+<!-- 9. Harvest Flow -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-amber"></span> 9. Harvest Flow</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>Flowering → Drying:</b> "Harvest" action records wet weight, advances phase</div>
+    <div class="tree-leaf"><b>Drying (7+ days):</b> Daily dry checks, stem snap test → advance to Curing</div>
+    <div class="tree-leaf"><b>Curing (2+ weeks):</b> Regular cure checks (jar burping) → advance to Processing</div>
+    <div class="tree-leaf"><b>Processing → Complete:</b> Final trim, packaging, record dry weight → grow finished</div>
+  </div>
+</div>
+
+<!-- 10. Sensor Integration -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-cyan"></span> 10. Sensor Integration (BLE)</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Discovery</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Scan for nearby BLE sensors (CoreBluetooth / Android BLE)</div>
+        <div class="tree-leaf">Discovered sensors show: name, UUID, RSSI signal strength</div>
+        <div class="tree-leaf">4-bar signal indicator based on RSSI</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Pairing</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Select sensor → assign to a plant</div>
+        <div class="tree-leaf">One sensor per plant, one plant per sensor</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Readings</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Real-time: moisture %, temperature °C, light lux, battery %</div>
+        <div class="tree-leaf">Readings pushed to API for storage and rule evaluation</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Settings:</b> Manage paired sensors, remove mappings, re-scan</div>
+  </div>
+</div>
+
+<!-- 11. Rule Engine -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-amber"></span> 11. Rule Engine &amp; Recommendations</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Threshold Resolution</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Phase-aware: uses phase defaults for temperature/humidity</div>
+        <div class="tree-leaf">Plant-level: uses plant thresholds for moisture</div>
+        <div class="tree-leaf">Cannabis plants merge phase + plant + strain defaults</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Sensor Checks</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Moisture too low / too high → watering recommendation</div>
+        <div class="tree-leaf">Temperature too low / too high → environmental adjustment</div>
+        <div class="tree-leaf">Battery low (&lt;20%) → replace battery warning</div>
+        <div class="tree-leaf">Light insufficient → light recommendation</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Transition Suggestions</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Veg 42+ days → suggest switching to flowering</div>
+        <div class="tree-leaf">Drying 7+ days → suggest advancing to curing</div>
+        <div class="tree-leaf">Curing 14+ days → suggest advancing to processing</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Severity levels:</b> <span style="color:var(--blue)">info</span>, <span style="color:var(--amber)">warning</span>, <span style="color:var(--red)">urgent</span></div>
+    <div class="tree-leaf">Recommendations displayed on Plant Detail with act-on checkmark</div>
+  </div>
+</div>
+
+<!-- 12. Achievements -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-amber"></span> 12. Achievements (10 Total)</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>First Seed</b> (10 pts) — Start first plant</div>
+    <div class="tree-leaf"><b>First Harvest</b> (50 pts) — Complete first harvest</div>
+    <div class="tree-leaf"><b>Green Thumb</b> (30 pts) — Grow 10 plants</div>
+    <div class="tree-leaf"><b>First Top</b> (20 pts) — Top a plant</div>
+    <div class="tree-leaf"><b>First LST</b> (20 pts) — Apply LST training</div>
+    <div class="tree-leaf"><b>Speed Grower</b> (100 pts) — Complete grow in record time</div>
+    <div class="tree-leaf"><b>First Gram</b> (25 pts) — Harvest first gram</div>
+    <div class="tree-leaf"><b>Big Yield</b> (75 pts) — Harvest 100g+ from single plant</div>
+    <div class="tree-leaf"><b>Week Streak</b> (15 pts) — Log 7 consecutive days</div>
+    <div class="tree-leaf"><b>Strain Collector</b> (40 pts) — Grow 5 different strains</div>
+    <div class="tree-leaf">Display: locked/unlocked state, cumulative points total, trophy icons</div>
+  </div>
+</div>
+
+<!-- 13. Strain Profiles -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-green"></span> 13. Strain Profiles</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Built-in Strains (15)</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Northern Lights, Blue Dream, OG Kush, Girl Scout Cookies, Gorilla Glue</div>
+        <div class="tree-leaf">White Widow, Sour Diesel, AK-47, Jack Herer, Amnesia Haze</div>
+        <div class="tree-leaf">Granddaddy Purple, Pineapple Express, Gelato, Wedding Cake, Bruce Banner</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Custom Strain</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Name (free text)</div>
+        <div class="tree-leaf">Type: indica / sativa / hybrid</div>
+        <div class="tree-leaf">Flowering weeks: 7-12 range</div>
+        <div class="tree-leaf">Difficulty: beginner / intermediate / advanced</div>
+      </div>
+    </div>
+    <div class="tree-leaf"><b>Strain data:</b> Environmental thresholds by phase, flowering time range, grower notes</div>
+    <div class="tree-leaf"><b>Picker:</b> Appears in Add Plant flow Step 3 (search + filter)</div>
+  </div>
+</div>
+
+<!-- 14. Data Sync -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-cyan"></span> 14. Data Sync</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Architecture</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Local-first:</b> GRDB (iOS/macOS), Room (Android), SQLite/Turso (Web)</div>
+        <div class="tree-leaf"><b>Conflict strategy:</b> Server wins</div>
+        <div class="tree-leaf">Auth: Bearer token in Authorization header</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Push Operations</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Sensor readings → POST /api/readings</div>
+        <div class="tree-leaf">Care logs → POST /api/care-logs</div>
+        <div class="tree-leaf">Grow logs → POST /api/grow-logs</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Pull Operations</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Plants → GET /api/plants</div>
+        <div class="tree-leaf">Recommendations → GET /api/recommendations</div>
+        <div class="tree-leaf">Grow logs → GET /api/grow-logs</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Sync Triggers</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Pull-to-refresh (user-initiated)</div>
+        <div class="tree-leaf">Periodic: every 15s on iOS Garden view</div>
+        <div class="tree-leaf">Manual: settings or action completion</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 15. Platform-Specific -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-pink"></span> 15. Platform-Specific Features</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> iOS</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Full mobile app (SwiftUI)</div>
+        <div class="tree-leaf">BLE sensor support (CoreBluetooth)</div>
+        <div class="tree-leaf">Widgets (WidgetKit) — plant status summary</div>
+        <div class="tree-leaf">GRDB local database</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> macOS</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Menu bar item: vitality indicator, attention count, quick refresh</div>
+        <div class="tree-leaf">Garden window: split view (plant list + detail)</div>
+        <div class="tree-leaf">Shares codebase with iOS (SwiftUI + Catalyst/native)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Android</button>
+      <div class="tree-content">
+        <div class="tree-leaf">Full mobile app (Kotlin / Jetpack Compose)</div>
+        <div class="tree-leaf">Room database for local persistence</div>
+        <div class="tree-leaf">BLE sensor support (Android BLE API)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Web</button>
+      <div class="tree-content">
+        <div class="tree-leaf">API server: Astro framework</div>
+        <div class="tree-leaf">Database: Turso (libSQL) — remote SQLite</div>
+        <div class="tree-leaf">All REST endpoints for mobile clients</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 16. Settings -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-pink"></span> 16. Settings</button>
+  <div class="tree-content">
+    <div class="tree-leaf"><b>User ID:</b> Display current user identifier</div>
+    <div class="tree-leaf"><b>Paired Sensors:</b> List, manage, remove sensor-plant mappings</div>
+    <div class="tree-leaf"><b>Language:</b> Toggle PT-BR / English</div>
+    <div class="tree-leaf"><b>Retro Mode:</b> Pixel font toggle for aesthetic</div>
+    <div class="tree-leaf"><b>Demo Mode:</b> Load sample data for testing</div>
+    <div class="tree-leaf"><b>Clear All Data:</b> Danger zone — wipes local DB after confirmation</div>
+  </div>
+</div>
+
+<!-- 17. Creators -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-red"></span> 17. Creators (LMS)</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Become a Creator</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Opt-in:</b> Visit /become-creator page (authenticated users only)</div>
+        <div class="tree-leaf"><b>Profile:</b> Display name, bio, avatar URL</div>
+        <div class="tree-leaf">Creates creator_profiles record linked to user_id (one per user)</div>
+        <div class="tree-leaf">POST /api/creators → returns new creator profile</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Creator Dashboard</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Route:</b> /creator/dashboard</div>
+        <div class="tree-leaf">Lists all creator's courses with enrollment counts and status</div>
+        <div class="tree-leaf">"+ New Course" button → /creator/courses/new</div>
+        <div class="tree-leaf">Quick stats: total enrollments, published/draft/archived counts</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Creator Profile Management</button>
+      <div class="tree-content">
+        <div class="tree-leaf">GET /api/creators/me — own profile</div>
+        <div class="tree-leaf">PATCH /api/creators/me — update display name, bio, avatar</div>
+        <div class="tree-leaf">GET /api/creators/[id] — public creator profile</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Access Control</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Creator actions:</b> Requires creator_profiles record (session auth)</div>
+        <div class="tree-leaf"><b>Ownership checks:</b> Edit/delete verifies creator_id matches course creator</div>
+        <div class="tree-leaf"><b>Public actions:</b> Browse catalog, view landing page — no auth needed</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 18. Courses -->
+<div class="tree-section">
+  <button class="tree-toggle"><span class="arrow">&#9654;</span><span class="badge c-red"></span> 18. Courses (Learning Marketplace)</button>
+  <div class="tree-content">
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Course Catalog</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Route:</b> /courses — public marketplace</div>
+        <div class="tree-leaf">Grid of CourseCards with filtering and search</div>
+        <div class="tree-leaf">Each card: thumbnail, title, creator name, price badge (or "Free")</div>
+        <div class="tree-leaf">Only published courses shown (draft/archived hidden)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Course Landing Page</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Route:</b> /courses/[slug]</div>
+        <div class="tree-leaf">Course description, cover image, creator profile</div>
+        <div class="tree-leaf">Phase overview with module counts</div>
+        <div class="tree-leaf">"Enroll" CTA button (free or paid)</div>
+        <div class="tree-leaf">Preview modules accessible without enrollment</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Course Structure (Hierarchical)</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Course</b> → Phases → Modules → Content Blocks</div>
+        <div class="tree-leaf"><b>Phases:</b> Top-level sections (e.g., "Seedling Stage", "Vegetative Stage")</div>
+        <div class="tree-leaf"><b>Modules:</b> Individual lessons within a phase (sortable, preview flag)</div>
+        <div class="tree-leaf"><b>Content Blocks:</b> Ordered content — video, text (markdown), or quiz</div>
+        <div class="tree-leaf"><b>Quiz JSON:</b> question, options[], correct_index, explanation</div>
+        <div class="tree-leaf"><b>Video JSON:</b> url, duration_seconds, caption</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Course Editor (Creator)</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Create:</b> POST /api/courses → title, description, price, cover image</div>
+        <div class="tree-leaf"><b>Slug:</b> Auto-generated from title with collision handling</div>
+        <div class="tree-leaf"><b>Status:</b> draft → published → archived</div>
+        <div class="tree-leaf"><b>Route:</b> /creator/courses/[slug]/edit</div>
+        <div class="tree-leaf">Add/edit/reorder phases, modules, and content blocks inline</div>
+        <div class="tree-leaf">Mark modules as "preview" for free access in paid courses</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Enrollment &amp; Payment</button>
+      <div class="tree-content">
+        <div class="tree-leaf">POST /api/courses/[slug]/enroll — grants access</div>
+        <div class="tree-leaf"><b>Free courses:</b> price_cents = 0, instant enrollment</div>
+        <div class="tree-leaf"><b>Paid courses:</b> Records price_paid_cents (v1: no payment gateway)</div>
+        <div class="tree-leaf">One enrollment per user per course (unique constraint)</div>
+        <div class="tree-leaf">Future: Stripe integration (schema ready)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Learner View</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Route:</b> /courses/[slug]/learn</div>
+        <div class="tree-leaf">Phase sidebar with module list (completion checkmarks)</div>
+        <div class="tree-leaf">Content area: sequential video, text, quiz blocks</div>
+        <div class="tree-leaf">Circular ProgressRing showing overall completion %</div>
+        <div class="tree-leaf">Click any module in sidebar to jump directly</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Progress Tracking</button>
+      <div class="tree-content">
+        <div class="tree-leaf">POST /api/courses/[slug]/modules/[moduleId]/complete — mark done</div>
+        <div class="tree-leaf">GET /api/courses/[slug]/progress — total/completed modules, per-phase breakdown</div>
+        <div class="tree-leaf"><b>Unit:</b> Per-module (smallest trackable unit)</div>
+        <div class="tree-leaf"><b>Phase complete:</b> All modules in phase done</div>
+        <div class="tree-leaf"><b>Course complete:</b> All phases complete</div>
+        <div class="tree-leaf"><b>Quiz answers:</b> Stored in module_completions.quiz_answers (JSON)</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> API Endpoints</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Courses:</b> GET/POST /api/courses, GET/PATCH/DELETE /api/courses/[slug]</div>
+        <div class="tree-leaf"><b>Phases:</b> GET/POST /api/courses/[slug]/phases, PATCH/DELETE .../[phaseId]</div>
+        <div class="tree-leaf"><b>Modules:</b> GET/POST .../phases/[phaseId]/modules, PATCH/DELETE .../[moduleId]</div>
+        <div class="tree-leaf"><b>Blocks:</b> GET/POST .../modules/[moduleId]/blocks, PATCH/DELETE .../[blockId]</div>
+        <div class="tree-leaf"><b>Learner:</b> POST .../enroll, GET .../progress, POST .../modules/[id]/complete</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> UI Components (React Islands)</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>Atoms:</b> CoursePriceBadge, ProgressRing, ContentBlockIcon, CompletionCheck</div>
+        <div class="tree-leaf"><b>Molecules:</b> CourseCard, PhaseAccordion, ContentBlockEditor, QuizBlock, VideoPlayer, ModuleNavItem</div>
+        <div class="tree-leaf"><b>Organisms:</b> CourseCatalog, CourseEditor, CourseLearnerView, CreatorDashboard, CreatorProfileForm, CourseLandingPage</div>
+      </div>
+    </div>
+    <div class="tree-section">
+      <button class="tree-toggle"><span class="arrow">&#9654;</span> Database Tables (7)</button>
+      <div class="tree-content">
+        <div class="tree-leaf"><b>creator_profiles:</b> id, user_id (unique), display_name, bio, avatar_url</div>
+        <div class="tree-leaf"><b>courses:</b> id, creator_id, title, slug, description, cover_image_url, price_cents, currency, status</div>
+        <div class="tree-leaf"><b>course_phases:</b> id, course_id, title, description, sort_order</div>
+        <div class="tree-leaf"><b>phase_modules:</b> id, phase_id, title, description, sort_order, is_preview</div>
+        <div class="tree-leaf"><b>module_content_blocks:</b> id, module_id, block_type (video/text/quiz), sort_order, content (JSON)</div>
+        <div class="tree-leaf"><b>course_enrollments:</b> id, course_id, user_id, price_paid_cents, enrolled_at</div>
+        <div class="tree-leaf"><b>module_completions:</b> id, module_id, user_id, completed_at, quiz_answers (JSON)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /tree view -->
+
+<!-- ==================== FLOWCHART VIEW ==================== -->
+<div id="flowchart" class="view">
+  <div class="fc-controls">
+    <button class="fc-filter active" data-filter="all">All</button>
+    <button class="fc-filter" data-filter="auth">Auth</button>
+    <button class="fc-filter" data-filter="plants">Plants</button>
+    <button class="fc-filter" data-filter="lifecycle">Lifecycle</button>
+    <button class="fc-filter" data-filter="sensors">Sensors</button>
+    <button class="fc-filter" data-filter="data">Data/Sync</button>
+    <button class="fc-filter" data-filter="meta">Settings/Achievements</button>
+    <button class="fc-filter" data-filter="lms">Creators/Courses</button>
+    <div class="fc-zoom">
+      <button id="fc-zoom-out" title="Zoom out">&#8722;</button>
+      <span class="fc-zoom-label" id="fc-zoom-label">100%</span>
+      <button id="fc-zoom-in" title="Zoom in">+</button>
+      <button id="fc-zoom-fit" title="Fit to view" style="width:auto;padding:0 8px;font-size:0.75rem">Fit</button>
+      <button id="fc-zoom-reset" title="Reset view" style="width:auto;padding:0 8px;font-size:0.75rem">Reset</button>
+    </div>
+  </div>
+  <div class="flowchart-container" id="fc-container">
+    <svg id="fc-svg" class="fc-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div class="fc-minimap" id="fc-minimap">
+      <svg id="fc-minimap-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="fc-tooltip" id="fc-tooltip"></div>
+  </div>
+  <div class="fc-legend">
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--purple)"></div> Authentication</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--green)"></div> Plants / Garden</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--blue)"></div> Cannabis Lifecycle</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--cyan)"></div> Sensors / Sync</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--amber)"></div> Rules / Achievements</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--pink)"></div> Settings / Platform</div>
+    <div class="fc-legend-item"><div class="fc-legend-color" style="background:var(--red)"></div> Creators / Courses (LMS)</div>
+  </div>
+</div><!-- /flowchart view -->
+
+<!-- ==================== WALKTHROUGH VIEW ==================== -->
+<div id="walkthrough" class="view">
+  <div class="wt-progress">
+    <div class="wt-bar-bg"><div class="wt-bar" id="wt-bar"></div></div>
+    <div class="wt-counter" id="wt-counter">1 / 18</div>
+  </div>
+
+  <div id="wt-cards"></div>
+
+  <div class="wt-nav">
+    <button class="wt-btn" id="wt-prev" disabled>Previous</button>
+    <button class="wt-btn primary" id="wt-next">Next</button>
+  </div>
+</div><!-- /walkthrough view -->
+
+</div><!-- /container -->
+
+<script>
+// =============================================
+// TAB SWITCHING
+// =============================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// =============================================
+// TREE VIEW — Collapsible sections
+// =============================================
+document.querySelectorAll('.tree-toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    toggle.parentElement.classList.toggle('open');
+  });
+});
+
+// =============================================
+// FLOWCHART VIEW — Canvas with Pan/Zoom
+// =============================================
+(function() {
+  const svg = document.getElementById('fc-svg');
+  const container = document.getElementById('fc-container');
+  const tooltip = document.getElementById('fc-tooltip');
+  const minimapSvg = document.getElementById('fc-minimap-svg');
+
+  const COLORS = {
+    auth: {fill:'#2e1065',stroke:'#a78bfa'},
+    plants: {fill:'#052e16',stroke:'#4ade80'},
+    lifecycle: {fill:'#172554',stroke:'#60a5fa'},
+    sensors: {fill:'#083344',stroke:'#22d3ee'},
+    data: {fill:'#083344',stroke:'#22d3ee'},
+    meta: {fill:'#451a03',stroke:'#fbbf24'},
+    settings: {fill:'#4a0532',stroke:'#f472b6'},
+    lms: {fill:'#450a0a',stroke:'#f87171'}
+  };
+
+  const TOOLTIPS = {
+    signup:'Email + password registration',
+    signin:'Email/password or Apple Sign-In',
+    apple_auth:'ASAuthorization identity token flow',
+    token:'Bearer token stored in Keychain / SharedPrefs / cookie',
+    signout:'Clear token, reset state, return to auth',
+    garden:'Main grid of all plants (LazyVGrid / RecyclerView / CSS Grid)',
+    add_plant:'5-step guided flow: name, type, strain, environment, thresholds',
+    strain_pick:'15 built-in + custom strains with search/filter',
+    plant_detail:'Header, sensors, phase banner, actions, recommendations, logs',
+    quick_actions:'Phase-aware grid of available care actions',
+    recommendations:'Rule engine output: info / warning / urgent',
+    grow_log_hist:'Chronological list of all grow log entries',
+    germination:'22-28°C, 70-90% RH, 18/6 light',
+    seedling:'20-26°C, 60-70% RH, 18/6 light',
+    vegetative:'20-28°C, 40-60% RH, 18/6 — topping, LST, defoliation',
+    flowering:'18-26°C, 40-50% RH, 12/12 — flushing, trichome check',
+    drying:'18-22°C, 55-65% RH, dark — daily dry checks',
+    curing:'18-22°C, 58-65% RH, dark — jar burping',
+    processing:'Final trim, packaging, record dry weight',
+    complete:'Grow finished. Photo/note only.',
+    phase_trans:'Advance Phase button → confirmation → phase change log',
+    grow_session:'Group plants for coordinated grow cycle',
+    grow_logging:'21 log types covering all plant care aspects',
+    quick_log:'4-column grid filtered by current phase',
+    measurements:'Height, pH, EC/PPM, Weight — manual entry',
+    harvest_flow:'Flowering → Drying → Curing → Processing → Complete',
+    ble_scan:'Discover nearby BLE sensors (CoreBluetooth / Android BLE)',
+    sensor_pair:'Assign one sensor to one plant (1:1 mapping)',
+    sensor_read:'Real-time: moisture, temperature, light, battery',
+    rule_engine:'Evaluates sensor readings against thresholds',
+    threshold_res:'Phase defaults + plant-level + strain data merged',
+    transition_sug:'Veg 42d→flowering, dry 7d→curing, cure 14d→processing',
+    achievements:'10 unlockable achievements, 385 total points',
+    local_db:'GRDB (iOS/macOS), Room (Android), SQLite/Turso (Web)',
+    push_sync:'Readings, care logs, grow logs → API',
+    pull_sync:'Plants, recommendations, grow logs ← API',
+    api_server:'Astro framework + Turso (libSQL)',
+    ios_app:'SwiftUI + CoreBluetooth + WidgetKit',
+    macos_app:'Menu bar vitality indicator + Garden window',
+    android_app:'Jetpack Compose + Room + Android BLE',
+    web_app:'Astro + Turso + React Islands',
+    settings:'Language, retro mode, demo mode, clear data',
+    strain_profiles:'15 built-in strains with env defaults by phase',
+    become_creator:'Opt-in: display name + bio → creator_profiles record',
+    creator_profile:'Update display name, bio, avatar',
+    creator_dash:'List courses with enrollment counts and status',
+    create_course:'Title, description, price, cover image → auto slug',
+    course_editor:'Add/edit/reorder phases, modules, content blocks',
+    add_phases:'Top-level course sections (sortable)',
+    add_modules:'Individual lessons within a phase (preview flag)',
+    add_blocks:'Video (URL), Text (markdown), Quiz (single-choice)',
+    publish_course:'Status: draft → published → archived',
+    course_catalog:'Public marketplace grid with filtering',
+    course_landing:'Description, phases overview, enroll CTA',
+    enroll:'Free or paid (v1: record-keeping, no Stripe yet)',
+    learner_view:'Phase sidebar + content area + progress ring',
+    video_player:'Embedded video wrapper (YouTube, Vimeo)',
+    quiz_block:'Single-choice quiz with explanation feedback',
+    progress_track:'Per-module completion, per-phase breakdown',
+    module_complete:'Mark done + submit quiz answers (JSON)'
+  };
+
+  // NODE POSITIONS — spacious layout with clear columns and sections
+  const NW = 190; // node width
+  const NH = 50;  // node height
+  const COL_GAP = 280; // horizontal gap between columns
+  const ROW_GAP = 80;  // vertical gap between rows
+
+  function col(c) { return 60 + c * COL_GAP; }
+  function row(r) { return 60 + r * ROW_GAP; }
+
+  const nodes = [
+    // === Column 0: Auth ===
+    {id:'signup',      x:col(0), y:row(0), w:NW, h:NH, label:'Sign Up',         cat:'auth'},
+    {id:'signin',      x:col(0), y:row(1), w:NW, h:NH, label:'Sign In',         cat:'auth'},
+    {id:'apple_auth',  x:col(0), y:row(2), w:NW, h:NH, label:'Apple Sign-In',   cat:'auth'},
+    {id:'token',       x:col(0), y:row(3), w:NW, h:NH, label:'Token Mgmt',      cat:'auth'},
+    {id:'signout',     x:col(0), y:row(4), w:NW, h:NH, label:'Sign Out',        cat:'auth'},
+
+    // === Column 1: Plants / Garden ===
+    {id:'garden',       x:col(1), y:row(0), w:NW, h:NH, label:'Garden View',        cat:'plants'},
+    {id:'add_plant',    x:col(1), y:row(1), w:NW, h:NH, label:'Add Plant (5 steps)', cat:'plants'},
+    {id:'strain_pick',  x:col(1), y:row(2), w:NW, h:NH, label:'Strain Picker',      cat:'plants'},
+    {id:'plant_detail', x:col(1), y:row(3), w:NW, h:NH, label:'Plant Detail',       cat:'plants'},
+    {id:'quick_actions',x:col(1), y:row(4), w:NW, h:NH, label:'Quick Actions',      cat:'plants'},
+    {id:'recommendations',x:col(1),y:row(5),w:NW, h:NH, label:'Recommendations',    cat:'plants'},
+    {id:'grow_log_hist',x:col(1), y:row(6), w:NW, h:NH, label:'Grow Log History',   cat:'plants'},
+    {id:'strain_profiles',x:col(1),y:row(7),w:NW, h:NH, label:'Strain Profiles (15)',cat:'plants'},
+
+    // === Column 2: Cannabis Lifecycle ===
+    {id:'germination', x:col(2), y:row(0), w:NW, h:NH, label:'Germination',      cat:'lifecycle'},
+    {id:'seedling',    x:col(2), y:row(1), w:NW, h:NH, label:'Seedling',         cat:'lifecycle'},
+    {id:'vegetative',  x:col(2), y:row(2), w:NW, h:NH, label:'Vegetative',       cat:'lifecycle'},
+    {id:'flowering',   x:col(2), y:row(3), w:NW, h:NH, label:'Flowering',        cat:'lifecycle'},
+    {id:'drying',      x:col(2), y:row(4), w:NW, h:NH, label:'Drying',           cat:'lifecycle'},
+    {id:'curing',      x:col(2), y:row(5), w:NW, h:NH, label:'Curing',           cat:'lifecycle'},
+    {id:'processing',  x:col(2), y:row(6), w:NW, h:NH, label:'Processing',       cat:'lifecycle'},
+    {id:'complete',    x:col(2), y:row(7), w:NW, h:NH, label:'Complete',          cat:'lifecycle'},
+    {id:'phase_trans', x:col(2), y:row(8.5),w:NW, h:NH, label:'Phase Transition', cat:'lifecycle'},
+    {id:'grow_session',x:col(2), y:row(10),w:NW, h:NH, label:'Grow Sessions',    cat:'lifecycle'},
+    {id:'grow_logging',x:col(2), y:row(11),w:NW, h:NH, label:'Grow Logging (21)',cat:'lifecycle'},
+    {id:'quick_log',   x:col(2), y:row(12),w:NW, h:NH, label:'Quick Log View',   cat:'lifecycle'},
+
+    // === Column 3: Sensors + Measurements ===
+    {id:'measurements',x:col(3), y:row(0), w:NW, h:NH, label:'Measurements',     cat:'sensors'},
+    {id:'harvest_flow',x:col(3), y:row(1), w:NW, h:NH, label:'Harvest Flow',     cat:'sensors'},
+    {id:'ble_scan',    x:col(3), y:row(3), w:NW, h:NH, label:'BLE Scan',         cat:'sensors'},
+    {id:'sensor_pair', x:col(3), y:row(4), w:NW, h:NH, label:'Pair Sensor',      cat:'sensors'},
+    {id:'sensor_read', x:col(3), y:row(5), w:NW, h:NH, label:'Sensor Readings',  cat:'sensors'},
+
+    // === Column 3: Rule Engine (lower) ===
+    {id:'rule_engine',   x:col(3), y:row(7), w:NW, h:NH, label:'Rule Engine',        cat:'meta'},
+    {id:'threshold_res', x:col(3), y:row(8), w:NW, h:NH, label:'Threshold Resolution',cat:'meta'},
+    {id:'transition_sug',x:col(3), y:row(9), w:NW, h:NH, label:'Transition Suggest',  cat:'meta'},
+    {id:'achievements',  x:col(3), y:row(11),w:NW, h:NH, label:'Achievements (10)',   cat:'meta'},
+
+    // === Column 4: Data Sync + Platform ===
+    {id:'local_db',   x:col(4), y:row(0), w:NW, h:NH, label:'Local DB (GRDB/Room)',cat:'data'},
+    {id:'push_sync',  x:col(4), y:row(1), w:NW, h:NH, label:'Push Sync',          cat:'data'},
+    {id:'pull_sync',  x:col(4), y:row(2), w:NW, h:NH, label:'Pull Sync',          cat:'data'},
+    {id:'api_server', x:col(4), y:row(3), w:NW, h:NH, label:'API Server (Astro)', cat:'data'},
+
+    {id:'ios_app',    x:col(4), y:row(5), w:NW, h:NH, label:'iOS (SwiftUI)',      cat:'settings'},
+    {id:'macos_app',  x:col(4), y:row(6), w:NW, h:NH, label:'macOS (Menu Bar)',   cat:'settings'},
+    {id:'android_app',x:col(4), y:row(7), w:NW, h:NH, label:'Android (Compose)',  cat:'settings'},
+    {id:'web_app',    x:col(4), y:row(8), w:NW, h:NH, label:'Web (Astro/Turso)',  cat:'settings'},
+    {id:'settings',   x:col(4), y:row(10),w:NW, h:NH, label:'Settings',           cat:'settings'},
+
+    // === LMS Section (below main chart, cols 0-3) ===
+    // Section label area: row 15+
+    {id:'become_creator', x:col(0), y:row(15), w:NW, h:NH, label:'Become a Creator',  cat:'lms'},
+    {id:'creator_profile',x:col(0), y:row(16), w:NW, h:NH, label:'Creator Profile',   cat:'lms'},
+    {id:'creator_dash',   x:col(0), y:row(17), w:NW, h:NH, label:'Creator Dashboard', cat:'lms'},
+
+    {id:'create_course',  x:col(1), y:row(15), w:NW, h:NH, label:'Create Course',     cat:'lms'},
+    {id:'course_editor',  x:col(1), y:row(16), w:NW, h:NH, label:'Course Editor',     cat:'lms'},
+    {id:'add_phases',     x:col(1), y:row(17), w:NW, h:NH, label:'Add Phases',        cat:'lms'},
+    {id:'add_modules',    x:col(1), y:row(18), w:NW, h:NH, label:'Add Modules',       cat:'lms'},
+    {id:'add_blocks',     x:col(1), y:row(19), w:NW, h:NH, label:'Content Blocks',    cat:'lms'},
+    {id:'publish_course', x:col(1), y:row(20), w:NW, h:NH, label:'Publish Course',    cat:'lms'},
+
+    {id:'course_catalog', x:col(2), y:row(15), w:NW, h:NH, label:'Course Catalog',    cat:'lms'},
+    {id:'course_landing', x:col(2), y:row(16), w:NW, h:NH, label:'Course Landing',    cat:'lms'},
+    {id:'enroll',         x:col(2), y:row(17), w:NW, h:NH, label:'Enroll',            cat:'lms'},
+    {id:'learner_view',   x:col(2), y:row(18), w:NW, h:NH, label:'Learner View',      cat:'lms'},
+
+    {id:'video_player',   x:col(3), y:row(15), w:NW, h:NH, label:'Video Player',      cat:'lms'},
+    {id:'quiz_block',     x:col(3), y:row(16), w:NW, h:NH, label:'Quiz Block',        cat:'lms'},
+    {id:'progress_track', x:col(3), y:row(17), w:NW, h:NH, label:'Progress Tracking', cat:'lms'},
+    {id:'module_complete',x:col(3), y:row(18), w:NW, h:NH, label:'Module Completion', cat:'lms'},
+  ];
+
+  const edges = [
+    // Auth flow
+    {from:'signup',to:'token'},{from:'signin',to:'token'},{from:'apple_auth',to:'token'},
+    {from:'token',to:'garden'},{from:'signout',to:'signin'},
+
+    // Garden flow
+    {from:'garden',to:'add_plant'},{from:'garden',to:'plant_detail'},
+    {from:'add_plant',to:'strain_pick'},{from:'strain_pick',to:'strain_profiles'},
+    {from:'add_plant',to:'garden'},
+
+    // Plant detail flows
+    {from:'plant_detail',to:'quick_actions'},{from:'plant_detail',to:'recommendations'},
+    {from:'plant_detail',to:'grow_log_hist'},{from:'plant_detail',to:'phase_trans'},
+    {from:'quick_actions',to:'grow_logging'},{from:'quick_actions',to:'quick_log'},
+
+    // Lifecycle chain
+    {from:'germination',to:'seedling'},{from:'seedling',to:'vegetative'},
+    {from:'vegetative',to:'flowering'},{from:'flowering',to:'drying'},
+    {from:'drying',to:'curing'},{from:'curing',to:'processing'},
+    {from:'processing',to:'complete'},
+    {from:'phase_trans',to:'germination'},
+
+    // Grow sessions
+    {from:'grow_session',to:'grow_logging'},{from:'grow_logging',to:'quick_log'},
+
+    // Measurements & harvest
+    {from:'measurements',to:'grow_logging'},
+    {from:'harvest_flow',to:'flowering'},{from:'harvest_flow',to:'drying'},
+
+    // Sensors
+    {from:'ble_scan',to:'sensor_pair'},{from:'sensor_pair',to:'sensor_read'},
+    {from:'sensor_read',to:'rule_engine'},{from:'sensor_read',to:'push_sync'},
+
+    // Rule engine
+    {from:'rule_engine',to:'threshold_res'},{from:'rule_engine',to:'recommendations'},
+    {from:'threshold_res',to:'transition_sug'},{from:'transition_sug',to:'phase_trans'},
+
+    // Achievements
+    {from:'grow_logging',to:'achievements'},
+
+    // Data sync
+    {from:'local_db',to:'push_sync'},{from:'pull_sync',to:'local_db'},
+    {from:'push_sync',to:'api_server'},{from:'api_server',to:'pull_sync'},
+    {from:'garden',to:'pull_sync'},
+
+    // Platform to features
+    {from:'ios_app',to:'local_db'},{from:'macos_app',to:'local_db'},
+    {from:'android_app',to:'local_db'},{from:'web_app',to:'api_server'},
+    {from:'settings',to:'sensor_pair'},
+
+    // LMS / Creators flow
+    {from:'token',to:'become_creator'},
+    {from:'become_creator',to:'creator_profile'},{from:'creator_profile',to:'creator_dash'},
+    {from:'creator_dash',to:'create_course'},
+    {from:'create_course',to:'course_editor'},{from:'course_editor',to:'add_phases'},
+    {from:'add_phases',to:'add_modules'},{from:'add_modules',to:'add_blocks'},
+    {from:'course_editor',to:'publish_course'},
+    {from:'publish_course',to:'course_catalog'},
+
+    // LMS / Learner flow
+    {from:'course_catalog',to:'course_landing'},{from:'course_landing',to:'enroll'},
+    {from:'enroll',to:'learner_view'},
+    {from:'learner_view',to:'video_player'},{from:'learner_view',to:'quiz_block'},
+    {from:'learner_view',to:'progress_track'},
+    {from:'video_player',to:'module_complete'},{from:'quiz_block',to:'module_complete'},
+    {from:'module_complete',to:'progress_track'},
+
+    // LMS connections to web
+    {from:'web_app',to:'course_catalog'},
+  ];
+
+  // ---- Build lookups ----
+  const nodeMap = {};
+  nodes.forEach(n => nodeMap[n.id] = n);
+  const adj = {};
+  nodes.forEach(n => adj[n.id] = new Set());
+  edges.forEach(e => { if(adj[e.from]) adj[e.from].add(e.to); if(adj[e.to]) adj[e.to].add(e.from); });
+
+  // ---- Compute canvas bounds ----
+  let canvasW = 0, canvasH = 0;
+  nodes.forEach(n => {
+    canvasW = Math.max(canvasW, n.x + n.w + 80);
+    canvasH = Math.max(canvasH, n.y + n.h + 80);
+  });
+  svg.setAttribute('width', canvasW);
+  svg.setAttribute('height', canvasH);
+
+  // ---- Section labels ----
+  const sections = [
+    {label:'Authentication',x:col(0)-10,y:row(0)-30,color:'#a78bfa'},
+    {label:'Plants / Garden',x:col(1)-10,y:row(0)-30,color:'#4ade80'},
+    {label:'Cannabis Lifecycle',x:col(2)-10,y:row(0)-30,color:'#60a5fa'},
+    {label:'Sensors & Measurements',x:col(3)-10,y:row(0)-30,color:'#22d3ee'},
+    {label:'Data Sync & Platform',x:col(4)-10,y:row(0)-30,color:'#f472b6'},
+    {label:'Creators / Courses (LMS)',x:col(0)-10,y:row(14.2),color:'#f87171'},
+  ];
+  sections.forEach(s => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',s.x);
+    t.setAttribute('y',s.y);
+    t.setAttribute('fill',s.color);
+    t.setAttribute('font-size','14');
+    t.setAttribute('font-weight','700');
+    t.setAttribute('opacity','0.6');
+    t.textContent = s.label;
+    svg.appendChild(t);
+  });
+
+  // ---- Render edges (bezier curves) ----
+  function getEdgePoints(a, b) {
+    const ax = a.x + a.w/2, ay = a.y + a.h/2;
+    const bx = b.x + b.w/2, by = b.y + b.h/2;
+    const dx = bx - ax, dy = by - ay;
+    let x1, y1, x2, y2;
+
+    if (Math.abs(dx) * a.h > Math.abs(dy) * a.w) {
+      x1 = dx > 0 ? a.x + a.w : a.x;
+      y1 = Math.max(a.y, Math.min(a.y + a.h, ay + dy * (a.w/2) / Math.abs(dx)));
+    } else {
+      y1 = dy > 0 ? a.y + a.h : a.y;
+      x1 = Math.max(a.x, Math.min(a.x + a.w, ax + dx * (a.h/2) / Math.abs(dy)));
+    }
+
+    if (Math.abs(dx) * b.h > Math.abs(dy) * b.w) {
+      x2 = dx > 0 ? b.x : b.x + b.w;
+      y2 = Math.max(b.y, Math.min(b.y + b.h, by - dy * (b.w/2) / Math.abs(dx)));
+    } else {
+      y2 = dy > 0 ? b.y : b.y + b.h;
+      x2 = Math.max(b.x, Math.min(b.x + b.w, bx - dx * (b.h/2) / Math.abs(dy)));
+    }
+    return {x1, y1, x2, y2};
+  }
+
+  edges.forEach(e => {
+    const a = nodeMap[e.from], b = nodeMap[e.to];
+    if (!a || !b) return;
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('fc-edge');
+    g.dataset.from = e.from;
+    g.dataset.to = e.to;
+
+    const {x1, y1, x2, y2} = getEdgePoints(a, b);
+    const dx = x2 - x1, dy = y2 - y1;
+
+    // Bezier control points — curve outward to avoid overlapping
+    let cx1, cy1, cx2, cy2;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      cx1 = x1 + dx * 0.4; cy1 = y1;
+      cx2 = x2 - dx * 0.4; cy2 = y2;
+    } else {
+      cx1 = x1; cy1 = y1 + dy * 0.4;
+      cx2 = x2; cy2 = y2 - dy * 0.4;
+    }
+
+    // Arrow
+    const angle = Math.atan2(y2 - cy2, x2 - cx2);
+    const aw = 8;
+    const px1 = x2 - aw * Math.cos(angle - 0.4);
+    const py1 = y2 - aw * Math.sin(angle - 0.4);
+    const px2 = x2 - aw * Math.cos(angle + 0.4);
+    const py2 = y2 - aw * Math.sin(angle + 0.4);
+
+    g.innerHTML = `<path d="M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}" stroke="#475569"/>` +
+      `<polygon points="${x2},${y2} ${px1},${py1} ${px2},${py2}" fill="#475569"/>`;
+    svg.insertBefore(g, svg.firstChild);
+  });
+
+  // ---- Render nodes ----
+  nodes.forEach(n => {
+    const c = COLORS[n.cat] || COLORS.plants;
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('fc-node');
+    g.dataset.id = n.id;
+    g.dataset.cat = n.cat;
+    g.innerHTML = `<rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" fill="${c.fill}" stroke="${c.stroke}"/>` +
+      `<text x="${n.x + n.w/2}" y="${n.y + n.h/2 + 5}" text-anchor="middle">${n.label}</text>`;
+    svg.appendChild(g);
+  });
+
+  // ---- PAN & ZOOM ----
+  let panX = 0, panY = 0, zoom = 0.55;
+  let isPanning = false, startX, startY, startPanX, startPanY;
+  const MIN_ZOOM = 0.15, MAX_ZOOM = 2.0;
+
+  function applyTransform() {
+    svg.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`;
+    document.getElementById('fc-zoom-label').textContent = Math.round(zoom * 100) + '%';
+    updateMinimap();
+  }
+
+  // Mouse drag to pan
+  container.addEventListener('mousedown', e => {
+    if (e.target.closest('.fc-node') || e.target.closest('.fc-minimap')) return;
+    isPanning = true;
+    startX = e.clientX; startY = e.clientY;
+    startPanX = panX; startPanY = panY;
+    container.classList.add('grabbing');
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isPanning) return;
+    panX = startPanX + (e.clientX - startX);
+    panY = startPanY + (e.clientY - startY);
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    isPanning = false;
+    container.classList.remove('grabbing');
+  });
+
+  // Scroll to zoom (centered on cursor)
+  container.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = container.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const oldZoom = zoom;
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom * delta));
+
+    // Zoom toward cursor
+    panX = mx - (mx - panX) * (zoom / oldZoom);
+    panY = my - (my - panY) * (zoom / oldZoom);
+    applyTransform();
+  }, {passive: false});
+
+  // Touch support for mobile pan
+  let lastTouchDist = 0;
+  container.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      isPanning = true;
+      startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+      startPanX = panX; startPanY = panY;
+    } else if (e.touches.length === 2) {
+      lastTouchDist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+    }
+  }, {passive: true});
+  container.addEventListener('touchmove', e => {
+    if (e.touches.length === 1 && isPanning) {
+      panX = startPanX + (e.touches[0].clientX - startX);
+      panY = startPanY + (e.touches[0].clientY - startY);
+      applyTransform();
+    } else if (e.touches.length === 2) {
+      const dist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+      const scale = dist / lastTouchDist;
+      zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom * scale));
+      lastTouchDist = dist;
+      applyTransform();
+    }
+  }, {passive: true});
+  container.addEventListener('touchend', () => { isPanning = false; });
+
+  // Zoom buttons
+  document.getElementById('fc-zoom-in').addEventListener('click', () => {
+    zoom = Math.min(MAX_ZOOM, zoom * 1.2);
+    applyTransform();
+  });
+  document.getElementById('fc-zoom-out').addEventListener('click', () => {
+    zoom = Math.max(MIN_ZOOM, zoom / 1.2);
+    applyTransform();
+  });
+  document.getElementById('fc-zoom-reset').addEventListener('click', () => {
+    zoom = 0.55; panX = 0; panY = 0;
+    applyTransform();
+  });
+  document.getElementById('fc-zoom-fit').addEventListener('click', () => {
+    const rect = container.getBoundingClientRect();
+    const scaleX = rect.width / canvasW;
+    const scaleY = rect.height / canvasH;
+    zoom = Math.min(scaleX, scaleY) * 0.92;
+    panX = (rect.width - canvasW * zoom) / 2;
+    panY = (rect.height - canvasH * zoom) / 2;
+    applyTransform();
+  });
+
+  // ---- MINIMAP ----
+  function updateMinimap() {
+    const mmW = 200, mmH = 140;
+    const scale = Math.min(mmW / canvasW, mmH / canvasH);
+    minimapSvg.setAttribute('viewBox', `0 0 ${canvasW} ${canvasH}`);
+
+    // Draw minimap nodes (if not drawn yet)
+    if (!minimapSvg.dataset.drawn) {
+      minimapSvg.dataset.drawn = '1';
+      nodes.forEach(n => {
+        const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        r.setAttribute('x', n.x); r.setAttribute('y', n.y);
+        r.setAttribute('width', n.w); r.setAttribute('height', n.h);
+        r.setAttribute('fill', COLORS[n.cat].stroke); r.setAttribute('opacity', '0.5');
+        r.setAttribute('rx', '4');
+        minimapSvg.appendChild(r);
+      });
+      // Viewport rect
+      const vp = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      vp.classList.add('fc-minimap-viewport');
+      vp.id = 'fc-mm-vp';
+      minimapSvg.appendChild(vp);
+    }
+
+    // Update viewport rect
+    const cRect = container.getBoundingClientRect();
+    const vp = document.getElementById('fc-mm-vp');
+    if (vp) {
+      const vx = -panX / zoom;
+      const vy = -panY / zoom;
+      const vw = cRect.width / zoom;
+      const vh = cRect.height / zoom;
+      vp.setAttribute('x', vx); vp.setAttribute('y', vy);
+      vp.setAttribute('width', vw); vp.setAttribute('height', vh);
+    }
+  }
+
+  // Click minimap to jump
+  document.getElementById('fc-minimap').addEventListener('click', e => {
+    const rect = minimapSvg.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / rect.width * canvasW;
+    const my = (e.clientY - rect.top) / rect.height * canvasH;
+    const cRect = container.getBoundingClientRect();
+    panX = -(mx * zoom - cRect.width / 2);
+    panY = -(my * zoom - cRect.height / 2);
+    applyTransform();
+  });
+
+  // ---- TOOLTIP on hover ----
+  svg.addEventListener('mouseover', e => {
+    const node = e.target.closest('.fc-node');
+    if (!node) { tooltip.classList.remove('visible'); return; }
+    const id = node.dataset.id;
+    const tip = TOOLTIPS[id];
+    if (!tip) return;
+    tooltip.textContent = tip;
+    tooltip.classList.add('visible');
+  });
+  svg.addEventListener('mousemove', e => {
+    if (!tooltip.classList.contains('visible')) return;
+    const cRect = container.getBoundingClientRect();
+    tooltip.style.left = (e.clientX - cRect.left + 14) + 'px';
+    tooltip.style.top = (e.clientY - cRect.top - 30) + 'px';
+  });
+  svg.addEventListener('mouseout', e => {
+    if (!e.target.closest('.fc-node')) tooltip.classList.remove('visible');
+  });
+
+  // ---- CLICK to highlight ----
+  let highlightedNode = null;
+  svg.addEventListener('click', e => {
+    const nodeEl = e.target.closest('.fc-node');
+    if (!nodeEl) return;
+    e.stopPropagation();
+    const id = nodeEl.dataset.id;
+
+    if (highlightedNode === id) {
+      highlightedNode = null;
+      document.querySelectorAll('.fc-node').forEach(n => n.classList.remove('dimmed','highlighted'));
+      document.querySelectorAll('.fc-edge').forEach(e => e.classList.remove('dimmed','highlighted'));
+      return;
+    }
+    highlightedNode = id;
+    const connected = adj[id];
+
+    document.querySelectorAll('.fc-node').forEach(n => {
+      const nid = n.dataset.id;
+      if (nid === id) { n.classList.add('highlighted'); n.classList.remove('dimmed'); }
+      else if (connected.has(nid)) { n.classList.remove('dimmed','highlighted'); }
+      else { n.classList.add('dimmed'); n.classList.remove('highlighted'); }
+    });
+    document.querySelectorAll('.fc-edge').forEach(e => {
+      if (e.dataset.from === id || e.dataset.to === id) {
+        e.classList.add('highlighted'); e.classList.remove('dimmed');
+      } else {
+        e.classList.add('dimmed'); e.classList.remove('highlighted');
+      }
+    });
+  });
+
+  // ---- FILTER buttons ----
+  document.querySelectorAll('.fc-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.fc-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      highlightedNode = null;
+
+      document.querySelectorAll('.fc-node').forEach(n => {
+        n.classList.remove('highlighted');
+        if (f === 'all') { n.classList.remove('dimmed'); }
+        else if (n.dataset.cat === f) { n.classList.remove('dimmed'); }
+        else { n.classList.add('dimmed'); }
+      });
+      document.querySelectorAll('.fc-edge').forEach(e => {
+        e.classList.remove('highlighted');
+        if (f === 'all') { e.classList.remove('dimmed'); }
+        else {
+          const fn = nodeMap[e.dataset.from], tn = nodeMap[e.dataset.to];
+          if (fn && tn && (fn.cat === f || tn.cat === f)) { e.classList.remove('dimmed'); }
+          else { e.classList.add('dimmed'); }
+        }
+      });
+    });
+  });
+
+  // ---- Initial view ----
+  applyTransform();
+})();
+
+// =============================================
+// WALKTHROUGH VIEW
+// =============================================
+(function() {
+  const steps = [
+    {
+      title: 'Authentication',
+      badge: 'AUTH', badgeColor: 'var(--purple)',
+      body: `<p>Users authenticate via <b>email + password</b> sign-up/sign-in or <b>Apple Sign-In</b>.</p>
+        <div class="detail-box"><b>Sign Up:</b> Email, password, confirm password → POST /api/auth/signup<br>
+        <b>Sign In:</b> Email + password → POST /api/auth/signin<br>
+        <b>Apple:</b> ASAuthorization → identity token sent to server</div>
+        <p>A <b>bearer token</b> is returned and stored securely (Keychain on iOS/macOS, EncryptedSharedPrefs on Android, httpOnly cookie on Web). All subsequent API calls include this token in the Authorization header.</p>
+        <p><b>Sign Out</b> clears the token, resets local state, and returns to the auth screen.</p>`
+    },
+    {
+      title: 'Garden View',
+      badge: 'PLANTS', badgeColor: 'var(--green)',
+      body: `<p>The main screen shows a grid of all plants the user is growing.</p>
+        <div class="detail-box"><b>iOS:</b> 2-column LazyVGrid<br>
+        <b>macOS:</b> Adaptive grid in Garden window (split view)<br>
+        <b>Android:</b> RecyclerView with GridLayoutManager<br>
+        <b>Web:</b> CSS Grid (auto-fill, minmax)</div>
+        <p>Each <b>plant card</b> shows: emoji icon, name, species, status badge (healthy / needs attention / critical), and an HP health bar.</p>
+        <p><b>Pull-to-refresh</b> triggers a full sync. An <b>empty state</b> shows an illustration and "Add your first plant" button.</p>`
+    },
+    {
+      title: 'Add Plant (Multi-Step)',
+      badge: 'PLANTS', badgeColor: 'var(--green)',
+      body: `<p>Adding a plant is a guided 5-step flow:</p>
+        <ul>
+          <li><b>Step 1:</b> Name, species, and emoji selection (grid picker)</li>
+          <li><b>Step 2:</b> Plant type — Regular Plant vs Cannabis toggle</li>
+          <li><b>Step 3 (Cannabis):</b> Strain selection — 15 built-in strains or custom entry</li>
+          <li><b>Step 4 (Cannabis):</b> Environment — Indoor / Outdoor</li>
+          <li><b>Step 5:</b> Thresholds — Moisture min/max, temp min/max, light preference</li>
+        </ul>
+        <p>On save, the plant is created in the <b>local DB</b> (GRDB/Room/SQLite) and queued for sync to the API server.</p>`
+    },
+    {
+      title: 'Plant Detail View',
+      badge: 'PLANTS', badgeColor: 'var(--green)',
+      body: `<p>Tapping a plant card opens the detailed view with multiple sections:</p>
+        <ul>
+          <li><b>Header:</b> Large emoji, name, species, status badge, HP bar</li>
+          <li><b>Sensor Readings:</b> Moisture %, temperature °C, light lux, battery %</li>
+          <li><b>Phase Banner</b> (cannabis): Current phase, days in phase, timeline, "Advance Phase" button</li>
+          <li><b>Quick Actions</b> (cannabis): Phase-aware grid of available actions</li>
+          <li><b>Legacy Actions</b> (non-cannabis): Water, fertilize, prune, repot</li>
+          <li><b>Recommendations:</b> Rule engine output with severity colors (info/warning/urgent)</li>
+          <li><b>Grow Log / Care Log History:</b> Chronological activity entries</li>
+        </ul>`
+    },
+    {
+      title: 'Cannabis Lifecycle — 8 Phases',
+      badge: 'LIFECYCLE', badgeColor: 'var(--blue)',
+      body: `<p>Cannabis plants progress through 8 distinct phases, each with environmental defaults and available actions:</p>
+        <div class="detail-box">
+          <b>Germination:</b> 22-28°C, 70-90% RH, 18/6 light<br>
+          <b>Seedling:</b> 20-26°C, 60-70% RH, 18/6<br>
+          <b>Vegetative:</b> 20-28°C, 40-60% RH, 18/6<br>
+          <b>Flowering:</b> 18-26°C, 40-50% RH, 12/12 (late: 30-40% RH)<br>
+          <b>Drying:</b> 18-22°C, 55-65% RH, 0/24 (dark)<br>
+          <b>Curing:</b> 18-22°C, 58-65% RH, 0/24<br>
+          <b>Processing:</b> 18-24°C, 40-60% RH, 0/24<br>
+          <b>Complete:</b> Photo/note only
+        </div>
+        <p>As phases progress, more actions become available (e.g., topping and LST in Vegetative, harvest in Flowering).</p>`
+    },
+    {
+      title: 'Phase Transitions',
+      badge: 'LIFECYCLE', badgeColor: 'var(--blue)',
+      body: `<p>The "Advance Phase" button on Plant Detail opens the <b>PhaseTransitionView</b>.</p>
+        <ul>
+          <li>Shows current phase → next phase with visual summary</li>
+          <li>Confirmation dialog explains what changes</li>
+          <li>On confirm: updates plant record, creates a phase change grow log entry</li>
+          <li>Environmental defaults update to match new phase</li>
+        </ul>
+        <p>The rule engine also generates <b>transition suggestions</b> (e.g., veg 42+ days → suggest flowering).</p>`
+    },
+    {
+      title: 'Grow Sessions',
+      badge: 'LIFECYCLE', badgeColor: 'var(--blue)',
+      body: `<p>Grow sessions group plants together for a coordinated grow cycle.</p>
+        <ul>
+          <li><b>Create:</b> Name + environment (indoor/outdoor)</li>
+          <li><b>View:</b> List of active grows with plant counts</li>
+          <li><b>Assign:</b> Add/remove plants from a session</li>
+          <li><b>Complete:</b> Archive the grow, moves to history</li>
+        </ul>`
+    },
+    {
+      title: 'Grow Logging (21 Types)',
+      badge: 'LIFECYCLE', badgeColor: 'var(--blue)',
+      body: `<p>21 log types cover every aspect of plant care:</p>
+        <div class="detail-box">Phase Change, Watering, Feeding, Topping, FIMming, LST, Defoliation, Transplant, Flushing, Trichome Check, Measurement, Environmental, Photo, Note, Harvest, Dry Weight, Dry Check, Cure Check, Processing Log, Pest Treatment, Cloning</div>
+        <p>The <b>Quick Log View</b> shows a 4-column grid filtered by current phase. Each entry captures: plantId, phase, logType, data (JSON), optional photoUrl, and notes.</p>`
+    },
+    {
+      title: 'Measurements',
+      badge: 'SENSORS', badgeColor: 'var(--cyan)',
+      body: `<p>Manual measurements tracked via the AddMeasurementView:</p>
+        <ul>
+          <li><b>Height:</b> in/cm</li>
+          <li><b>pH:</b> 0-14 scale</li>
+          <li><b>EC/PPM:</b> Electrical conductivity / parts per million</li>
+          <li><b>Weight:</b> g/oz</li>
+        </ul>
+        <p>Stored as a GrowLog with logType=measurement. The data JSON contains the measurement type, value, and unit.</p>`
+    },
+    {
+      title: 'Harvest Flow',
+      badge: 'HARVEST', badgeColor: 'var(--amber)',
+      body: `<p>The harvest pipeline spans 4 phases:</p>
+        <ul>
+          <li><b>Flowering → Drying:</b> "Harvest" action records wet weight, advances phase</li>
+          <li><b>Drying (7+ days):</b> Daily dry checks, stem snap test → advance to Curing</li>
+          <li><b>Curing (2+ weeks):</b> Regular cure checks (jar burping) → advance to Processing</li>
+          <li><b>Processing → Complete:</b> Final trim, packaging, record dry weight → grow finished</li>
+        </ul>`
+    },
+    {
+      title: 'Sensor Integration (BLE)',
+      badge: 'SENSORS', badgeColor: 'var(--cyan)',
+      body: `<p>BLE sensors provide real-time environmental data for each plant.</p>
+        <ul>
+          <li><b>Scan:</b> Discover nearby BLE sensors (CoreBluetooth / Android BLE)</li>
+          <li><b>Display:</b> Name, UUID, RSSI signal strength (4-bar indicator)</li>
+          <li><b>Pair:</b> Assign one sensor to one plant</li>
+          <li><b>Read:</b> Moisture %, temperature °C, light lux, battery %</li>
+        </ul>
+        <p>Readings are pushed to the API for storage. The Rule Engine evaluates readings against thresholds to generate recommendations.</p>`
+    },
+    {
+      title: 'Rule Engine & Recommendations',
+      badge: 'RULES', badgeColor: 'var(--amber)',
+      body: `<p>The rule engine generates actionable recommendations from sensor data and phase context.</p>
+        <div class="detail-box">
+          <b>Threshold Resolution:</b> Phase defaults for temp/humidity, plant-level for moisture, merged with strain data for cannabis<br><br>
+          <b>Sensor Checks:</b> Moisture too low/high, temp too low/high, battery low (<20%), light insufficient<br><br>
+          <b>Transition Suggestions:</b> Veg 42+ days → flowering, drying 7+ days → curing, curing 14+ days → processing
+        </div>
+        <p>Severity levels: <span style="color:var(--blue)">info</span>, <span style="color:var(--amber)">warning</span>, <span style="color:var(--red)">urgent</span>. Displayed on Plant Detail with act-on checkmarks.</p>`
+    },
+    {
+      title: 'Achievements (10 Total)',
+      badge: 'META', badgeColor: 'var(--amber)',
+      body: `<p>Gamification with 10 unlockable achievements:</p>
+        <ul>
+          <li><b>First Seed</b> (10 pts) — Start first plant</li>
+          <li><b>First Harvest</b> (50 pts) — Complete first harvest</li>
+          <li><b>Green Thumb</b> (30 pts) — Grow 10 plants</li>
+          <li><b>First Top</b> (20 pts) / <b>First LST</b> (20 pts) — Training techniques</li>
+          <li><b>Speed Grower</b> (100 pts) — Record time completion</li>
+          <li><b>First Gram</b> (25 pts) / <b>Big Yield</b> (75 pts) — Harvest milestones</li>
+          <li><b>Week Streak</b> (15 pts) — 7 consecutive days of logging</li>
+          <li><b>Strain Collector</b> (40 pts) — Grow 5 different strains</li>
+        </ul>
+        <p>Total: <b>385 points</b>. Display shows locked/unlocked state with trophy icons.</p>`
+    },
+    {
+      title: 'Strain Profiles',
+      badge: 'PLANTS', badgeColor: 'var(--green)',
+      body: `<p>15 built-in strains provide pre-configured growing parameters:</p>
+        <div class="detail-box">Northern Lights, Blue Dream, OG Kush, Girl Scout Cookies, Gorilla Glue, White Widow, Sour Diesel, AK-47, Jack Herer, Amnesia Haze, Granddaddy Purple, Pineapple Express, Gelato, Wedding Cake, Bruce Banner</div>
+        <p><b>Custom strains</b> can be created with: name, type (indica/sativa/hybrid), flowering weeks (7-12), and difficulty level.</p>
+        <p>Each strain provides environmental thresholds by phase, flowering time range, and grower notes. Selected in the Add Plant flow via the StrainPickerView.</p>`
+    },
+    {
+      title: 'Data Sync & Platform',
+      badge: 'SYNC', badgeColor: 'var(--cyan)',
+      body: `<p><b>Local-first architecture</b> with server sync:</p>
+        <div class="detail-box">
+          <b>Local DB:</b> GRDB (iOS/macOS), Room (Android), SQLite/Turso (Web)<br>
+          <b>Push:</b> Readings, care logs, grow logs → API<br>
+          <b>Pull:</b> Plants, recommendations, grow logs ← API<br>
+          <b>Conflict:</b> Server wins<br>
+          <b>Triggers:</b> Pull-to-refresh, periodic (15s on iOS garden), manual
+        </div>
+        <p><b>Platforms:</b> iOS (SwiftUI + BLE + Widgets), macOS (Menu Bar + Garden window), Android (Compose + Room + BLE), Web (Astro + Turso).</p>`
+    },
+    {
+      title: 'Creators (LMS)',
+      badge: 'LMS', badgeColor: 'var(--red)',
+      body: `<p>Any authenticated user can <b>become a creator</b> and build educational courses about plant care.</p>
+        <div class="detail-box">
+          <b>Become a Creator:</b> Visit /become-creator → enter display name + bio → creates creator_profiles record<br><br>
+          <b>Creator Dashboard:</b> /creator/dashboard — lists all courses with enrollment counts, status (draft/published/archived), and quick stats<br><br>
+          <b>Profile Management:</b> Update display name, bio, avatar via PATCH /api/creators/me
+        </div>
+        <p><b>Access control:</b> Creator actions require a creator_profiles record. Ownership checks verify the session user's creator_id matches the course's creator_id for all edit/delete operations.</p>
+        <p><b>Web-only (v1):</b> The LMS is built on Astro + Turso (web platform). iOS/macOS/Android do not have LMS views in v1.</p>`
+    },
+    {
+      title: 'Courses (Learning Marketplace)',
+      badge: 'LMS', badgeColor: 'var(--red)',
+      body: `<p>A full <b>learning management system</b> with hierarchical course structure and progress tracking.</p>
+        <div class="detail-box">
+          <b>Course Structure:</b> Course → Phases → Modules → Content Blocks<br>
+          <b>Content Types:</b> Video (external URL), Text (markdown), Quiz (single-choice with explanation)<br>
+          <b>Pricing:</b> Free (price_cents=0) or paid (v1: record-keeping only, no Stripe yet)
+        </div>
+        <p><b>Creator flow:</b> Create course → add phases → add modules → add content blocks → publish</p>
+        <p><b>Learner flow:</b> Browse /courses catalog → view landing page → enroll → learn at /courses/[slug]/learn with phase sidebar, progress ring, and module completion tracking</p>
+        <div class="detail-box">
+          <b>Progress:</b> Per-module granularity. Phase complete = all modules done. Course complete = all phases done.<br>
+          <b>Quiz answers:</b> Stored in module_completions.quiz_answers JSON<br>
+          <b>Database:</b> 7 tables — creator_profiles, courses, course_phases, phase_modules, module_content_blocks, course_enrollments, module_completions<br>
+          <b>UI Components:</b> CourseCatalog, CourseEditor, CourseLearnerView, CreatorDashboard, CourseCard, PhaseAccordion, QuizBlock, VideoPlayer, ProgressRing
+        </div>`
+    },
+    {
+      title: 'Settings',
+      badge: 'SETTINGS', badgeColor: 'var(--pink)',
+      body: `<p>App settings and configuration:</p>
+        <ul>
+          <li><b>User ID:</b> Display current user identifier</li>
+          <li><b>Paired Sensors:</b> Manage sensor-plant mappings</li>
+          <li><b>Language:</b> Toggle PT-BR / English</li>
+          <li><b>Retro Mode:</b> Pixel font aesthetic toggle</li>
+          <li><b>Demo Mode:</b> Load sample data for testing</li>
+          <li><b>Clear All Data:</b> Danger zone — wipes local DB after confirmation dialog</li>
+        </ul>`
+    }
+  ];
+
+  const cardsContainer = document.getElementById('wt-cards');
+  steps.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'wt-card' + (i === 0 ? ' active' : '');
+    div.dataset.step = i;
+    div.innerHTML = `<h2><span class="step-badge" style="background:${s.badgeColor};color:#000">${s.badge}</span>${s.title}</h2>${s.body}`;
+    cardsContainer.appendChild(div);
+  });
+
+  let current = 0;
+  const total = steps.length;
+  const bar = document.getElementById('wt-bar');
+  const counter = document.getElementById('wt-counter');
+  const prevBtn = document.getElementById('wt-prev');
+  const nextBtn = document.getElementById('wt-next');
+
+  function update() {
+    document.querySelectorAll('.wt-card').forEach((c, i) => {
+      c.classList.toggle('active', i === current);
+    });
+    bar.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = (current + 1) + ' / ' + total;
+    prevBtn.disabled = current === 0;
+    nextBtn.textContent = current === total - 1 ? 'Finish' : 'Next';
+  }
+
+  prevBtn.addEventListener('click', () => { if (current > 0) { current--; update(); } });
+  nextBtn.addEventListener('click', () => { if (current < total - 1) { current++; update(); } });
+  update();
+})();
+</script>
+</body>
+</html>

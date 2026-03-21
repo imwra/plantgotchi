@@ -87,11 +87,16 @@ struct PlantgotchiApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
+                #if DEBUG
+                // Skip auth in debug for simulator testing
+                GardenView()
+                #else
                 if authService.isAuthenticated {
                     GardenView()
                 } else {
                     LoginView()
                 }
+                #endif
             }
             .environmentObject(bleManager)
             .environmentObject(themeManager)

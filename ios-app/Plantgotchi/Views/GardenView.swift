@@ -176,7 +176,16 @@ struct GardenView: View {
             )
 
             guard httpResponse.statusCode == 200 else {
-                print("[GardenView] API returned non-200")
+                print("[GardenView] API returned \(httpResponse.statusCode)")
+                #if DEBUG
+                if let localPlants = try? AppDatabase.shared.getPlants(userId: userId) {
+                    plants = localPlants
+                    plantViews = localPlants.map { plant in
+                        toPlantView(plant: plant, latestReading: nil, recentCareLogs: [])
+                    }
+                    print("[GardenView] DEBUG: Loaded \(localPlants.count) plants from local DB")
+                }
+                #endif
                 return
             }
 
@@ -215,6 +224,16 @@ struct GardenView: View {
             Analytics.track("garden_viewed", properties: ["plant_count": plants.count])
         } catch {
             print("[GardenView] Failed to load plants: \(error)")
+            #if DEBUG
+            // Fall back to local database in debug mode (no auth needed)
+            if let localPlants = try? AppDatabase.shared.getPlants(userId: userId) {
+                plants = localPlants
+                plantViews = localPlants.map { plant in
+                    toPlantView(plant: plant, latestReading: nil, recentCareLogs: [])
+                }
+                print("[GardenView] Loaded \(localPlants.count) plants from local DB")
+            }
+            #endif
         }
     }
 }

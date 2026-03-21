@@ -37,7 +37,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { name, species, emoji, light_preference, moisture_min, moisture_max, temp_min, temp_max } = body;
+    const { name, species, emoji, light_preference, moisture_min, moisture_max, temp_min, temp_max, garden_id, catalog_id, plant_type, strain_id, strain_name, strain_type, environment, current_phase, grow_id } = body;
 
     if (!name || !emoji) {
       return new Response(JSON.stringify({ error: "Name and emoji are required" }), {
@@ -58,8 +58,16 @@ export const POST: APIRoute = async ({ request }) => {
       moisture_max: moisture_max ?? 80,
       temp_min: temp_min ?? 15,
       temp_max: temp_max ?? 30,
-      garden_id: null,
-      catalog_id: null,
+      garden_id: garden_id ?? null,
+      catalog_id: catalog_id ?? null,
+      plant_type: plant_type ?? null,
+      strain_id: strain_id ?? null,
+      strain_name: strain_name ?? null,
+      strain_type: strain_type ?? null,
+      environment: environment ?? null,
+      current_phase: current_phase ?? null,
+      phase_started_at: current_phase ? new Date().toISOString() : null,
+      grow_id: grow_id ?? null,
       identification_confidence: null,
     };
 

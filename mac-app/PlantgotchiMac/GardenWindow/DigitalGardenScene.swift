@@ -61,6 +61,16 @@ struct DigitalGardenScene: View {
             Text(statusLabel(for: plant))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+
+            if let phase = plant.currentPhase {
+                Text(phaseLabel(phase))
+                    .font(.caption2.weight(.medium))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(phaseColor(phase).opacity(0.15))
+                    .foregroundStyle(phaseColor(phase))
+                    .clipShape(Capsule())
+            }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -102,6 +112,33 @@ struct DigitalGardenScene: View {
             return "🪴"
         case .high:
             return "🌿"
+        }
+    }
+
+    private func phaseLabel(_ phase: String) -> String {
+        switch phase {
+        case "germination": return "Germinating"
+        case "seedling": return "Seedling"
+        case "vegetative": return "Vegetative"
+        case "flowering": return "Flowering"
+        case "drying": return "Drying"
+        case "curing": return "Curing"
+        case "processing": return "Processing"
+        case "complete": return "Complete"
+        default: return phase.capitalized
+        }
+    }
+
+    private func phaseColor(_ phase: String) -> Color {
+        switch phase {
+        case "germination", "seedling": return .green
+        case "vegetative": return .mint
+        case "flowering": return .purple
+        case "drying": return .orange
+        case "curing": return .brown
+        case "processing": return .gray
+        case "complete": return .blue
+        default: return .secondary
         }
     }
 

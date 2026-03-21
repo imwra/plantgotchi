@@ -5,6 +5,9 @@ public struct PlantScopeInput: Codable, Equatable {
     public let temperatureScore: Double?
     public let lightScore: Double?
     public let freshnessScore: Double
+    public let currentPhase: String?
+    public let strainName: String?
+    public let environment: String?
 
     public init(
         id: String,
@@ -12,7 +15,10 @@ public struct PlantScopeInput: Codable, Equatable {
         moistureScore: Double?,
         temperatureScore: Double?,
         lightScore: Double?,
-        freshnessScore: Double
+        freshnessScore: Double,
+        currentPhase: String? = nil,
+        strainName: String? = nil,
+        environment: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -20,6 +26,9 @@ public struct PlantScopeInput: Codable, Equatable {
         self.temperatureScore = temperatureScore
         self.lightScore = lightScore
         self.freshnessScore = freshnessScore
+        self.currentPhase = currentPhase
+        self.strainName = strainName
+        self.environment = environment
     }
 }
 
@@ -34,17 +43,26 @@ public struct PlantScope: Codable, Equatable, Identifiable {
     public let name: String
     public let vitality: GardenSnapshot.VitalityLevel
     public let attentionState: AttentionState
+    public let currentPhase: String?
+    public let strainName: String?
+    public let environment: String?
 
     public init(
         id: String,
         name: String,
         vitality: GardenSnapshot.VitalityLevel,
-        attentionState: AttentionState
+        attentionState: AttentionState,
+        currentPhase: String? = nil,
+        strainName: String? = nil,
+        environment: String? = nil
     ) {
         self.id = id
         self.name = name
         self.vitality = vitality
         self.attentionState = attentionState
+        self.currentPhase = currentPhase
+        self.strainName = strainName
+        self.environment = environment
     }
 }
 
