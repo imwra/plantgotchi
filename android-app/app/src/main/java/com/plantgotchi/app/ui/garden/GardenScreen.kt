@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,6 +66,7 @@ fun GardenScreen(
     onAddPlantClick: () -> Unit = {},
     onScanClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
+    onCoursesClick: () -> Unit = {},
 ) {
     var plants by remember { mutableStateOf<List<Plant>>(emptyList()) }
     var isRefreshing by remember { mutableStateOf(false) }
@@ -123,6 +125,12 @@ fun GardenScreen(
                     )
                 },
                 actions = {
+                    IconButton(onClick = onCoursesClick) {
+                        Icon(
+                            imageVector = Icons.Default.School,
+                            contentDescription = stringResource(R.string.courses_title),
+                        )
+                    }
                     IconButton(onClick = onScanClick) {
                         Icon(
                             imageVector = Icons.Default.Bluetooth,

@@ -9,6 +9,7 @@ import com.plantgotchi.app.db.AppDatabase
 import com.posthog.PostHog
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
+import com.plantgotchi.app.sync.TursoSync
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -30,6 +31,13 @@ class PlantgotchiApp : Application() {
         private set
     lateinit var httpClient: HttpClient
         private set
+
+    val tursoSync: TursoSync by lazy {
+        TursoSync(
+            baseURL = BuildConfig.API_BASE_URL,
+            httpClient = httpClient,
+        )
+    }
 
     override fun onCreate() {
         super.onCreate()

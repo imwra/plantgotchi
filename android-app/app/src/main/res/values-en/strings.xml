@@ -103,4 +103,35 @@
     <!-- BLE permissions -->
     <string name="ble_permission_rationale">Plantgotchi needs Bluetooth access to connect to your plant sensors.</string>
     <string name="location_permission_rationale">Location access is required on Android to scan for BLE devices.</string>
+
+    <!-- LMS Courses -->
+    <string name="courses_title">Courses</string>
+    <string name="courses_search_hint">Search courses…</string>
+    <string name="courses_empty">No courses available</string>
+    <string name="courses_empty_search">No courses found</string>
+    <string name="courses_by">by %1$s</string>
+    <string name="courses_free">Free</string>
+    <string name="courses_enrolled">Enrolled</string>
+    <string name="courses_enroll">Enroll</string>
+    <string name="courses_enroll_free">Enroll Free</string>
+    <string name="courses_enroll_paid">Enroll for %1$s</string>
+    <string name="courses_continue">Continue Learning</string>
+    <string name="courses_modules">%1$d modules</string>
+    <string name="courses_phases">%1$d phases</string>
+    <string name="courses_progress">%1$d%% complete</string>
+    <string name="courses_about">About Course</string>
+    <string name="courses_curriculum">Curriculum</string>
+    <string name="courses_complete_module">Complete Module</string>
+    <string name="courses_completed">Completed</string>
+    <string name="courses_quiz_submit">Submit</string>
+    <string name="courses_quiz_correct">Correct!</string>
+    <string name="courses_quiz_incorrect">Incorrect</string>
+    <string name="courses_video">Video</string>
+    <string name="courses_text">Text</string>
+    <string name="courses_quiz">Quiz</string>
+    <string name="courses_my_courses">My Courses</string>
+    <string name="courses_all">All</string>
+    <string name="courses_sort_newest">Newest</string>
+    <string name="courses_sort_popular">Popular</string>
+    <string name="courses_sort_price">Price</string>
 </resources>

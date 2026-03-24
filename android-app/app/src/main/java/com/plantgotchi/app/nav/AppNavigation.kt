@@ -15,6 +15,9 @@ import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.ui.add.AddPlantScreen
 import com.plantgotchi.app.ui.auth.LoginScreen
 import com.plantgotchi.app.ui.auth.SignUpScreen
+import com.plantgotchi.app.ui.courses.CourseCatalogScreen
+import com.plantgotchi.app.ui.courses.CourseDetailScreen
+import com.plantgotchi.app.ui.courses.CourseLearnerScreen
 import com.plantgotchi.app.ui.detail.PlantDetailScreen
 import com.plantgotchi.app.ui.garden.GardenScreen
 import com.plantgotchi.app.ui.scan.ScanScreen
@@ -28,8 +31,13 @@ object Routes {
     const val ADD_PLANT = "add"
     const val SCAN = "scan"
     const val SETTINGS = "settings"
+    const val COURSES = "courses"
+    const val COURSE_DETAIL = "courses/{slug}"
+    const val COURSE_LEARN = "courses/{slug}/learn"
 
     fun plantDetail(plantId: String) = "detail/$plantId"
+    fun courseDetail(slug: String) = "courses/$slug"
+    fun courseLearn(slug: String) = "courses/$slug/learn"
 }
 
 @Composable
@@ -105,6 +113,9 @@ fun AppNavigation() {
                 onSettingsClick = {
                     navController.navigate(Routes.SETTINGS)
                 },
+                onCoursesClick = {
+                    navController.navigate(Routes.COURSES)
+                },
             )
         }
 
@@ -142,6 +153,37 @@ fun AppNavigation() {
 
         composable(Routes.SETTINGS) {
             SettingsScreen(
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.COURSES) {
+            CourseCatalogScreen(
+                onCourseClick = { slug ->
+                    navController.navigate(Routes.courseDetail(slug))
+                },
+            )
+        }
+
+        composable(
+            route = Routes.COURSE_DETAIL,
+            arguments = listOf(navArgument("slug") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val slug = backStackEntry.arguments?.getString("slug") ?: return@composable
+            CourseDetailScreen(
+                slug = slug,
+                onBack = { navController.popBackStack() },
+                onStartLearning = { navController.navigate(Routes.courseLearn(it)) },
+            )
+        }
+
+        composable(
+            route = Routes.COURSE_LEARN,
+            arguments = listOf(navArgument("slug") { type = NavType.StringType }),
+        ) { backStackEntry ->
+            val slug = backStackEntry.arguments?.getString("slug") ?: return@composable
+            CourseLearnerScreen(
+                slug = slug,
                 onBack = { navController.popBackStack() },
             )
         }

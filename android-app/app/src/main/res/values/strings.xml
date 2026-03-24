@@ -106,4 +106,35 @@
     <!-- BLE permissions -->
     <string name="ble_permission_rationale">Plantgotchi precisa de acesso ao Bluetooth para conectar aos seus sensores de plantas.</string>
     <string name="location_permission_rationale">Acesso à localização é necessário no Android para escanear dispositivos BLE.</string>
+
+    <!-- LMS Courses -->
+    <string name="courses_title">Cursos</string>
+    <string name="courses_search_hint">Buscar cursos…</string>
+    <string name="courses_empty">Nenhum curso disponível</string>
+    <string name="courses_empty_search">Nenhum curso encontrado</string>
+    <string name="courses_by">por %1$s</string>
+    <string name="courses_free">Grátis</string>
+    <string name="courses_enrolled">Matriculado</string>
+    <string name="courses_enroll">Matricular-se</string>
+    <string name="courses_enroll_free">Matricular-se Grátis</string>
+    <string name="courses_enroll_paid">Matricular-se por %1$s</string>
+    <string name="courses_continue">Continuar Aprendendo</string>
+    <string name="courses_modules">%1$d módulos</string>
+    <string name="courses_phases">%1$d fases</string>
+    <string name="courses_progress">%1$d%% concluído</string>
+    <string name="courses_about">Sobre o Curso</string>
+    <string name="courses_curriculum">Conteúdo</string>
+    <string name="courses_complete_module">Concluir Módulo</string>
+    <string name="courses_completed">Concluído</string>
+    <string name="courses_quiz_submit">Enviar</string>
+    <string name="courses_quiz_correct">Correto!</string>
+    <string name="courses_quiz_incorrect">Incorreto</string>
+    <string name="courses_video">Vídeo</string>
+    <string name="courses_text">Texto</string>
+    <string name="courses_quiz">Quiz</string>
+    <string name="courses_my_courses">Meus Cursos</string>
+    <string name="courses_all">Todos</string>
+    <string name="courses_sort_newest">Mais Recentes</string>
+    <string name="courses_sort_popular">Populares</string>
+    <string name="courses_sort_price">Preço</string>
 </resources>

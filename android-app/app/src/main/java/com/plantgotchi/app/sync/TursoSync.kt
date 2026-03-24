@@ -3,7 +3,12 @@ package com.plantgotchi.app.sync
 import com.plantgotchi.app.analytics.Analytics
 import com.plantgotchi.app.analytics.LogLevel
 import com.plantgotchi.app.model.CareLog
+import com.plantgotchi.app.model.ContentBlock
+import com.plantgotchi.app.model.Course
+import com.plantgotchi.app.model.CourseEnrollment
+import com.plantgotchi.app.model.CoursePhase
 import com.plantgotchi.app.model.GrowLog
+import com.plantgotchi.app.model.PhaseModule
 import com.plantgotchi.app.model.Plant
 import com.plantgotchi.app.model.Recommendation
 import com.plantgotchi.app.model.SensorReading
@@ -234,6 +239,198 @@ class TursoSync(
             createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
         )
     }
+
+    // MARK: - Course Operations
+
+    suspend fun pullCourses(): List<Course> {
+        try {
+            val response = httpClient.get("$baseURL/api/courses")
+            if (response.status != HttpStatusCode.OK) return emptyList()
+
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            return arr.mapNotNull { parseCourse(it.jsonObject) }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pullCourses"))
+            throw e
+        }
+    }
+
+    suspend fun pullCourseDetail(slug: String): CourseDetail? {
+        try {
+            val response = httpClient.get("$baseURL/api/courses/$slug")
+            if (response.status != HttpStatusCode.OK) return null
+
+            val body = response.bodyAsText()
+            val obj = json.parseToJsonElement(body).jsonObject
+            return parseCourseDetail(obj)
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pullCourseDetail"))
+            throw e
+        }
+    }
+
+    suspend fun pullContentBlocks(slug: String, phaseId: String, moduleId: String): List<ContentBlock> {
+        try {
+            val response = httpClient.get("$baseURL/api/courses/$slug/phases/$phaseId/modules/$moduleId/blocks")
+            if (response.status != HttpStatusCode.OK) return emptyList()
+
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            return arr.mapNotNull { parseContentBlock(it.jsonObject) }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pullContentBlocks"))
+            throw e
+        }
+    }
+
+    suspend fun enrollInCourse(courseId: String): CourseEnrollment? {
+        try {
+            val response = httpClient.post("$baseURL/api/enrollments") {
+                contentType(ContentType.Application.Json)
+                setBody(buildJsonObject {
+                    put("course_id", courseId)
+                }.toString())
+            }
+            if (response.status != HttpStatusCode.Created && response.status != HttpStatusCode.OK) return null
+
+            val body = response.bodyAsText()
+            return parseEnrollment(json.parseToJsonElement(body).jsonObject)
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "enrollInCourse"))
+            throw e
+        }
+    }
+
+    suspend fun completeModule(enrollmentId: String, moduleId: String, quizAnswers: String? = null) {
+        try {
+            val response = httpClient.post("$baseURL/api/enrollments/$enrollmentId/completions") {
+                contentType(ContentType.Application.Json)
+                setBody(buildJsonObject {
+                    put("module_id", moduleId)
+                    quizAnswers?.let { put("quiz_answers", json.parseToJsonElement(it)) }
+                }.toString())
+            }
+            if (response.status != HttpStatusCode.OK && response.status != HttpStatusCode.Created) {
+                throw TursoSyncException("Complete module failed: HTTP ${response.status.value}")
+            }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "completeModule"))
+            throw e
+        }
+    }
+
+    suspend fun pullEnrollments(userId: String): List<CourseEnrollment> {
+        try {
+            val response = httpClient.get("$baseURL/api/enrollments") {
+                parameter("user_id", userId)
+            }
+            if (response.status != HttpStatusCode.OK) return emptyList()
+
+            val body = response.bodyAsText()
+            val arr = json.parseToJsonElement(body).jsonArray
+            return arr.mapNotNull { parseEnrollment(it.jsonObject) }
+        } catch (e: Exception) {
+            Analytics.captureException(e, mapOf("operation" to "pullEnrollments"))
+            throw e
+        }
+    }
+
+    // MARK: - Course Parsing
+
+    private fun parseCourse(obj: JsonObject): Course? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val creatorId = obj["creator_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val title = obj["title"]?.jsonPrimitive?.contentOrNull ?: return null
+        val slug = obj["slug"]?.jsonPrimitive?.contentOrNull ?: return null
+
+        return Course(
+            id = id,
+            creatorId = creatorId,
+            creatorName = obj["creator_name"]?.jsonPrimitive?.contentOrNull,
+            title = title,
+            slug = slug,
+            description = obj["description"]?.jsonPrimitive?.contentOrNull,
+            coverImageUrl = obj["cover_image_url"]?.jsonPrimitive?.contentOrNull,
+            priceCents = obj["price_cents"]?.jsonPrimitive?.intOrNull ?: 0,
+            currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+            status = obj["status"]?.jsonPrimitive?.contentOrNull ?: "published",
+            enrollmentCount = obj["enrollment_count"]?.jsonPrimitive?.intOrNull,
+            createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
+            updatedAt = obj["updated_at"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
+    private fun parseCourseDetail(obj: JsonObject): CourseDetail? {
+        val course = parseCourse(obj) ?: return null
+        val phasesArr = obj["phases"]?.jsonArray ?: return CourseDetail(course, emptyList(), emptyMap())
+        val phases = phasesArr.mapNotNull { parseCoursePhase(it.jsonObject) }
+        val modules = mutableMapOf<String, List<PhaseModule>>()
+        for (phaseObj in phasesArr) {
+            val phaseId = phaseObj.jsonObject["id"]?.jsonPrimitive?.contentOrNull ?: continue
+            val modsArr = phaseObj.jsonObject["modules"]?.jsonArray ?: continue
+            modules[phaseId] = modsArr.mapNotNull { parsePhaseModule(it.jsonObject) }
+        }
+        return CourseDetail(course, phases, modules)
+    }
+
+    private fun parseCoursePhase(obj: JsonObject): CoursePhase? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val courseId = obj["course_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val title = obj["title"]?.jsonPrimitive?.contentOrNull ?: return null
+        return CoursePhase(
+            id = id, courseId = courseId, title = title,
+            description = obj["description"]?.jsonPrimitive?.contentOrNull,
+            sortOrder = obj["sort_order"]?.jsonPrimitive?.intOrNull ?: 0,
+            createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
+    private fun parsePhaseModule(obj: JsonObject): PhaseModule? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val phaseId = obj["phase_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val title = obj["title"]?.jsonPrimitive?.contentOrNull ?: return null
+        return PhaseModule(
+            id = id, phaseId = phaseId, title = title,
+            description = obj["description"]?.jsonPrimitive?.contentOrNull,
+            sortOrder = obj["sort_order"]?.jsonPrimitive?.intOrNull ?: 0,
+            createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
+    private fun parseContentBlock(obj: JsonObject): ContentBlock? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val moduleId = obj["module_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val blockType = obj["block_type"]?.jsonPrimitive?.contentOrNull ?: return null
+        val content = obj["content"]?.jsonPrimitive?.contentOrNull ?: return null
+        return ContentBlock(
+            id = id, moduleId = moduleId, blockType = blockType,
+            sortOrder = obj["sort_order"]?.jsonPrimitive?.intOrNull ?: 0,
+            content = content,
+            createdAt = obj["created_at"]?.jsonPrimitive?.contentOrNull,
+            updatedAt = obj["updated_at"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
+
+    private fun parseEnrollment(obj: JsonObject): CourseEnrollment? {
+        val id = obj["id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val userId = obj["user_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        val courseId = obj["course_id"]?.jsonPrimitive?.contentOrNull ?: return null
+        return CourseEnrollment(
+            id = id, userId = userId, courseId = courseId,
+            pricePaidCents = obj["price_paid_cents"]?.jsonPrimitive?.intOrNull ?: 0,
+            currency = obj["currency"]?.jsonPrimitive?.contentOrNull ?: "USD",
+            status = obj["status"]?.jsonPrimitive?.contentOrNull ?: "active",
+            enrolledAt = obj["enrolled_at"]?.jsonPrimitive?.contentOrNull,
+            completedAt = obj["completed_at"]?.jsonPrimitive?.contentOrNull,
+        )
+    }
 }
+
+data class CourseDetail(
+    val course: Course,
+    val phases: List<CoursePhase>,
+    val modules: Map<String, List<PhaseModule>>,
+)
 
 class TursoSyncException(message: String) : Exception(message)
