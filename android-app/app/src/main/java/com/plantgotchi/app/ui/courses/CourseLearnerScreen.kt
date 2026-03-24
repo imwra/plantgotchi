@@ -74,7 +74,7 @@ fun CourseLearnerScreen(
         val phase = phases.firstOrNull { modulesByPhase[it.id]?.any { m -> m.id == modId } == true } ?: return@LaunchedEffect
         try {
             blocks = app.tursoSync.pullContentBlocks(slug, phase.id, modId)
-            for (block in blocks) { app.database.courseDao().insertBlocks(listOf(block)) }
+            app.database.courseDao().insertBlocks(blocks)
         } catch (_: Exception) {
             blocks = app.database.courseDao().getBlocksByModule(modId)
         }
@@ -259,6 +259,8 @@ private fun VideoBlock(url: String, caption: String?) {
                 factory = { ctx ->
                     WebView(ctx).apply {
                         settings.javaScriptEnabled = true
+                        settings.allowFileAccess = false
+                        settings.allowContentAccess = false
                         webViewClient = WebViewClient()
                         loadUrl(embedUrl)
                     }

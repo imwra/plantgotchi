@@ -94,14 +94,15 @@ fun CourseDetailScreen(
                 Text(stringResource(R.string.courses_empty))
             }
         } else {
+            val c = course ?: return@Scaffold
             Column(
                 modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState())
             ) {
                 // Cover image
-                course!!.coverImageUrl?.let { url ->
+                c.coverImageUrl?.let { url ->
                     AsyncImage(
                         model = url,
-                        contentDescription = course!!.title,
+                        contentDescription = c.title,
                         modifier = Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp)),
                         contentScale = ContentScale.Crop,
                     )
@@ -109,8 +110,8 @@ fun CourseDetailScreen(
 
                 Column(modifier = Modifier.padding(16.dp)) {
                     // Title and creator
-                    Text(course!!.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                    course!!.creatorName?.let {
+                    Text(c.title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    c.creatorName?.let {
                         Text(stringResource(R.string.courses_by, it), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -132,11 +133,11 @@ fun CourseDetailScreen(
                                 isEnrolling = true
                                 scope.launch {
                                     try {
-                                        val newEnrollment = app.tursoSync.enrollInCourse(course!!.id)
+                                        val newEnrollment = app.tursoSync.enrollInCourse(c.id)
                                         if (newEnrollment != null) {
                                             app.database.enrollmentDao().insertEnrollment(newEnrollment)
                                             enrollment = newEnrollment
-                                            Analytics.track("course_enrolled", mapOf("course_id" to course!!.id, "price_cents" to course!!.priceCents))
+                                            Analytics.track("course_enrolled", mapOf("course_id" to c.id, "price_cents" to c.priceCents))
                                             onStartLearning(slug)
                                         }
                                     } catch (_: Exception) { }
@@ -149,14 +150,14 @@ fun CourseDetailScreen(
                     ) {
                         Text(
                             if (enrollment != null) stringResource(R.string.courses_continue)
-                            else if (course!!.priceCents == 0) stringResource(R.string.courses_enroll_free)
-                            else stringResource(R.string.courses_enroll_paid, "$${course!!.priceCents / 100.0}")
+                            else if (c.priceCents == 0) stringResource(R.string.courses_enroll_free)
+                            else stringResource(R.string.courses_enroll_paid, "$${c.priceCents / 100.0}")
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // About
-                    course!!.description?.let { desc ->
+                    c.description?.let { desc ->
                         Text(stringResource(R.string.courses_about), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(desc, style = MaterialTheme.typography.bodyMedium)
