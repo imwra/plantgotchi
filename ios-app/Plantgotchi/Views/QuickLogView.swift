@@ -26,7 +26,7 @@ struct QuickLogView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Quick Actions")
+            Text(S.quickActions)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
@@ -49,7 +49,7 @@ struct QuickLogView: View {
                 } label: {
                     HStack {
                         Image(systemName: "ruler")
-                        Text("Log Measurement")
+                        Text(S.logMeasurement)
                     }
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(PlantgotchiTheme.purple)

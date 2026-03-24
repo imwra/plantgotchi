@@ -29,16 +29,16 @@ struct PhaseTransitionView: View {
                 .padding()
             }
             .background(PlantgotchiTheme.background.ignoresSafeArea())
-            .navigationTitle("Phase Transition")
+            .navigationTitle(S.phaseTransition)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button(S.cancel) {
                         dismiss()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Confirm") {
+                    Button(S.confirm) {
                         confirmTransition()
                     }
                     .fontWeight(.semibold)
@@ -61,10 +61,10 @@ struct PhaseTransitionView: View {
             HStack(spacing: 16) {
                 // Current phase
                 VStack(spacing: 4) {
-                    Text("Current")
+                    Text(S.current)
                         .font(.caption2)
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-                    Text((plant.currentPhase?.rawValue ?? "none").capitalized)
+                    Text(S.phaseName(plant.currentPhase?.rawValue ?? "none"))
                         .font(PlantgotchiTheme.pixelFont(size: 11))
                         .foregroundColor(PlantgotchiTheme.green)
                         .padding(.horizontal, 12)
@@ -80,10 +80,10 @@ struct PhaseTransitionView: View {
 
                 // Target phase
                 VStack(spacing: 4) {
-                    Text("Target")
+                    Text(S.target)
                         .font(.caption2)
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-                    Text(targetPhase.rawValue.capitalized)
+                    Text(S.phaseName(targetPhase.rawValue))
                         .font(PlantgotchiTheme.pixelFont(size: 11))
                         .foregroundColor(.white)
                         .padding(.horizontal, 12)
@@ -102,33 +102,33 @@ struct PhaseTransitionView: View {
         let defaults = targetPhase.defaults
 
         return VStack(alignment: .leading, spacing: 12) {
-            Text("Recommended Thresholds")
+            Text(S.recommendedThresholds)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 thresholdTile(
                     icon: "thermometer.medium",
-                    label: "Temperature",
+                    label: S.temperature,
                     value: "\(Int(defaults.tempMinC))-\(Int(defaults.tempMaxC))\u{00B0}C",
                     color: PlantgotchiTheme.red
                 )
                 thresholdTile(
                     icon: "humidity",
-                    label: "Humidity",
+                    label: S.humidity,
                     value: "\(Int(defaults.rhMin))-\(Int(defaults.rhMax))%",
                     color: PlantgotchiTheme.blue
                 )
                 thresholdTile(
                     icon: "sun.max.fill",
-                    label: "Light Schedule",
+                    label: S.lightSchedule,
                     value: defaults.lightSchedule,
                     color: PlantgotchiTheme.yellow
                 )
                 thresholdTile(
                     icon: "leaf.fill",
-                    label: "Monitoring",
-                    value: targetPhase.hasMonitoring ? "Active" : "Off",
+                    label: S.monitoring,
+                    value: targetPhase.hasMonitoring ? S.active : S.off,
                     color: PlantgotchiTheme.green
                 )
             }
@@ -160,7 +160,7 @@ struct PhaseTransitionView: View {
 
     private var notesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Notes (optional)")
+            Text(S.notesOptional)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 

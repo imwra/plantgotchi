@@ -18,10 +18,10 @@ struct GrowView: View {
                         Image(systemName: "leaf.circle")
                             .font(.system(size: 48))
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
-                        Text("No grows yet")
+                        Text(S.noGrowsYet)
                             .font(PlantgotchiTheme.bodyFont)
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
-                        Text("Create a grow to group your plants")
+                        Text(S.createGrowDesc)
                             .font(PlantgotchiTheme.captionFont)
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
                     }
@@ -35,7 +35,7 @@ struct GrowView: View {
             .padding()
         }
         .background(PlantgotchiTheme.background.ignoresSafeArea())
-        .navigationTitle("Grows")
+        .navigationTitle(S.grows)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -78,7 +78,7 @@ struct GrowView: View {
             }
 
             if let startDate = grow.startDate {
-                Text("Started: \(String(startDate.prefix(10)))")
+                Text(S.started(String(startDate.prefix(10))))
                     .font(.caption2)
                     .foregroundColor(PlantgotchiTheme.text.opacity(0.4))
             }
@@ -89,25 +89,25 @@ struct GrowView: View {
     private var createGrowSheet: some View {
         NavigationStack {
             Form {
-                Section("Grow Name") {
+                Section(S.growName) {
                     TextField("e.g., Spring 2026 Tent A", text: $newGrowName)
                 }
-                Section("Environment") {
-                    Picker("Environment", selection: $newGrowEnvironment) {
-                        Text("Indoor").tag(GrowEnvironment.indoor)
-                        Text("Outdoor").tag(GrowEnvironment.outdoor)
+                Section(S.environment) {
+                    Picker(S.environment, selection: $newGrowEnvironment) {
+                        Text(S.indoor).tag(GrowEnvironment.indoor)
+                        Text(S.outdoor).tag(GrowEnvironment.outdoor)
                     }
                     .pickerStyle(.segmented)
                 }
             }
-            .navigationTitle("New Grow")
+            .navigationTitle(S.newGrow)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { showCreateGrow = false }
+                    Button(S.cancel) { showCreateGrow = false }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Create") {
+                    Button(S.create) {
                         createGrow()
                     }
                     .disabled(newGrowName.trimmingCharacters(in: .whitespaces).isEmpty)
