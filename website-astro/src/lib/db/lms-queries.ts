@@ -73,6 +73,12 @@ export interface ModuleCompletion {
   quiz_answers: string | null;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 // ── Helpers ──
 
 function generateSlug(title: string): string {
@@ -424,4 +430,97 @@ export async function getCourseWithContent(slug: string): Promise<(Course & { cr
   }));
 
   return { ...course, creator_name: creatorName, phases };
+}
+
+// ── Tag Queries ──
+
+export async function listTags(): Promise<Tag[]> {
+  const db = getDb();
+  const result = await db.execute({ sql: 'SELECT * FROM tags ORDER BY name', args: [] });
+  return result.rows as unknown as Tag[];
+}
+
+export async function getTagBySlug(slug: string): Promise<Tag | null> {
+  const db = getDb();
+  const result = await db.execute({ sql: 'SELECT * FROM tags WHERE slug = ?', args: [slug] });
+  return (result.rows[0] as unknown as Tag) || null;
+}
+
+export async function createTag(name: string): Promise<Tag> {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  await db.execute({ sql: 'INSERT INTO tags (id, name, slug) VALUES (?, ?, ?)', args: [id, name, slug] });
+  return { id, name, slug };
+}
+
+export async function addTagToCourse(courseId: string, tagId: string): Promise<void> {
+  const db = getDb();
+  await db.execute({ sql: 'INSERT OR IGNORE INTO course_tags (course_id, tag_id) VALUES (?, ?)', args: [courseId, tagId] });
+}
+
+export async function removeTagFromCourse(courseId: string, tagId: string): Promise<void> {
+  const db = getDb();
+  await db.execute({ sql: 'DELETE FROM course_tags WHERE course_id = ? AND tag_id = ?', args: [courseId, tagId] });
+}
+
+export async function getCourseTags(courseId: string): Promise<Tag[]> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: 'SELECT t.* FROM tags t JOIN course_tags ct ON t.id = ct.tag_id WHERE ct.course_id = ? ORDER BY t.name',
+    args: [courseId],
+  });
+  return result.rows as unknown as Tag[];
+}
+
+export async function searchCourses(
+  options: {
+    query?: string;
+    tagSlugs?: string[];
+    sort?: 'newest' | 'popular' | 'price_asc' | 'price_desc';
+    limit?: number;
+    offset?: number;
+  }
+): Promise<(Course & { creator_name: string; enrollment_count: number; tags: string[] })[]> {
+  const db = getDb();
+  const { query, tagSlugs, sort = 'newest', limit = 50, offset = 0 } = options;
+  const args: unknown[] = [];
+  let where = `c.status = 'published'`;
+
+  if (query && query.trim()) {
+    where += ` AND c.rowid IN (SELECT rowid FROM courses_fts WHERE courses_fts MATCH ?)`;
+    args.push(query.trim() + '*');
+  }
+
+  if (tagSlugs && tagSlugs.length > 0) {
+    const placeholders = tagSlugs.map(() => '?').join(',');
+    where += ` AND c.id IN (SELECT ct.course_id FROM course_tags ct JOIN tags t ON ct.tag_id = t.id WHERE t.slug IN (${placeholders}))`;
+    args.push(...tagSlugs);
+  }
+
+  const orderBy = {
+    newest: 'c.created_at DESC',
+    popular: 'enrollment_count DESC',
+    price_asc: 'c.price_cents ASC',
+    price_desc: 'c.price_cents DESC',
+  }[sort];
+
+  args.push(limit, offset);
+
+  const result = await db.execute({
+    sql: `SELECT c.*, cp.display_name as creator_name,
+      (SELECT COUNT(*) FROM course_enrollments ce WHERE ce.course_id = c.id) as enrollment_count,
+      (SELECT GROUP_CONCAT(t.slug, ',') FROM course_tags ct2 JOIN tags t ON ct2.tag_id = t.id WHERE ct2.course_id = c.id) as tag_slugs
+    FROM courses c
+    JOIN creator_profiles cp ON c.creator_id = cp.id
+    WHERE ${where}
+    ORDER BY ${orderBy}
+    LIMIT ? OFFSET ?`,
+    args,
+  });
+
+  return (result.rows as unknown as (Course & { creator_name: string; enrollment_count: number; tag_slugs: string | null })[]).map(r => ({
+    ...r,
+    tags: r.tag_slugs ? r.tag_slugs.split(',') : [],
+  }));
 }

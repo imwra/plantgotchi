@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { getSession } from "../../../lib/auth";
-import { getCreatorByUserId, listPublishedCourses, listCreatorCourses, createCourse } from "../../../lib/db/lms-queries";
+import { getCreatorByUserId, listCreatorCourses, createCourse, searchCourses } from "../../../lib/db/lms-queries";
 import { ServerAnalytics } from "../../../lib/analytics.server";
 
 export const GET: APIRoute = async ({ request, url }) => {
@@ -17,7 +17,12 @@ export const GET: APIRoute = async ({ request, url }) => {
     return new Response(JSON.stringify(courses), { headers: { "Content-Type": "application/json" } });
   }
 
-  const courses = await listPublishedCourses(limit, offset);
+  const query = url.searchParams.get("q") || undefined;
+  const tagParam = url.searchParams.get("tags");
+  const tagSlugs = tagParam ? tagParam.split(",") : undefined;
+  const sort = (url.searchParams.get("sort") as "newest" | "popular" | "price_asc" | "price_desc") || "newest";
+
+  const courses = await searchCourses({ query, tagSlugs, sort, limit, offset });
   return new Response(JSON.stringify(courses), { headers: { "Content-Type": "application/json" } });
 };
 

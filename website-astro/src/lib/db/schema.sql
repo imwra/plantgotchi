@@ -392,3 +392,49 @@ CREATE TABLE IF NOT EXISTS media_assets (
   created_at TEXT DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_media_assets_creator_id ON media_assets(creator_id);
+
+-- Tags for course categorization
+CREATE TABLE IF NOT EXISTS tags (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Course-tag join table
+CREATE TABLE IF NOT EXISTS course_tags (
+  course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+  tag_id TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  PRIMARY KEY (course_id, tag_id)
+);
+CREATE INDEX IF NOT EXISTS idx_course_tags_tag_id ON course_tags(tag_id);
+
+-- Full-text search on courses
+CREATE VIRTUAL TABLE IF NOT EXISTS courses_fts USING fts5(
+  title, description, content='courses', content_rowid='rowid'
+);
+
+-- Triggers to keep FTS in sync
+CREATE TRIGGER IF NOT EXISTS courses_ai AFTER INSERT ON courses BEGIN
+  INSERT INTO courses_fts(rowid, title, description) VALUES (new.rowid, new.title, new.description);
+END;
+CREATE TRIGGER IF NOT EXISTS courses_ad AFTER DELETE ON courses BEGIN
+  INSERT INTO courses_fts(courses_fts, rowid, title, description) VALUES ('delete', old.rowid, old.title, old.description);
+END;
+CREATE TRIGGER IF NOT EXISTS courses_au AFTER UPDATE ON courses BEGIN
+  INSERT INTO courses_fts(courses_fts, rowid, title, description) VALUES ('delete', old.rowid, old.title, old.description);
+  INSERT INTO courses_fts(rowid, title, description) VALUES (new.rowid, new.title, new.description);
+END;
+
+-- Seed default tags
+INSERT OR IGNORE INTO tags (id, name, slug) VALUES
+  ('tag-cultivation', 'Cultivation', 'cultivation'),
+  ('tag-genetics', 'Genetics', 'genetics'),
+  ('tag-nutrients', 'Nutrients', 'nutrients'),
+  ('tag-harvesting', 'Harvesting', 'harvesting'),
+  ('tag-processing', 'Processing', 'processing'),
+  ('tag-beginner', 'Beginner', 'beginner'),
+  ('tag-advanced', 'Advanced', 'advanced'),
+  ('tag-indoor', 'Indoor', 'indoor'),
+  ('tag-outdoor', 'Outdoor', 'outdoor'),
+  ('tag-organic', 'Organic', 'organic');
