@@ -10,19 +10,19 @@ struct GrowLogView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Grow Journal")
+            Text(S.growJournal)
                 .font(PlantgotchiTheme.pixelFont(size: 9))
                 .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
             // Filter chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    FilterChip(label: "All", isSelected: selectedPhase == nil) {
+                    FilterChip(label: S.all, isSelected: selectedPhase == nil) {
                         selectedPhase = nil
                     }
                     ForEach(Phase.allCases, id: \.self) { phase in
                         FilterChip(
-                            label: phase.rawValue.capitalized,
+                            label: S.phaseName(phase.rawValue),
                             isSelected: selectedPhase == phase
                         ) {
                             selectedPhase = phase
@@ -39,7 +39,7 @@ struct GrowLogView: View {
                         Image(systemName: "note.text")
                             .font(.title2)
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.3))
-                        Text("No journal entries yet")
+                        Text(S.noJournalEntries)
                             .font(PlantgotchiTheme.bodyFont)
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
                     }
@@ -87,7 +87,7 @@ struct GrowLogRow: View {
                         .font(PlantgotchiTheme.bodyFont.weight(.medium))
                         .foregroundColor(PlantgotchiTheme.text)
 
-                    Text(log.phase.rawValue.capitalized)
+                    Text(S.phaseName(log.phase.rawValue))
                         .font(.system(size: 9, weight: .medium, design: .rounded))
                         .foregroundColor(PlantgotchiTheme.green)
                         .padding(.horizontal, 6)

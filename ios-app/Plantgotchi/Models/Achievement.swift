@@ -84,17 +84,6 @@ enum AchievementDef: String, CaseIterable {
     }
 
     var label: String {
-        switch self {
-        case .firstSeed:    return "First Seed"
-        case .firstHarvest: return "First Harvest"
-        case .tenPlants:    return "Ten Plants"
-        case .firstTop:     return "First Top"
-        case .firstLST:     return "First LST"
-        case .speedGrow:    return "Speed Grow"
-        case .firstGram:    return "First Gram"
-        case .bigYield100g: return "Big Yield (100g)"
-        case .weekStreak:   return "Week Streak"
-        case .fiveStrains:  return "Five Strains"
-        }
+        S.achievementLabel(rawValue)
     }
 }

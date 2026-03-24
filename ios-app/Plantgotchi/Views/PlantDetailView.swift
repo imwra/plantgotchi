@@ -91,12 +91,12 @@ struct PlantDetailView: View {
                 Image(systemName: "leaf.circle.fill")
                     .foregroundColor(PlantgotchiTheme.green)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(currentPhase.rawValue.capitalized)
+                    Text(S.phaseName(currentPhase.rawValue))
                         .font(PlantgotchiTheme.pixelFont(size: 11))
                         .foregroundColor(PlantgotchiTheme.text)
                     if let startStr = plant.phaseStartedAt {
                         let days = daysInPhase(from: startStr)
-                        Text("Day \(days)")
+                        Text("\(S.day) \(days)")
                             .font(PlantgotchiTheme.captionFont)
                             .foregroundColor(PlantgotchiTheme.text.opacity(0.6))
                     }
@@ -122,7 +122,7 @@ struct PlantDetailView: View {
             // Phase labels
             HStack(spacing: 2) {
                 ForEach(Array(allPhases.enumerated()), id: \.offset) { idx, phase in
-                    Text(phaseAbbrev(phase))
+                    Text(S.phaseAbbrev(phase.rawValue))
                         .font(.system(size: 6, weight: .medium, design: .rounded))
                         .foregroundColor(
                             idx <= currentIdx
@@ -140,7 +140,7 @@ struct PlantDetailView: View {
                 } label: {
                     HStack {
                         Image(systemName: "arrow.right.circle.fill")
-                        Text("Advance to \(nextPhase.rawValue.capitalized)")
+                        Text(S.advanceTo(S.phaseName(nextPhase.rawValue)))
                     }
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundColor(.white)
@@ -160,19 +160,6 @@ struct PlantDetailView: View {
         guard let date = formatter.date(from: isoString)
                 ?? ISO8601DateFormatter().date(from: isoString) else { return 0 }
         return max(0, Int(Date().timeIntervalSince(date) / 86400))
-    }
-
-    private func phaseAbbrev(_ phase: Phase) -> String {
-        switch phase {
-        case .germination: return "GRM"
-        case .seedling:    return "SDL"
-        case .vegetative:  return "VEG"
-        case .flowering:   return "FLR"
-        case .drying:      return "DRY"
-        case .curing:      return "CUR"
-        case .processing:  return "PRC"
-        case .complete:    return "DON"
-        }
     }
 
     // MARK: - Header

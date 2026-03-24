@@ -24,29 +24,9 @@ enum GrowLogType: String, Codable, CaseIterable, Equatable {
     case cureCheck      = "cure_check"
     case processingLog  = "processing_log"
 
-    /// Human-readable label for display.
+    /// Human-readable label for display (localized via S enum).
     var label: String {
-        switch self {
-        case .phaseChange:   return "Phase Change"
-        case .watering:      return "Watering"
-        case .feeding:       return "Feeding"
-        case .topping:       return "Topping"
-        case .fimming:       return "FIMming"
-        case .lst:           return "LST"
-        case .defoliation:   return "Defoliation"
-        case .transplant:    return "Transplant"
-        case .flushing:      return "Flushing"
-        case .trichomeCheck: return "Trichome Check"
-        case .measurement:   return "Measurement"
-        case .environmental: return "Environmental"
-        case .photo:         return "Photo"
-        case .note:          return "Note"
-        case .harvest:       return "Harvest"
-        case .dryWeight:     return "Dry Weight"
-        case .dryCheck:      return "Dry Check"
-        case .cureCheck:     return "Cure Check"
-        case .processingLog: return "Processing Log"
-        }
+        S.growLogLabel(rawValue)
     }
 
     /// SF Symbol icon name.

@@ -19,7 +19,7 @@ struct AchievementsView: View {
                     Text("\(totalPoints)")
                         .font(PlantgotchiTheme.pixelFont(size: 20))
                         .foregroundColor(PlantgotchiTheme.text)
-                    Text("Total Points")
+                    Text(S.totalPoints)
                         .font(PlantgotchiTheme.captionFont)
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
                 }
@@ -29,7 +29,7 @@ struct AchievementsView: View {
 
                 // All achievements
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Achievements")
+                    Text(S.achievements)
                         .font(PlantgotchiTheme.pixelFont(size: 9))
                         .foregroundColor(PlantgotchiTheme.text.opacity(0.5))
 
@@ -43,7 +43,7 @@ struct AchievementsView: View {
             .padding()
         }
         .background(PlantgotchiTheme.background.ignoresSafeArea())
-        .navigationTitle("Achievements")
+        .navigationTitle(S.achievements)
         .navigationBarTitleDisplayMode(.inline)
         .task {
             loadAchievements()
@@ -61,7 +61,7 @@ struct AchievementsView: View {
                 Text(def.label)
                     .font(PlantgotchiTheme.bodyFont.weight(.medium))
                     .foregroundColor(unlocked ? PlantgotchiTheme.text : PlantgotchiTheme.text.opacity(0.3))
-                Text("\(def.points) pts")
+                Text(S.points(def.points))
                     .font(PlantgotchiTheme.captionFont)
                     .foregroundColor(unlocked ? PlantgotchiTheme.green : PlantgotchiTheme.text.opacity(0.2))
             }

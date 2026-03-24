@@ -156,4 +156,179 @@ enum S {
         default: return label
         }
     }
+
+    // MARK: - Phase Names
+    static func phaseName(_ phase: String) -> String {
+        guard isPt else { return phase.capitalized }
+        switch phase {
+        case "germination": return "Germinação"
+        case "seedling":    return "Muda"
+        case "vegetative":  return "Vegetativo"
+        case "flowering":   return "Floração"
+        case "drying":      return "Secagem"
+        case "curing":      return "Cura"
+        case "processing":  return "Processamento"
+        case "complete":    return "Completo"
+        default:            return phase.capitalized
+        }
+    }
+
+    static func phaseAbbrev(_ phase: String) -> String {
+        guard isPt else {
+            switch phase {
+            case "germination": return "GRM"
+            case "seedling":    return "SDL"
+            case "vegetative":  return "VEG"
+            case "flowering":   return "FLR"
+            case "drying":      return "DRY"
+            case "curing":      return "CUR"
+            case "processing":  return "PRC"
+            case "complete":    return "DON"
+            default:            return String(phase.prefix(3)).uppercased()
+            }
+        }
+        switch phase {
+        case "germination": return "GRM"
+        case "seedling":    return "MDA"
+        case "vegetative":  return "VEG"
+        case "flowering":   return "FLR"
+        case "drying":      return "SEC"
+        case "curing":      return "CUR"
+        case "processing":  return "PRC"
+        case "complete":    return "FIM"
+        default:            return String(phase.prefix(3)).uppercased()
+        }
+    }
+
+    // MARK: - Grow Log Types
+    static func growLogLabel(_ type: String) -> String {
+        guard isPt else {
+            switch type {
+            case "phase_change":   return "Phase Change"
+            case "watering":       return "Watering"
+            case "feeding":        return "Feeding"
+            case "topping":        return "Topping"
+            case "fimming":        return "FIMming"
+            case "lst":            return "LST"
+            case "defoliation":    return "Defoliation"
+            case "transplant":     return "Transplant"
+            case "flushing":       return "Flushing"
+            case "trichome_check": return "Trichome Check"
+            case "measurement":    return "Measurement"
+            case "environmental":  return "Environmental"
+            case "photo":          return "Photo"
+            case "note":           return "Note"
+            case "harvest":        return "Harvest"
+            case "dry_weight":     return "Dry Weight"
+            case "dry_check":      return "Dry Check"
+            case "cure_check":     return "Cure Check"
+            case "processing_log": return "Processing Log"
+            default:               return type.replacingOccurrences(of: "_", with: " ").capitalized
+            }
+        }
+        switch type {
+        case "phase_change":   return "Mudança de Fase"
+        case "watering":       return "Rega"
+        case "feeding":        return "Alimentação"
+        case "topping":        return "Topping"
+        case "fimming":        return "FIMming"
+        case "lst":            return "LST"
+        case "defoliation":    return "Desfolhação"
+        case "transplant":     return "Transplante"
+        case "flushing":       return "Lavagem"
+        case "trichome_check": return "Checagem de Tricomas"
+        case "measurement":    return "Medição"
+        case "environmental":  return "Ambiental"
+        case "photo":          return "Foto"
+        case "note":           return "Nota"
+        case "harvest":        return "Colheita"
+        case "dry_weight":     return "Peso Seco"
+        case "dry_check":      return "Checagem de Secagem"
+        case "cure_check":     return "Checagem de Cura"
+        case "processing_log": return "Registro de Processamento"
+        default:               return type.replacingOccurrences(of: "_", with: " ").capitalized
+        }
+    }
+
+    // MARK: - Achievement Labels
+    static func achievementLabel(_ key: String) -> String {
+        guard isPt else {
+            switch key {
+            case "first_seed":     return "First Seed"
+            case "first_harvest":  return "First Harvest"
+            case "ten_plants":     return "Ten Plants"
+            case "first_top":      return "First Top"
+            case "first_lst":      return "First LST"
+            case "speed_grow":     return "Speed Grow"
+            case "first_gram":     return "First Gram"
+            case "big_yield_100g": return "Big Yield (100g)"
+            case "week_streak":    return "Week Streak"
+            case "five_strains":   return "Five Strains"
+            default:               return key.replacingOccurrences(of: "_", with: " ").capitalized
+            }
+        }
+        switch key {
+        case "first_seed":     return "Primeira Semente"
+        case "first_harvest":  return "Primeira Colheita"
+        case "ten_plants":     return "Dez Plantas"
+        case "first_top":      return "Primeiro Topping"
+        case "first_lst":      return "Primeiro LST"
+        case "speed_grow":     return "Crescimento Rápido"
+        case "first_gram":     return "Primeiro Grama"
+        case "big_yield_100g": return "Grande Colheita (100g)"
+        case "week_streak":    return "Sequência Semanal"
+        case "five_strains":   return "Cinco Cepas"
+        default:               return key.replacingOccurrences(of: "_", with: " ").capitalized
+        }
+    }
+
+    // MARK: - Lifecycle Views
+    static var day: String { isPt ? "Dia" : "Day" }
+    static func advanceTo(_ phaseName: String) -> String {
+        isPt ? "Avançar para \(phaseName)" : "Advance to \(phaseName)"
+    }
+    static var growJournal: String { isPt ? "Diário de Cultivo" : "Grow Journal" }
+    static var all: String { isPt ? "Todos" : "All" }
+    static var noJournalEntries: String { isPt ? "Nenhuma entrada no diário ainda" : "No journal entries yet" }
+    static var phaseTransition: String { isPt ? "Transição de Fase" : "Phase Transition" }
+    static var confirm: String { isPt ? "Confirmar" : "Confirm" }
+    static var current: String { isPt ? "Atual" : "Current" }
+    static var target: String { isPt ? "Destino" : "Target" }
+    static var recommendedThresholds: String { isPt ? "Limiares Recomendados" : "Recommended Thresholds" }
+    static var humidity: String { isPt ? "Umidade do Ar" : "Humidity" }
+    static var lightSchedule: String { isPt ? "Fotoperíodo" : "Light Schedule" }
+    static var monitoring: String { isPt ? "Monitoramento" : "Monitoring" }
+    static var active: String { isPt ? "Ativo" : "Active" }
+    static var off: String { isPt ? "Desligado" : "Off" }
+    static var notesOptional: String { isPt ? "Notas (opcional)" : "Notes (optional)" }
+
+    // MARK: - Grows
+    static var grows: String { isPt ? "Cultivos" : "Grows" }
+    static var newGrow: String { isPt ? "Novo Cultivo" : "New Grow" }
+    static var noGrowsYet: String { isPt ? "Nenhum cultivo ainda" : "No grows yet" }
+    static var createGrowDesc: String { isPt ? "Crie um cultivo para agrupar suas plantas" : "Create a grow to group your plants" }
+    static var growName: String { isPt ? "Nome do Cultivo" : "Grow Name" }
+    static var create: String { isPt ? "Criar" : "Create" }
+    static func started(_ date: String) -> String {
+        isPt ? "Iniciado: \(date)" : "Started: \(date)"
+    }
+
+    // MARK: - Achievements
+    static var totalPoints: String { isPt ? "Pontos Totais" : "Total Points" }
+    static var achievements: String { isPt ? "Conquistas" : "Achievements" }
+    static func points(_ n: Int) -> String { "\(n) pts" }
+
+    // MARK: - Quick Actions
+    static var quickActions: String { isPt ? "Ações Rápidas" : "Quick Actions" }
+    static var logMeasurement: String { isPt ? "Registrar Medição" : "Log Measurement" }
+
+    // MARK: - Measurements
+    static var measurementType: String { isPt ? "Tipo de Medição" : "Measurement Type" }
+    static var value: String { isPt ? "Valor" : "Value" }
+    static var enterValue: String { isPt ? "Digite o valor" : "Enter value" }
+    static var saveMeasurement: String { isPt ? "Salvar Medição" : "Save Measurement" }
+    static var height: String { isPt ? "Altura" : "Height" }
+    static var ph: String { "pH" }
+    static var ecPpm: String { "EC / PPM" }
+    static var weight: String { isPt ? "Peso" : "Weight" }
 }

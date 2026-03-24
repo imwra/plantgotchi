@@ -22,10 +22,10 @@ struct AddMeasurementView: View {
 
         var label: String {
             switch self {
-            case .height: return "Height"
-            case .ph: return "pH"
-            case .ecPpm: return "EC / PPM"
-            case .weight: return "Weight"
+            case .height: return S.height
+            case .ph: return S.ph
+            case .ecPpm: return S.ecPpm
+            case .weight: return S.weight
             }
         }
 
@@ -60,7 +60,7 @@ struct AddMeasurementView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section("Measurement Type") {
+                Section(S.measurementType) {
                     Picker("Type", selection: $measurementType) {
                         ForEach(MeasurementType.allCases, id: \.self) { type in
                             HStack {
@@ -73,8 +73,8 @@ struct AddMeasurementView: View {
                     .pickerStyle(.menu)
                 }
 
-                Section("Value") {
-                    TextField("Enter value", text: $value)
+                Section(S.value) {
+                    TextField(S.enterValue, text: $value)
                         .keyboardType(.decimalPad)
 
                     if let units = measurementType.units {
@@ -93,7 +93,7 @@ struct AddMeasurementView: View {
                     } label: {
                         HStack {
                             Spacer()
-                            Text("Save Measurement")
+                            Text(S.saveMeasurement)
                                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                                 .foregroundColor(.white)
                             Spacer()
@@ -106,11 +106,11 @@ struct AddMeasurementView: View {
                     .listRowBackground(Color.clear)
                 }
             }
-            .navigationTitle("Log Measurement")
+            .navigationTitle(S.logMeasurement)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(S.cancel) { dismiss() }
                 }
             }
             .onChange(of: measurementType) { newType in
