@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+
 interface MediaUploaderProps {
   accept?: string;
   onUpload: (asset: { public_url: string; r2_key: string; filename: string; content_type: string; size_bytes: number }) => void;
@@ -10,8 +12,16 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const upload = useCallback(async (file: File) => {
+    setError(null);
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError('File too large (max 50 MB)');
+      return;
+    }
+
     setUploading(true);
     setProgress(0);
 
@@ -20,24 +30,34 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filename: file.name, content_type: file.type }),
     });
-    if (!res.ok) { setUploading(false); return; }
+    if (!res.ok) {
+      setError('Upload failed — unsupported file type or not signed in');
+      setUploading(false);
+      return;
+    }
     const { upload_url, r2_key, public_url } = await res.json();
 
     const xhr = new XMLHttpRequest();
     xhr.upload.onprogress = (e) => { if (e.lengthComputable) setProgress(Math.round(e.loaded / e.total * 100)); };
     xhr.onload = async () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        await fetch('/api/media', {
+        const metaRes = await fetch('/api/media', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filename: file.name, content_type: file.type, size_bytes: file.size, r2_key, public_url }),
         });
-        onUpload({ public_url, r2_key, filename: file.name, content_type: file.type, size_bytes: file.size });
+        if (metaRes.ok) {
+          onUpload({ public_url, r2_key, filename: file.name, content_type: file.type, size_bytes: file.size });
+        } else {
+          setError('Failed to save upload metadata');
+        }
+      } else {
+        setError('Upload to storage failed');
       }
       setUploading(false);
       setProgress(0);
     };
-    xhr.onerror = () => { setUploading(false); setProgress(0); };
+    xhr.onerror = () => { setUploading(false); setProgress(0); setError('Network error during upload'); };
     xhr.open('PUT', upload_url);
     xhr.setRequestHeader('Content-Type', file.type);
     xhr.send(file);
@@ -63,6 +83,7 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
           <input type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
         </label>
       )}
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
     </div>
   );
 }

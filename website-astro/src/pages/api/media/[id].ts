@@ -15,8 +15,8 @@ export const DELETE: APIRoute = async ({ request, params }) => {
   if (!asset) return new Response('Not found', { status: 404 });
   if (asset.creator_id !== creator.id) return new Response('Forbidden', { status: 403 });
 
-  await deleteObject(asset.r2_key);
   await deleteMediaAsset(asset.id);
+  try { await deleteObject(asset.r2_key); } catch { /* R2 cleanup best-effort */ }
 
   return new Response(null, { status: 204 });
 };

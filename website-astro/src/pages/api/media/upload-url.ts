@@ -10,7 +10,9 @@ export const POST: APIRoute = async ({ request }) => {
   const creator = await getCreatorByUserId(session.user.id);
   if (!creator) return new Response('Creator profile required', { status: 403 });
 
-  const { filename, content_type } = await request.json();
+  let body: { filename?: string; content_type?: string };
+  try { body = await request.json(); } catch { return new Response('Invalid JSON', { status: 400 }); }
+  const { filename, content_type } = body;
   if (!filename || !content_type) return new Response('filename and content_type required', { status: 400 });
 
   const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'application/pdf'];

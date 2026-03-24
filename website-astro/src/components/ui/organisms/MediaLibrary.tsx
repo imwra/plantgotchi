@@ -69,7 +69,7 @@ export default function MediaLibrary({ accept = 'image/*,video/*', onSelect, onC
                   <div className="p-1.5 text-xs text-text-light truncate">{asset.filename}</div>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDelete(asset.id); }}
-                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 bg-red-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center transition-opacity"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 bg-danger text-white rounded-full w-5 h-5 text-xs flex items-center justify-center transition-opacity"
                   >&times;</button>
                 </div>
               ))}

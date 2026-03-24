@@ -21,14 +21,12 @@ function getClient(): S3Client {
 
 export async function generateUploadUrl(
   key: string,
-  contentType: string,
-  maxSizeBytes = 50 * 1024 * 1024
+  contentType: string
 ): Promise<string> {
   const command = new PutObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,
     ContentType: contentType,
-    ContentLength: maxSizeBytes,
   });
   return getSignedUrl(getClient(), command, { expiresIn: 600 });
 }
