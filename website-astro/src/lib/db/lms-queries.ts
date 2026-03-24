@@ -50,7 +50,7 @@ export interface PhaseModule {
 export interface ModuleContentBlock {
   id: string;
   module_id: string;
-  block_type: 'video' | 'text' | 'quiz';
+  block_type: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code';
   sort_order: number;
   content: string;
   created_at: string;
@@ -71,6 +71,9 @@ export interface ModuleCompletion {
   user_id: string;
   completed_at: string;
   quiz_answers: string | null;
+  quiz_score: number | null;
+  quiz_passed: number | null; // 0 or 1
+  attempt_number: number;
 }
 
 export interface Tag {
@@ -293,7 +296,7 @@ export async function listContentBlocks(moduleId: string): Promise<ModuleContent
   return result.rows as unknown as ModuleContentBlock[];
 }
 
-export async function createContentBlock(moduleId: string, blockType: 'video' | 'text' | 'quiz', content: string): Promise<ModuleContentBlock> {
+export async function createContentBlock(moduleId: string, blockType: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code', content: string): Promise<ModuleContentBlock> {
   const db = getDb();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
@@ -369,6 +372,61 @@ export async function completeModule(moduleId: string, userId: string, quizAnswe
   });
   const result = await db.execute({ sql: 'SELECT * FROM module_completions WHERE module_id = ? AND user_id = ?', args: [moduleId, userId] });
   return result.rows[0] as unknown as ModuleCompletion;
+}
+
+export async function completeModuleWithScore(
+  moduleId: string,
+  userId: string,
+  quizAnswers: string,
+  quizScore: number,
+  passThreshold: number,
+): Promise<{ passed: boolean; attemptNumber: number }> {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const passed = quizScore >= passThreshold;
+
+  // Get current attempt count for this user+module
+  const existing = await db.execute({
+    sql: 'SELECT COUNT(*) as count FROM module_completions WHERE user_id = ? AND module_id = ?',
+    args: [userId, moduleId],
+  });
+  const attemptNumber = ((existing.rows[0] as unknown as { count: number }).count) + 1;
+
+  if (!passed) {
+    // Record failed attempt (quiz_passed = 0)
+    await db.execute({
+      sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers, quiz_score, quiz_passed, attempt_number)
+            VALUES (?, ?, ?, ?, ?, ?, 0, ?)`,
+      args: [id, moduleId, userId, now, quizAnswers, quizScore, attemptNumber],
+    });
+    return { passed: false, attemptNumber };
+  }
+
+  // Delete previous failed attempts, insert passing record
+  await db.execute({
+    sql: 'DELETE FROM module_completions WHERE user_id = ? AND module_id = ? AND quiz_passed = 0',
+    args: [userId, moduleId],
+  });
+  await db.execute({
+    sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers, quiz_score, quiz_passed, attempt_number)
+          VALUES (?, ?, ?, ?, ?, ?, 1, ?)`,
+    args: [id, moduleId, userId, now, quizAnswers, quizScore, attemptNumber],
+  });
+
+  return { passed: true, attemptNumber };
+}
+
+export async function getQuizAttempts(
+  userId: string,
+  moduleId: string,
+): Promise<ModuleCompletion[]> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: 'SELECT * FROM module_completions WHERE user_id = ? AND module_id = ? ORDER BY attempt_number',
+    args: [userId, moduleId],
+  });
+  return result.rows as unknown as ModuleCompletion[];
 }
 
 export interface CourseProgress {

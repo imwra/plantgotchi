@@ -3,7 +3,7 @@ import ContentBlockEditor from '../molecules/ContentBlockEditor';
 import MediaLibrary from './MediaLibrary';
 import { Analytics } from '../../../lib/analytics';
 
-interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
+interface Block { id: string; block_type: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code'; content: string; sort_order: number }
 interface Module { id: string; title: string; is_preview: number; blocks: Block[] }
 interface Phase { id: string; title: string; description: string | null; sort_order: number; modules: Module[] }
 interface CourseData { id: string; title: string; slug: string; description: string | null; price_cents: number; currency: string; status: string; cover_image_url: string | null; phases: Phase[] }
@@ -82,11 +82,19 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     }
   };
 
-  const addBlock = async (moduleId: string, blockType: 'video' | 'text' | 'quiz') => {
+  const addBlock = async (moduleId: string, blockType: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code') => {
     if (!slug) return;
     const phase = phases.find(p => p.modules.some(m => m.id === moduleId));
     if (!phase) return;
-    const defaultContent = blockType === 'text' ? '{"markdown":""}' : blockType === 'video' ? '{"url":"","caption":""}' : '{"question":"","options":["","","",""],"correct_index":0,"explanation":""}';
+    const defaultContentMap: Record<string, string> = {
+      text: '{"markdown":""}',
+      video: '{"url":"","caption":""}',
+      quiz: '{"question":"","options":["","","",""],"correct_index":0,"explanation":""}',
+      image: '{"url":"","alt":"","caption":""}',
+      file: '{"url":"","filename":"","description":""}',
+      code: '{"language":"javascript","code":"","caption":""}',
+    };
+    const defaultContent = defaultContentMap[blockType];
     const res = await fetch(`/api/courses/${slug}/phases/${phase.id}/modules/${moduleId}/blocks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ block_type: blockType, content: defaultContent }) });
     if (res.ok) {
       const block = await res.json();
@@ -199,6 +207,9 @@ export default function CourseEditor({ slug }: { slug?: string }) {
                     <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Text</button>
                     <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Video</button>
                     <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Quiz</button>
+                    <button onClick={() => addBlock(activeModule.id, 'image')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Image</button>
+                    <button onClick={() => addBlock(activeModule.id, 'file')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ File</button>
+                    <button onClick={() => addBlock(activeModule.id, 'code')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Code</button>
                   </div>
                 </div>
               ) : activePhase ? (

@@ -278,3 +278,61 @@ export async function runLmsMigrations(): Promise<string[]> {
 
   return tables;
 }
+
+export async function runLmsMigrationV2() {
+  const db = getDb();
+
+  // Check if migration already ran by looking for 'image' in an existing block
+  // (idempotency: if the v2 table already exists with expanded CHECK, skip)
+  try {
+    await db.execute({ sql: `SELECT 1 FROM module_content_blocks WHERE block_type = 'image' LIMIT 0`, args: [] });
+    // If no error, the expanded CHECK already exists — skip content blocks recreation
+  } catch {
+    // 1. Recreate module_content_blocks with expanded CHECK
+    await db.execute({
+      sql: `CREATE TABLE IF NOT EXISTS module_content_blocks_v2 (
+        id TEXT PRIMARY KEY,
+        module_id TEXT NOT NULL REFERENCES phase_modules(id) ON DELETE CASCADE,
+        block_type TEXT NOT NULL CHECK(block_type IN ('video', 'text', 'quiz', 'image', 'file', 'code')),
+        sort_order INTEGER NOT NULL,
+        content TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now'))
+      )`,
+      args: [],
+    });
+    await db.execute({ sql: `INSERT OR IGNORE INTO module_content_blocks_v2 SELECT * FROM module_content_blocks`, args: [] });
+    await db.execute({ sql: `DROP TABLE IF EXISTS module_content_blocks`, args: [] });
+    await db.execute({ sql: `ALTER TABLE module_content_blocks_v2 RENAME TO module_content_blocks`, args: [] });
+    await db.execute({ sql: `CREATE INDEX IF NOT EXISTS idx_content_blocks_module_id_sort ON module_content_blocks(module_id, sort_order)`, args: [] });
+  }
+
+  // 2. Recreate module_completions to drop UNIQUE constraint and add scoring columns
+  // Check if scoring columns already exist
+  try {
+    await db.execute({ sql: `SELECT quiz_score FROM module_completions LIMIT 0`, args: [] });
+    // Already migrated, skip
+  } catch {
+    await db.execute({
+      sql: `CREATE TABLE IF NOT EXISTS module_completions_v2 (
+        id TEXT PRIMARY KEY,
+        module_id TEXT NOT NULL REFERENCES phase_modules(id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL,
+        completed_at TEXT DEFAULT (datetime('now')),
+        quiz_answers TEXT,
+        quiz_score REAL,
+        quiz_passed INTEGER,
+        attempt_number INTEGER DEFAULT 1
+      )`,
+      args: [],
+    });
+    await db.execute({
+      sql: `INSERT OR IGNORE INTO module_completions_v2 (id, module_id, user_id, completed_at, quiz_answers, quiz_score, quiz_passed, attempt_number) SELECT id, module_id, user_id, completed_at, quiz_answers, NULL, 1, 1 FROM module_completions`,
+      args: [],
+    });
+    await db.execute({ sql: `DROP TABLE IF EXISTS module_completions`, args: [] });
+    await db.execute({ sql: `ALTER TABLE module_completions_v2 RENAME TO module_completions`, args: [] });
+    await db.execute({ sql: `CREATE INDEX IF NOT EXISTS idx_module_completions_user_id ON module_completions(user_id)`, args: [] });
+    await db.execute({ sql: `CREATE INDEX IF NOT EXISTS idx_module_completions_module_id ON module_completions(module_id)`, args: [] });
+  }
+}
