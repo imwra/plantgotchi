@@ -204,5 +204,48 @@ struct Schema {
                 FROM care_logs
                 """)
         }
+
+        // MARK: - v3: LMS course cache tables
+
+        migrator.registerMigration("v3_lms_courses") { db in
+            // Courses cache
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS courses (
+                    id TEXT PRIMARY KEY,
+                    creator_id TEXT NOT NULL,
+                    creator_name TEXT,
+                    title TEXT NOT NULL,
+                    slug TEXT NOT NULL UNIQUE,
+                    description TEXT,
+                    cover_image_url TEXT,
+                    price_cents INTEGER NOT NULL DEFAULT 0,
+                    currency TEXT NOT NULL DEFAULT 'USD',
+                    status TEXT NOT NULL DEFAULT 'published',
+                    enrollment_count INTEGER,
+                    created_at TEXT,
+                    updated_at TEXT
+                )
+                """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_courses_slug
+                ON courses(slug)
+                """)
+
+            // Enrollments cache
+            try db.execute(sql: """
+                CREATE TABLE IF NOT EXISTS course_enrollments (
+                    id TEXT PRIMARY KEY,
+                    course_id TEXT NOT NULL,
+                    user_id TEXT NOT NULL,
+                    price_paid_cents INTEGER NOT NULL DEFAULT 0,
+                    enrolled_at TEXT,
+                    UNIQUE(course_id, user_id)
+                )
+                """)
+            try db.execute(sql: """
+                CREATE INDEX IF NOT EXISTS idx_enrollments_user_course
+                ON course_enrollments(user_id, course_id)
+                """)
+        }
     }
 }
