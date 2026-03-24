@@ -27,7 +27,7 @@ export default function FileBlock({ url, filename, sizeBytes, description }: Fil
         <p className="font-pixel text-pixel-xs text-text truncate">{filename}</p>
         {description && <p className="text-xs text-text-mid">{description}</p>}
       </div>
-      {sizeBytes && (
+      {sizeBytes != null && sizeBytes > 0 && (
         <span className="text-xs text-text-mid whitespace-nowrap">{formatBytes(sizeBytes)}</span>
       )}
       <span className="font-pixel text-pixel-xs text-primary">Download</span>

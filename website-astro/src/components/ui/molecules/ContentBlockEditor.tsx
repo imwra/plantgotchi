@@ -54,10 +54,12 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
           <label className="flex items-center gap-2 text-sm text-text-mid">
             <input type="checkbox" checked={parsed.multi_select || false}
               onChange={e => {
-                updateField('multi_select', e.target.checked);
+                const updated = { ...parsed, multi_select: e.target.checked };
                 if (e.target.checked) {
-                  updateField('correct_indices', [parsed.correct_index ?? 0]);
+                  updated.correct_indices = [parsed.correct_index ?? 0];
                 }
+                setParsed(updated);
+                onChange(JSON.stringify(updated));
               }}
               className="accent-primary" />
             Multi-select (multiple correct answers)

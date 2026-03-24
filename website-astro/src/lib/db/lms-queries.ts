@@ -364,14 +364,21 @@ export async function listUserEnrollments(userId: string): Promise<(CourseEnroll
 
 export async function completeModule(moduleId: string, userId: string, quizAnswers?: string): Promise<ModuleCompletion> {
   const db = getDb();
+  // Guard: don't insert duplicate completions (UNIQUE constraint was removed in V2 migration)
+  const existing = await db.execute({
+    sql: 'SELECT * FROM module_completions WHERE module_id = ? AND user_id = ? AND (quiz_passed IS NULL OR quiz_passed = 1)',
+    args: [moduleId, userId],
+  });
+  if (existing.rows.length > 0) {
+    return existing.rows[0] as unknown as ModuleCompletion;
+  }
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await db.execute({
-    sql: `INSERT OR IGNORE INTO module_completions (id, module_id, user_id, completed_at, quiz_answers) VALUES (?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers) VALUES (?, ?, ?, ?, ?)`,
     args: [id, moduleId, userId, now, quizAnswers || null],
   });
-  const result = await db.execute({ sql: 'SELECT * FROM module_completions WHERE module_id = ? AND user_id = ?', args: [moduleId, userId] });
-  return result.rows[0] as unknown as ModuleCompletion;
+  return { id, module_id: moduleId, user_id: userId, completed_at: now, quiz_answers: quizAnswers || null } as unknown as ModuleCompletion;
 }
 
 export async function completeModuleWithScore(
@@ -453,7 +460,7 @@ export async function getCourseProgress(courseId: string, userId: string): Promi
     if (moduleIds.length > 0) {
       const placeholders = moduleIds.map(() => '?').join(',');
       const completions = await db.execute({
-        sql: `SELECT COUNT(*) as cnt FROM module_completions WHERE user_id = ? AND module_id IN (${placeholders})`,
+        sql: `SELECT COUNT(DISTINCT module_id) as cnt FROM module_completions WHERE user_id = ? AND module_id IN (${placeholders}) AND (quiz_passed IS NULL OR quiz_passed = 1)`,
         args: [userId, ...moduleIds],
       });
       completed = (completions.rows[0] as unknown as { cnt: number }).cnt;

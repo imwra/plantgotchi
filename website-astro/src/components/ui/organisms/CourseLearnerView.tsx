@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ModuleNavItem from '../molecules/ModuleNavItem';
 import VideoPlayer from '../molecules/VideoPlayer';
 import QuizBlock from '../molecules/QuizBlock';
@@ -64,17 +64,13 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
     }
   };
 
-  const handleCompleteWithScore = async (moduleId: string, quizAnswers: Record<string, unknown>, score: number, passThreshold: number) => {
+  const handleCompleteWithScore = async (moduleId: string, quizAnswers: Record<string, unknown>, score: number, _passThreshold: number) => {
     if (!course || !slug) return;
     try {
       const res = await fetch(`/api/courses/${slug}/modules/${moduleId}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quiz_answers: quizAnswers,
-          quiz_score: score,
-          pass_threshold: passThreshold,
-        }),
+        body: JSON.stringify({ quiz_answers: quizAnswers }),
       });
       const data = await res.json();
       if (data.passed) {
@@ -85,11 +81,17 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
     }
   };
 
+  const trackedVideoIds = useRef<Set<string>>(new Set());
+
   const renderBlock = (block: Block) => {
-    const parsed = JSON.parse(block.content);
+    let parsed;
+    try { parsed = JSON.parse(block.content); } catch { return <p key={block.id} className="text-sm text-danger">Invalid block content</p>; }
     switch (block.block_type) {
       case 'video':
-        Analytics.track('course_video_played', { course_id: course!.id, module_id: activeModuleId! });
+        if (!trackedVideoIds.current.has(block.id)) {
+          trackedVideoIds.current.add(block.id);
+          Analytics.track('course_video_played', { course_id: course!.id, module_id: activeModuleId! });
+        }
         return <VideoPlayer key={block.id} url={parsed.url} caption={parsed.caption} />;
       case 'text': return <div key={block.id} className="prose max-w-none"><p className="whitespace-pre-wrap text-sm text-text-mid">{parsed.markdown}</p></div>;
       case 'quiz':
