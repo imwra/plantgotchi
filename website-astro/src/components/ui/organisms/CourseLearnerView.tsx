@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ModuleNavItem from '../molecules/ModuleNavItem';
 import VideoPlayer from '../molecules/VideoPlayer';
 import QuizBlock from '../molecules/QuizBlock';
+import ImageBlock from '../molecules/ImageBlock';
+import FileBlock from '../molecules/FileBlock';
+import CodeBlock from '../molecules/CodeBlock';
 import ProgressRing from '../atoms/ProgressRing';
 import { Analytics } from '../../../lib/analytics';
 
-interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
+interface Block { id: string; block_type: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code'; content: string; sort_order: number }
 interface Module { id: string; title: string; is_preview: number; blocks: Block[] }
 interface Phase { id: string; title: string; modules: Module[] }
 interface CourseData { id: string; title: string; slug: string; phases: Phase[] }
@@ -61,18 +64,67 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
     }
   };
 
+  const handleCompleteWithScore = async (moduleId: string, quizAnswers: Record<string, unknown>, score: number, _passThreshold: number) => {
+    if (!course || !slug) return;
+    try {
+      const res = await fetch(`/api/courses/${slug}/modules/${moduleId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quiz_answers: quizAnswers }),
+      });
+      const data = await res.json();
+      if (data.passed) {
+        setCompletedModules(prev => new Set([...prev, moduleId]));
+      }
+    } catch (e) {
+      console.error('[CourseLearnerView] Failed to submit quiz score:', e);
+    }
+  };
+
+  const trackedVideoIds = useRef<Set<string>>(new Set());
+
   const renderBlock = (block: Block) => {
-    const parsed = JSON.parse(block.content);
+    let parsed;
+    try { parsed = JSON.parse(block.content); } catch { return <p key={block.id} className="text-sm text-danger">Invalid block content</p>; }
     switch (block.block_type) {
       case 'video':
-        Analytics.track('course_video_played', { course_id: course!.id, module_id: activeModuleId! });
+        if (!trackedVideoIds.current.has(block.id)) {
+          trackedVideoIds.current.add(block.id);
+          Analytics.track('course_video_played', { course_id: course!.id, module_id: activeModuleId! });
+        }
         return <VideoPlayer key={block.id} url={parsed.url} caption={parsed.caption} />;
       case 'text': return <div key={block.id} className="prose max-w-none"><p className="whitespace-pre-wrap text-sm text-text-mid">{parsed.markdown}</p></div>;
-      case 'quiz': return <QuizBlock key={block.id} question={parsed.question} options={parsed.options} correctIndex={parsed.correct_index} explanation={parsed.explanation} onAnswer={(idx) => {
-        const quizScore = idx === parsed.correct_index ? 1 : 0;
-        Analytics.track('course_quiz_submitted', { course_id: course!.id, module_id: activeModuleId!, quiz_score: quizScore });
-        handleComplete(activeModuleId!, { [block.id]: idx });
-      }} />;
+      case 'quiz':
+        return <QuizBlock
+          key={block.id}
+          question={parsed.question}
+          options={parsed.options}
+          correctIndex={parsed.correct_index}
+          correctIndices={parsed.correct_indices}
+          multiSelect={parsed.multi_select}
+          explanation={parsed.explanation}
+          passThreshold={parsed.pass_threshold}
+          maxAttempts={parsed.max_attempts}
+          onAnswer={(selectedIndices, score) => {
+            Analytics.track('course_quiz_submitted', {
+              course_id: course!.id,
+              module_id: activeModuleId!,
+              quiz_score: score,
+              multi_select: parsed.multi_select || false,
+            });
+            if (parsed.pass_threshold) {
+              handleCompleteWithScore(activeModuleId!, { [block.id]: selectedIndices }, score, parsed.pass_threshold);
+            } else {
+              handleComplete(activeModuleId!, { [block.id]: selectedIndices[0] });
+            }
+          }}
+        />;
+      case 'image':
+        return <ImageBlock key={block.id} url={parsed.url} alt={parsed.alt} caption={parsed.caption} />;
+      case 'file':
+        return <FileBlock key={block.id} url={parsed.url} filename={parsed.filename} sizeBytes={parsed.size_bytes} description={parsed.description} />;
+      case 'code':
+        return <CodeBlock key={block.id} language={parsed.language} code={parsed.code} caption={parsed.caption} />;
       default: return null;
     }
   };

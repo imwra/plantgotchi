@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import ContentBlockEditor from '../molecules/ContentBlockEditor';
+import MediaLibrary from './MediaLibrary';
 import { Analytics } from '../../../lib/analytics';
 
-interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
+interface Block { id: string; block_type: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code'; content: string; sort_order: number }
 interface Module { id: string; title: string; is_preview: number; blocks: Block[] }
 interface Phase { id: string; title: string; description: string | null; sort_order: number; modules: Module[] }
 interface CourseData { id: string; title: string; slug: string; description: string | null; price_cents: number; currency: string; status: string; cover_image_url: string | null; phases: Phase[] }
@@ -19,6 +20,8 @@ export default function CourseEditor({ slug }: { slug?: string }) {
   const [saving, setSaving] = useState(false);
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState<'cover' | { blockId: string } | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -79,11 +82,19 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     }
   };
 
-  const addBlock = async (moduleId: string, blockType: 'video' | 'text' | 'quiz') => {
+  const addBlock = async (moduleId: string, blockType: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code') => {
     if (!slug) return;
     const phase = phases.find(p => p.modules.some(m => m.id === moduleId));
     if (!phase) return;
-    const defaultContent = blockType === 'text' ? '{"markdown":""}' : blockType === 'video' ? '{"url":"","caption":""}' : '{"question":"","options":["","","",""],"correct_index":0,"explanation":""}';
+    const defaultContentMap: Record<string, string> = {
+      text: '{"markdown":""}',
+      video: '{"url":"","caption":""}',
+      quiz: '{"question":"","options":["","","",""],"correct_index":0,"explanation":""}',
+      image: '{"url":"","alt":"","caption":""}',
+      file: '{"url":"","filename":"","description":""}',
+      code: '{"language":"javascript","code":"","caption":""}',
+    };
+    const defaultContent = defaultContentMap[blockType];
     const res = await fetch(`/api/courses/${slug}/phases/${phase.id}/modules/${moduleId}/blocks`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ block_type: blockType, content: defaultContent }) });
     if (res.ok) {
       const block = await res.json();
@@ -146,6 +157,15 @@ export default function CourseEditor({ slug }: { slug?: string }) {
               <input type="number" value={priceCents} onChange={e => setPriceCents(Number(e.target.value))} className="block w-32 rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" min={0} />
             </label>
           </div>
+          {!isNew && (
+            <div className="flex gap-2 items-center">
+              {course?.cover_image_url && <img src={course.cover_image_url} alt="Cover" className="w-16 h-16 rounded object-cover" />}
+              <button onClick={() => { setMediaTarget('cover'); setShowMediaLibrary(true); }}
+                className="rounded-md border border-border-light px-3 py-1.5 text-sm text-text-mid hover:bg-bg-warm transition-colors">
+                {course?.cover_image_url ? 'Change Cover' : 'Upload Cover Image'}
+              </button>
+            </div>
+          )}
         </div>
 
         {!isNew && (
@@ -183,10 +203,13 @@ export default function CourseEditor({ slug }: { slug?: string }) {
                   {activeModule.blocks.sort((a, b) => a.sort_order - b.sort_order).map(block => (
                     <ContentBlockEditor key={block.id} blockType={block.block_type} content={block.content} onChange={(c) => updateBlock(block.id, c)} onDelete={() => deleteBlock(block.id)} />
                   ))}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Text</button>
                     <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Video</button>
                     <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Quiz</button>
+                    <button onClick={() => addBlock(activeModule.id, 'image')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Image</button>
+                    <button onClick={() => addBlock(activeModule.id, 'file')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ File</button>
+                    <button onClick={() => addBlock(activeModule.id, 'code')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Code</button>
                   </div>
                 </div>
               ) : activePhase ? (
@@ -198,6 +221,21 @@ export default function CourseEditor({ slug }: { slug?: string }) {
           </div>
         )}
       </div>
+
+      {showMediaLibrary && mediaTarget && (
+        <MediaLibrary
+          accept={mediaTarget === 'cover' ? 'image/*' : 'image/*,video/*'}
+          onClose={() => { setShowMediaLibrary(false); setMediaTarget(null); }}
+          onSelect={async (url) => {
+            if (mediaTarget === 'cover') {
+              await fetch(`/api/courses/${slug}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cover_image_url: url }) });
+              setCourse(prev => prev ? { ...prev, cover_image_url: url } : prev);
+            }
+            setShowMediaLibrary(false);
+            setMediaTarget(null);
+          }}
+        />
+      )}
     </div>
   );
 }

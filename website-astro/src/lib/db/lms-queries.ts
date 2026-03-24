@@ -50,7 +50,7 @@ export interface PhaseModule {
 export interface ModuleContentBlock {
   id: string;
   module_id: string;
-  block_type: 'video' | 'text' | 'quiz';
+  block_type: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code';
   sort_order: number;
   content: string;
   created_at: string;
@@ -71,6 +71,15 @@ export interface ModuleCompletion {
   user_id: string;
   completed_at: string;
   quiz_answers: string | null;
+  quiz_score: number | null;
+  quiz_passed: number | null; // 0 or 1
+  attempt_number: number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 // ── Helpers ──
@@ -287,7 +296,7 @@ export async function listContentBlocks(moduleId: string): Promise<ModuleContent
   return result.rows as unknown as ModuleContentBlock[];
 }
 
-export async function createContentBlock(moduleId: string, blockType: 'video' | 'text' | 'quiz', content: string): Promise<ModuleContentBlock> {
+export async function createContentBlock(moduleId: string, blockType: 'video' | 'text' | 'quiz' | 'image' | 'file' | 'code', content: string): Promise<ModuleContentBlock> {
   const db = getDb();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
@@ -355,14 +364,76 @@ export async function listUserEnrollments(userId: string): Promise<(CourseEnroll
 
 export async function completeModule(moduleId: string, userId: string, quizAnswers?: string): Promise<ModuleCompletion> {
   const db = getDb();
+  // Guard: don't insert duplicate completions (UNIQUE constraint was removed in V2 migration)
+  const existing = await db.execute({
+    sql: 'SELECT * FROM module_completions WHERE module_id = ? AND user_id = ? AND (quiz_passed IS NULL OR quiz_passed = 1)',
+    args: [moduleId, userId],
+  });
+  if (existing.rows.length > 0) {
+    return existing.rows[0] as unknown as ModuleCompletion;
+  }
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await db.execute({
-    sql: `INSERT OR IGNORE INTO module_completions (id, module_id, user_id, completed_at, quiz_answers) VALUES (?, ?, ?, ?, ?)`,
+    sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers) VALUES (?, ?, ?, ?, ?)`,
     args: [id, moduleId, userId, now, quizAnswers || null],
   });
-  const result = await db.execute({ sql: 'SELECT * FROM module_completions WHERE module_id = ? AND user_id = ?', args: [moduleId, userId] });
-  return result.rows[0] as unknown as ModuleCompletion;
+  return { id, module_id: moduleId, user_id: userId, completed_at: now, quiz_answers: quizAnswers || null } as unknown as ModuleCompletion;
+}
+
+export async function completeModuleWithScore(
+  moduleId: string,
+  userId: string,
+  quizAnswers: string,
+  quizScore: number,
+  passThreshold: number,
+): Promise<{ passed: boolean; attemptNumber: number }> {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const passed = quizScore >= passThreshold;
+
+  // Get current attempt count for this user+module
+  const existing = await db.execute({
+    sql: 'SELECT COUNT(*) as count FROM module_completions WHERE user_id = ? AND module_id = ?',
+    args: [userId, moduleId],
+  });
+  const attemptNumber = ((existing.rows[0] as unknown as { count: number }).count) + 1;
+
+  if (!passed) {
+    // Record failed attempt (quiz_passed = 0)
+    await db.execute({
+      sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers, quiz_score, quiz_passed, attempt_number)
+            VALUES (?, ?, ?, ?, ?, ?, 0, ?)`,
+      args: [id, moduleId, userId, now, quizAnswers, quizScore, attemptNumber],
+    });
+    return { passed: false, attemptNumber };
+  }
+
+  // Delete previous failed attempts, insert passing record
+  await db.execute({
+    sql: 'DELETE FROM module_completions WHERE user_id = ? AND module_id = ? AND quiz_passed = 0',
+    args: [userId, moduleId],
+  });
+  await db.execute({
+    sql: `INSERT INTO module_completions (id, module_id, user_id, completed_at, quiz_answers, quiz_score, quiz_passed, attempt_number)
+          VALUES (?, ?, ?, ?, ?, ?, 1, ?)`,
+    args: [id, moduleId, userId, now, quizAnswers, quizScore, attemptNumber],
+  });
+
+  return { passed: true, attemptNumber };
+}
+
+export async function getQuizAttempts(
+  userId: string,
+  moduleId: string,
+): Promise<ModuleCompletion[]> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: 'SELECT * FROM module_completions WHERE user_id = ? AND module_id = ? ORDER BY attempt_number',
+    args: [userId, moduleId],
+  });
+  return result.rows as unknown as ModuleCompletion[];
 }
 
 export interface CourseProgress {
@@ -389,7 +460,7 @@ export async function getCourseProgress(courseId: string, userId: string): Promi
     if (moduleIds.length > 0) {
       const placeholders = moduleIds.map(() => '?').join(',');
       const completions = await db.execute({
-        sql: `SELECT COUNT(*) as cnt FROM module_completions WHERE user_id = ? AND module_id IN (${placeholders})`,
+        sql: `SELECT COUNT(DISTINCT module_id) as cnt FROM module_completions WHERE user_id = ? AND module_id IN (${placeholders}) AND (quiz_passed IS NULL OR quiz_passed = 1)`,
         args: [userId, ...moduleIds],
       });
       completed = (completions.rows[0] as unknown as { cnt: number }).cnt;
@@ -424,4 +495,99 @@ export async function getCourseWithContent(slug: string): Promise<(Course & { cr
   }));
 
   return { ...course, creator_name: creatorName, phases };
+}
+
+// ── Tag Queries ──
+
+export async function listTags(): Promise<Tag[]> {
+  const db = getDb();
+  const result = await db.execute({ sql: 'SELECT * FROM tags ORDER BY name', args: [] });
+  return result.rows as unknown as Tag[];
+}
+
+export async function getTagBySlug(slug: string): Promise<Tag | null> {
+  const db = getDb();
+  const result = await db.execute({ sql: 'SELECT * FROM tags WHERE slug = ?', args: [slug] });
+  return (result.rows[0] as unknown as Tag) || null;
+}
+
+export async function createTag(name: string): Promise<Tag> {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  await db.execute({ sql: 'INSERT INTO tags (id, name, slug) VALUES (?, ?, ?)', args: [id, name, slug] });
+  return { id, name, slug };
+}
+
+export async function addTagToCourse(courseId: string, tagId: string): Promise<void> {
+  const db = getDb();
+  await db.execute({ sql: 'INSERT OR IGNORE INTO course_tags (course_id, tag_id) VALUES (?, ?)', args: [courseId, tagId] });
+}
+
+export async function removeTagFromCourse(courseId: string, tagId: string): Promise<void> {
+  const db = getDb();
+  await db.execute({ sql: 'DELETE FROM course_tags WHERE course_id = ? AND tag_id = ?', args: [courseId, tagId] });
+}
+
+export async function getCourseTags(courseId: string): Promise<Tag[]> {
+  const db = getDb();
+  const result = await db.execute({
+    sql: 'SELECT t.* FROM tags t JOIN course_tags ct ON t.id = ct.tag_id WHERE ct.course_id = ? ORDER BY t.name',
+    args: [courseId],
+  });
+  return result.rows as unknown as Tag[];
+}
+
+export async function searchCourses(
+  options: {
+    query?: string;
+    tagSlugs?: string[];
+    sort?: 'newest' | 'popular' | 'price_asc' | 'price_desc';
+    limit?: number;
+    offset?: number;
+  }
+): Promise<(Course & { creator_name: string; enrollment_count: number; tags: string[] })[]> {
+  const db = getDb();
+  const { query, tagSlugs, sort = 'newest', limit = 50, offset = 0 } = options;
+  const args: unknown[] = [];
+  let where = `c.status = 'published'`;
+
+  if (query && query.trim()) {
+    where += ` AND c.rowid IN (SELECT rowid FROM courses_fts WHERE courses_fts MATCH ?)`;
+    const sanitized = query.trim().replace(/['"()*]/g, '').replace(/\b(AND|OR|NOT|NEAR)\b/gi, '');
+    if (sanitized) args.push(sanitized + '*');
+    else where = where.replace(` AND c.rowid IN (SELECT rowid FROM courses_fts WHERE courses_fts MATCH ?)`, '');
+  }
+
+  if (tagSlugs && tagSlugs.length > 0) {
+    const placeholders = tagSlugs.map(() => '?').join(',');
+    where += ` AND c.id IN (SELECT ct.course_id FROM course_tags ct JOIN tags t ON ct.tag_id = t.id WHERE t.slug IN (${placeholders}))`;
+    args.push(...tagSlugs);
+  }
+
+  const orderBy = {
+    newest: 'c.created_at DESC',
+    popular: 'enrollment_count DESC',
+    price_asc: 'c.price_cents ASC',
+    price_desc: 'c.price_cents DESC',
+  }[sort];
+
+  args.push(limit, offset);
+
+  const result = await db.execute({
+    sql: `SELECT c.*, cp.display_name as creator_name,
+      (SELECT COUNT(*) FROM course_enrollments ce WHERE ce.course_id = c.id) as enrollment_count,
+      (SELECT GROUP_CONCAT(t.slug, ',') FROM course_tags ct2 JOIN tags t ON ct2.tag_id = t.id WHERE ct2.course_id = c.id) as tag_slugs
+    FROM courses c
+    JOIN creator_profiles cp ON c.creator_id = cp.id
+    WHERE ${where}
+    ORDER BY ${orderBy}
+    LIMIT ? OFFSET ?`,
+    args,
+  });
+
+  return (result.rows as unknown as (Course & { creator_name: string; enrollment_count: number; tag_slugs: string | null })[]).map(r => ({
+    ...r,
+    tags: r.tag_slugs ? r.tag_slugs.split(',') : [],
+  }));
 }

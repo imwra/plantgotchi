@@ -154,6 +154,69 @@ final class TursoSync {
         }
     }
 
+    // MARK: - Courses API
+
+    func fetchCourses(query: String? = nil, limit: Int = 50) async throws -> [Course] {
+        var path = "/api/courses?limit=\(limit)"
+        if let q = query, !q.isEmpty {
+            path += "&q=\(q.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? q)"
+        }
+
+        Analytics.log(level: .info, message: "Fetching courses", context: ["method": "fetchCourses"])
+        let (data, response) = try await httpClient.request(path: path)
+        guard response.statusCode == 200 else {
+            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        }
+        let decoder = JSONDecoder()
+        return try decoder.decode([Course].self, from: data)
+    }
+
+    func fetchCourseDetail(slug: String) async throws -> CourseWithContent {
+        let (data, response) = try await httpClient.request(path: "/api/courses/\(slug)")
+        guard response.statusCode == 200 else {
+            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        }
+        let decoder = JSONDecoder()
+        return try decoder.decode(CourseWithContent.self, from: data)
+    }
+
+    func enrollInCourse(slug: String) async throws -> CourseEnrollment {
+        let (data, response) = try await httpClient.request(
+            path: "/api/courses/\(slug)/enroll",
+            method: "POST",
+            body: Data("{}".utf8)
+        )
+        guard response.statusCode == 200 || response.statusCode == 201 else {
+            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        }
+        let decoder = JSONDecoder()
+        return try decoder.decode(CourseEnrollment.self, from: data)
+    }
+
+    func fetchCourseProgress(slug: String) async throws -> CourseProgress {
+        let (data, response) = try await httpClient.request(path: "/api/courses/\(slug)/progress")
+        guard response.statusCode == 200 else {
+            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        }
+        let decoder = JSONDecoder()
+        return try decoder.decode(CourseProgress.self, from: data)
+    }
+
+    func completeModule(slug: String, moduleId: String, quizAnswers: String? = nil) async throws {
+        var body: [String: Any] = [:]
+        if let qa = quizAnswers { body["quiz_answers"] = qa }
+        let jsonData = try JSONSerialization.data(withJSONObject: body)
+
+        let (_, response) = try await httpClient.request(
+            path: "/api/courses/\(slug)/modules/\(moduleId)/complete",
+            method: "POST",
+            body: jsonData
+        )
+        guard response.statusCode == 200 || response.statusCode == 201 else {
+            throw TursoSyncError.httpError(statusCode: response.statusCode)
+        }
+    }
+
     // MARK: - Parsing
 
     private func parsePlant(from dict: [String: Any]) -> Plant? {

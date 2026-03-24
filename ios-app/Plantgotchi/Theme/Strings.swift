@@ -331,4 +331,27 @@ enum S {
     static var ph: String { "pH" }
     static var ecPpm: String { "EC / PPM" }
     static var weight: String { isPt ? "Peso" : "Weight" }
+
+    // MARK: - Courses / LMS
+    static var courses: String { isPt ? "Cursos" : "Courses" }
+    static var courseCatalog: String { isPt ? "Catalogo de Cursos" : "Course Catalog" }
+    static var searchCourses: String { isPt ? "Buscar cursos..." : "Search courses..." }
+    static var noCourses: String { isPt ? "Nenhum curso disponivel" : "No courses available" }
+    static var free: String { isPt ? "Gratis" : "Free" }
+    static var enrollFree: String { isPt ? "Inscrever-se Gratuitamente" : "Enroll for Free" }
+    static func enrollPrice(_ price: String) -> String { isPt ? "Inscrever-se \u{00B7} \(price)" : "Enroll \u{00B7} \(price)" }
+    static var continueLearning: String { isPt ? "Continuar Aprendendo" : "Continue Learning" }
+    static var enrolled: String { isPt ? "Inscrito" : "Enrolled" }
+    static var students: String { isPt ? "alunos" : "students" }
+    static var modules: String { isPt ? "modulos" : "modules" }
+    static var courseContent: String { isPt ? "Conteudo do Curso" : "Course Content" }
+    static var markComplete: String { isPt ? "Marcar como Concluido" : "Mark as Complete" }
+    static var completed: String { isPt ? "Concluido" : "Completed" }
+    static var progress: String { isPt ? "Progresso" : "Progress" }
+    static var submitQuiz: String { isPt ? "Enviar Respostas" : "Submit Answers" }
+    static var correct: String { isPt ? "Correto!" : "Correct!" }
+    static var incorrect: String { isPt ? "Incorreto" : "Incorrect" }
+    static var nextModule: String { isPt ? "Proximo Modulo" : "Next Module" }
+    static var byCreator: String { isPt ? "por" : "by" }
+    static var previewLabel: String { isPt ? "Pré-visualização" : "Preview" }
 }

@@ -18,6 +18,7 @@ struct GardenView: View {
     @State private var showSettings = false
     @State private var showGrows = false
     @State private var showAchievements = false
+    @State private var showCourses = false
 
     private var userId: String { authService.userId ?? "default-user" }
 
@@ -82,6 +83,10 @@ struct GardenView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 12) {
+                        Button(action: { showCourses = true }) {
+                            Image(systemName: "book.fill")
+                                .foregroundColor(PlantgotchiTheme.text)
+                        }
                         Button(action: { showGrows = true }) {
                             Image(systemName: "leaf.circle")
                                 .foregroundColor(PlantgotchiTheme.text)
@@ -118,6 +123,11 @@ struct GardenView: View {
             .sheet(isPresented: $showAchievements) {
                 NavigationStack {
                     AchievementsView()
+                }
+            }
+            .sheet(isPresented: $showCourses) {
+                NavigationStack {
+                    CourseCatalogView()
                 }
             }
             .onAppear {
