@@ -35,6 +35,7 @@ export const DELETE: APIRoute = async ({ request, params }) => {
 
   const url = new URL(request.url);
   const tagId = url.searchParams.get('tag_id');
-  if (tagId) await removeTagFromCourse(course.id, tagId);
+  if (!tagId) return new Response('tag_id query parameter required', { status: 400 });
+  await removeTagFromCourse(course.id, tagId);
   return new Response(null, { status: 204 });
 };

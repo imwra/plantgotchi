@@ -489,7 +489,9 @@ export async function searchCourses(
 
   if (query && query.trim()) {
     where += ` AND c.rowid IN (SELECT rowid FROM courses_fts WHERE courses_fts MATCH ?)`;
-    args.push(query.trim() + '*');
+    const sanitized = query.trim().replace(/['"()*]/g, '').replace(/\b(AND|OR|NOT|NEAR)\b/gi, '');
+    if (sanitized) args.push(sanitized + '*');
+    else where = where.replace(` AND c.rowid IN (SELECT rowid FROM courses_fts WHERE courses_fts MATCH ?)`, '');
   }
 
   if (tagSlugs && tagSlugs.length > 0) {

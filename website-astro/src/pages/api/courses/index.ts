@@ -20,7 +20,9 @@ export const GET: APIRoute = async ({ request, url }) => {
   const query = url.searchParams.get("q") || undefined;
   const tagParam = url.searchParams.get("tags");
   const tagSlugs = tagParam ? tagParam.split(",") : undefined;
-  const sort = (url.searchParams.get("sort") as "newest" | "popular" | "price_asc" | "price_desc") || "newest";
+  const validSorts = ["newest", "popular", "price_asc", "price_desc"] as const;
+  const sortParam = url.searchParams.get("sort") || "newest";
+  const sort = (validSorts as readonly string[]).includes(sortParam) ? sortParam as typeof validSorts[number] : "newest";
 
   const courses = await searchCourses({ query, tagSlugs, sort, limit, offset });
   return new Response(JSON.stringify(courses), { headers: { "Content-Type": "application/json" } });

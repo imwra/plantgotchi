@@ -12,6 +12,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Search cours
   const timer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => { setLocal(value); }, [value]);
+  useEffect(() => () => clearTimeout(timer.current), []);
 
   function handleChange(v: string) {
     setLocal(v);
