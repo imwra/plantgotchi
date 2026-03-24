@@ -353,4 +353,5 @@ enum S {
     static var incorrect: String { isPt ? "Incorreto" : "Incorrect" }
     static var nextModule: String { isPt ? "Proximo Modulo" : "Next Module" }
     static var byCreator: String { isPt ? "por" : "by" }
+    static var previewLabel: String { isPt ? "Pré-visualização" : "Preview" }
 }

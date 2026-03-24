@@ -168,7 +168,6 @@ final class TursoSync {
             throw TursoSyncError.httpError(statusCode: response.statusCode)
         }
         let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode([Course].self, from: data)
     }
 
@@ -178,7 +177,6 @@ final class TursoSync {
             throw TursoSyncError.httpError(statusCode: response.statusCode)
         }
         let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(CourseWithContent.self, from: data)
     }
 
@@ -192,7 +190,6 @@ final class TursoSync {
             throw TursoSyncError.httpError(statusCode: response.statusCode)
         }
         let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(CourseEnrollment.self, from: data)
     }
 
@@ -202,7 +199,6 @@ final class TursoSync {
             throw TursoSyncError.httpError(statusCode: response.statusCode)
         }
         let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(CourseProgress.self, from: data)
     }
 

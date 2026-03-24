@@ -70,7 +70,7 @@ struct CourseDetailView: View {
                                             .font(PlantgotchiTheme.captionFont)
                                             .foregroundColor(PlantgotchiTheme.text.opacity(0.7))
                                         if moduleData.module.isPreview == 1 {
-                                            Text("Preview")
+                                            Text(S.previewLabel)
                                                 .font(.system(size: 8, weight: .medium))
                                                 .foregroundColor(PlantgotchiTheme.blue)
                                                 .padding(.horizontal, 4)

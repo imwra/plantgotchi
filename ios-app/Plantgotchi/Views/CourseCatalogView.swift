@@ -5,6 +5,7 @@ struct CourseCatalogView: View {
     @State private var courses: [Course] = []
     @State private var searchText = ""
     @State private var isLoading = true
+    @State private var searchTask: Task<Void, Never>?
 
     var body: some View {
         ScrollView {
@@ -48,7 +49,14 @@ struct CourseCatalogView: View {
         .background(PlantgotchiTheme.background.ignoresSafeArea())
         .navigationTitle(S.courses)
         .task { await loadCourses() }
-        .onChange(of: searchText) { _ in Task { await loadCourses() } }
+        .onChange(of: searchText) { _ in
+            searchTask?.cancel()
+            searchTask = Task {
+                try? await Task.sleep(nanoseconds: 300_000_000)
+                guard !Task.isCancelled else { return }
+                await loadCourses()
+            }
+        }
         .onAppear {
             Analytics.track("screen_viewed", properties: ["screen_name": "course_catalog"])
         }
