@@ -378,3 +378,17 @@ CREATE TABLE IF NOT EXISTS module_completions (
 );
 CREATE INDEX IF NOT EXISTS idx_module_completions_user_id ON module_completions(user_id);
 CREATE INDEX IF NOT EXISTS idx_module_completions_module_id ON module_completions(module_id);
+
+-- Media assets (uploaded files for course content)
+CREATE TABLE IF NOT EXISTS media_assets (
+  id TEXT PRIMARY KEY,
+  creator_id TEXT NOT NULL REFERENCES creator_profiles(id) ON DELETE CASCADE,
+  filename TEXT NOT NULL,
+  content_type TEXT NOT NULL,
+  size_bytes INTEGER NOT NULL,
+  r2_key TEXT NOT NULL UNIQUE,
+  public_url TEXT NOT NULL,
+  alt_text TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_media_assets_creator_id ON media_assets(creator_id);

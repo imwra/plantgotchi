@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ContentBlockEditor from '../molecules/ContentBlockEditor';
+import MediaLibrary from './MediaLibrary';
 import { Analytics } from '../../../lib/analytics';
 
 interface Block { id: string; block_type: 'video' | 'text' | 'quiz'; content: string; sort_order: number }
@@ -19,6 +20,8 @@ export default function CourseEditor({ slug }: { slug?: string }) {
   const [saving, setSaving] = useState(false);
   const [activePhaseId, setActivePhaseId] = useState<string | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState<'cover' | { blockId: string } | null>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -146,6 +149,15 @@ export default function CourseEditor({ slug }: { slug?: string }) {
               <input type="number" value={priceCents} onChange={e => setPriceCents(Number(e.target.value))} className="block w-32 rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" min={0} />
             </label>
           </div>
+          {!isNew && (
+            <div className="flex gap-2 items-center">
+              {course?.cover_image_url && <img src={course.cover_image_url} alt="Cover" className="w-16 h-16 rounded object-cover" />}
+              <button onClick={() => { setMediaTarget('cover'); setShowMediaLibrary(true); }}
+                className="rounded-md border border-border-light px-3 py-1.5 text-sm text-text-mid hover:bg-bg-warm transition-colors">
+                {course?.cover_image_url ? 'Change Cover' : 'Upload Cover Image'}
+              </button>
+            </div>
+          )}
         </div>
 
         {!isNew && (
@@ -183,10 +195,11 @@ export default function CourseEditor({ slug }: { slug?: string }) {
                   {activeModule.blocks.sort((a, b) => a.sort_order - b.sort_order).map(block => (
                     <ContentBlockEditor key={block.id} blockType={block.block_type} content={block.content} onChange={(c) => updateBlock(block.id, c)} onDelete={() => deleteBlock(block.id)} />
                   ))}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Text</button>
                     <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Video</button>
                     <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Quiz</button>
+                    <button onClick={() => { setMediaTarget({ blockId: '' }); setShowMediaLibrary(true); }} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">Browse Media</button>
                   </div>
                 </div>
               ) : activePhase ? (
@@ -198,6 +211,21 @@ export default function CourseEditor({ slug }: { slug?: string }) {
           </div>
         )}
       </div>
+
+      {showMediaLibrary && mediaTarget && (
+        <MediaLibrary
+          accept={mediaTarget === 'cover' ? 'image/*' : 'image/*,video/*'}
+          onClose={() => { setShowMediaLibrary(false); setMediaTarget(null); }}
+          onSelect={async (url) => {
+            if (mediaTarget === 'cover') {
+              await fetch(`/api/courses/${slug}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cover_image_url: url }) });
+              setCourse(prev => prev ? { ...prev, cover_image_url: url } : prev);
+            }
+            setShowMediaLibrary(false);
+            setMediaTarget(null);
+          }}
+        />
+      )}
     </div>
   );
 }
