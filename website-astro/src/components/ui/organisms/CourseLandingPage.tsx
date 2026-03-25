@@ -10,7 +10,23 @@ interface CourseDetail {
   phases: { id: string; title: string; description: string | null; modules: { id: string; title: string; is_preview: number }[] }[];
 }
 
-export default function CourseLandingPage({ slug }: { slug: string }) {
+const translations = {
+  en: {
+    loading: 'Loading...', notFound: 'Course not found',
+    by: 'by', modules: 'modules',
+    continueLearning: 'Continue Learning', enrolling: 'Enrolling...',
+    enrollFree: 'Enroll for Free', courseContent: 'Course Content',
+  },
+  'pt-br': {
+    loading: 'Carregando...', notFound: 'Curso nao encontrado',
+    by: 'por', modules: 'modulos',
+    continueLearning: 'Continuar Aprendendo', enrolling: 'Inscrevendo...',
+    enrollFree: 'Inscrever-se Gratis', courseContent: 'Conteudo do Curso',
+  },
+};
+
+export default function CourseLandingPage({ slug, locale = 'pt-br' }: { slug: string; locale?: 'pt-br' | 'en' }) {
+  const t = translations[locale];
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
@@ -43,10 +59,11 @@ export default function CourseLandingPage({ slug }: { slug: string }) {
     setEnrolling(false);
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">Loading...</div>;
-  if (!course) return <div className="flex min-h-screen items-center justify-center text-text-mid">Course not found</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">{t.loading}</div>;
+  if (!course) return <div className="flex min-h-screen items-center justify-center text-text-mid">{t.notFound}</div>;
 
   const totalModules = course.phases.reduce((sum, p) => sum + p.modules.length, 0);
+  const numLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-bg via-bg-warm to-bg p-8">
@@ -55,21 +72,21 @@ export default function CourseLandingPage({ slug }: { slug: string }) {
         <div className="mb-6 flex items-start justify-between">
           <div>
             <h1 className="font-pixel text-pixel-xl text-text">{course.title}</h1>
-            <p className="mt-1 text-sm text-text-mid">by {course.creator_name} · {totalModules} modules</p>
+            <p className="mt-1 text-sm text-text-mid">{t.by} {course.creator_name} · {totalModules} {t.modules}</p>
           </div>
-          <CoursePriceBadge priceCents={course.price_cents} currency={course.currency} />
+          <CoursePriceBadge priceCents={course.price_cents} currency={course.currency} locale={locale} />
         </div>
         {course.description && <div className="prose mb-8 max-w-none"><p className="text-sm text-text-mid whitespace-pre-wrap">{course.description}</p></div>}
         <div className="mb-8">
           {enrolled ? (
-            <a href={`/courses/${slug}/learn`} className="inline-block rounded-md border-2 border-primary-dark bg-primary px-6 py-3 font-pixel text-pixel-xs text-white hover:bg-primary-dark transition-colors">Continue Learning</a>
+            <a href={`/courses/${slug}/learn`} className="inline-block rounded-md border-2 border-primary-dark bg-primary px-6 py-3 font-pixel text-pixel-xs text-white hover:bg-primary-dark transition-colors">{t.continueLearning}</a>
           ) : (
             <button onClick={handleEnroll} disabled={enrolling} className="rounded-md border-2 border-primary-dark bg-primary px-6 py-3 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-50 transition-colors">
-              {enrolling ? 'Enrolling...' : course.price_cents === 0 ? 'Enroll for Free' : `Enroll · ${new Intl.NumberFormat('en-US', { style: 'currency', currency: course.currency }).format(course.price_cents / 100)}`}
+              {enrolling ? t.enrolling : course.price_cents === 0 ? t.enrollFree : `${t.enrollFree} · ${new Intl.NumberFormat(numLocale, { style: 'currency', currency: course.currency }).format(course.price_cents / 100)}`}
             </button>
           )}
         </div>
-        <h2 className="mb-4 font-pixel text-pixel-lg text-text">Course Content</h2>
+        <h2 className="mb-4 font-pixel text-pixel-lg text-text">{t.courseContent}</h2>
         <div className="space-y-3">
           {course.phases.map((phase, i) => (
             <PhaseAccordion key={phase.id} title={phase.title} description={phase.description} defaultOpen={i === 0} modules={phase.modules.map(m => ({ ...m, completed: false }))} onModuleClick={() => {}} />

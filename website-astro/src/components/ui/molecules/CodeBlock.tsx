@@ -4,9 +4,16 @@ interface CodeBlockProps {
   language: string;
   code: string;
   caption?: string;
+  locale?: 'pt-br' | 'en';
 }
 
-export default function CodeBlock({ language, code, caption }: CodeBlockProps) {
+const translations = {
+  en: { copy: 'Copy', copied: 'Copied!' },
+  'pt-br': { copy: 'Copiar', copied: 'Copiado!' },
+};
+
+export default function CodeBlock({ language, code, caption, locale = 'pt-br' }: CodeBlockProps) {
+  const t = translations[locale];
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -23,7 +30,7 @@ export default function CodeBlock({ language, code, caption }: CodeBlockProps) {
           onClick={handleCopy}
           className="font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors"
         >
-          {copied ? 'Copied!' : 'Copy'}
+          {copied ? t.copied : t.copy}
         </button>
       </div>
       <pre className="overflow-x-auto p-4">

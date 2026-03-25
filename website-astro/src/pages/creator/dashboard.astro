@@ -2,11 +2,15 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CreatorDashboard from "../../components/ui/organisms/CreatorDashboard";
 import { getSession } from "../../lib/auth";
+import { getLocaleFromPath } from "../../i18n";
 
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect("/login");
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const title = locale === "pt-br" ? "Painel do Criador" : "Creator Dashboard";
 ---
 
-<BaseLayout title="Creator Dashboard">
-  <CreatorDashboard client:load />
+<BaseLayout title={title}>
+  <CreatorDashboard client:load locale={locale} />
 </BaseLayout>

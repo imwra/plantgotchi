@@ -6,9 +6,36 @@ interface ContentBlockEditorProps {
   content: string;
   onChange: (content: string) => void;
   onDelete: () => void;
+  locale?: 'pt-br' | 'en';
 }
 
-export default function ContentBlockEditor({ blockType, content, onChange, onDelete }: ContentBlockEditorProps) {
+const translations = {
+  en: {
+    remove: 'Remove', markdownPlaceholder: 'Markdown content...',
+    videoUrl: 'Video URL (YouTube/Vimeo)', caption: 'Caption (optional)',
+    question: 'Question', multiSelect: 'Multi-select (multiple correct answers)',
+    explanation: 'Explanation shown after answering',
+    passThreshold: 'Pass threshold:', maxAttempts: 'Max attempts:',
+    imageUrl: 'Image URL', altText: 'Alt text (accessibility)',
+    fileUrl: 'File URL', filename: 'Filename (e.g. guide.pdf)',
+    fileSize: 'File size in bytes (optional)', description: 'Description (optional)',
+    codeSnippet: 'Code snippet...',
+  },
+  'pt-br': {
+    remove: 'Remover', markdownPlaceholder: 'Conteudo em Markdown...',
+    videoUrl: 'URL do Video (YouTube/Vimeo)', caption: 'Legenda (opcional)',
+    question: 'Pergunta', multiSelect: 'Multipla escolha (varias respostas corretas)',
+    explanation: 'Explicacao mostrada apos responder',
+    passThreshold: 'Limiar de aprovacao:', maxAttempts: 'Maximo de tentativas:',
+    imageUrl: 'URL da Imagem', altText: 'Texto alternativo (acessibilidade)',
+    fileUrl: 'URL do Arquivo', filename: 'Nome do arquivo (ex: guia.pdf)',
+    fileSize: 'Tamanho em bytes (opcional)', description: 'Descricao (opcional)',
+    codeSnippet: 'Trecho de codigo...',
+  },
+};
+
+export default function ContentBlockEditor({ blockType, content, onChange, onDelete, locale = 'pt-br' }: ContentBlockEditorProps) {
+  const t = translations[locale];
   const [parsed, setParsed] = useState(() => { try { return JSON.parse(content); } catch { return {}; } });
 
   const updateField = (field: string, value: unknown) => {
@@ -17,6 +44,8 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
     onChange(JSON.stringify(updated));
   };
 
+  const optionLabel = (i: number) => locale === 'pt-br' ? `Opcao ${i + 1}` : `Option ${i + 1}`;
+
   return (
     <div className="rounded-xl border border-border bg-bg-card p-3 shadow-sm">
       <div className="mb-2 flex items-center justify-between">
@@ -24,7 +53,7 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
           <ContentBlockIcon type={blockType} />
           <span className="font-pixel text-pixel-xs uppercase text-text-mid">{blockType}</span>
         </div>
-        <button onClick={onDelete} className="font-pixel text-pixel-xs text-danger hover:text-danger transition-colors">Remove</button>
+        <button onClick={onDelete} className="font-pixel text-pixel-xs text-danger hover:text-danger transition-colors">{t.remove}</button>
       </div>
 
       {blockType === 'text' && (
@@ -33,14 +62,14 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
           onChange={e => updateField('markdown', e.target.value)}
           className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
           rows={6}
-          placeholder="Markdown content..."
+          placeholder={t.markdownPlaceholder}
         />
       )}
 
       {blockType === 'video' && (
         <div className="space-y-2">
-          <input type="text" value={parsed.url || ''} onChange={e => updateField('url', e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" placeholder="Video URL (YouTube/Vimeo)" />
-          <input type="text" value={parsed.caption || ''} onChange={e => updateField('caption', e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" placeholder="Caption (optional)" />
+          <input type="text" value={parsed.url || ''} onChange={e => updateField('url', e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" placeholder={t.videoUrl} />
+          <input type="text" value={parsed.caption || ''} onChange={e => updateField('caption', e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" placeholder={t.caption} />
         </div>
       )}
 
@@ -48,7 +77,7 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
         <div className="space-y-2">
           <input type="text" value={parsed.question || ''} onChange={e => updateField('question', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Question" />
+            placeholder={t.question} />
 
           {/* Multi-select toggle */}
           <label className="flex items-center gap-2 text-sm text-text-mid">
@@ -62,7 +91,7 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
                 onChange(JSON.stringify(updated));
               }}
               className="accent-primary" />
-            Multi-select (multiple correct answers)
+            {t.multiSelect}
           </label>
 
           {(parsed.options || ['', '', '', '']).map((opt: string, i: number) => (
@@ -84,7 +113,7 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
               <input type="text" value={opt}
                 onChange={e => { const opts = [...(parsed.options || ['', '', '', ''])]; opts[i] = e.target.value; updateField('options', opts); }}
                 className="flex-1 rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-                placeholder={`Option ${i + 1}`} />
+                placeholder={optionLabel(i)} />
               {i === (parsed.options || []).length - 1 && (
                 <button onClick={() => updateField('options', [...(parsed.options || []), ''])}
                   className="font-pixel text-pixel-xs text-primary">+</button>
@@ -95,19 +124,19 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
                   opts.splice(i, 1);
                   updateField('options', opts);
                 }}
-                  className="font-pixel text-pixel-xs text-danger">×</button>
+                  className="font-pixel text-pixel-xs text-danger">&times;</button>
               )}
             </div>
           ))}
 
           <input type="text" value={parsed.explanation || ''} onChange={e => updateField('explanation', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Explanation shown after answering" />
+            placeholder={t.explanation} />
 
           {/* Scoring options */}
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-1 text-sm text-text-mid">
-              Pass threshold:
+              {t.passThreshold}
               <input type="number" min="0" max="100" step="10"
                 value={parsed.pass_threshold ? Math.round(parsed.pass_threshold * 100) : ''}
                 onChange={e => updateField('pass_threshold', (parseInt(e.target.value) || 0) / 100)}
@@ -115,12 +144,12 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
                 placeholder="%" />%
             </label>
             <label className="flex items-center gap-1 text-sm text-text-mid">
-              Max attempts:
+              {t.maxAttempts}
               <input type="number" min="1" max="10"
                 value={parsed.max_attempts || ''}
                 onChange={e => updateField('max_attempts', parseInt(e.target.value) || undefined)}
                 className="w-16 rounded-md border border-border-light bg-bg-warm p-1 text-sm text-text focus:border-border-accent focus:outline-none"
-                placeholder="∞" />
+                placeholder="\u221E" />
             </label>
           </div>
         </div>
@@ -130,13 +159,13 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
         <div className="space-y-2">
           <input type="text" value={parsed.url || ''} onChange={e => updateField('url', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Image URL" />
+            placeholder={t.imageUrl} />
           <input type="text" value={parsed.alt || ''} onChange={e => updateField('alt', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Alt text (accessibility)" />
+            placeholder={t.altText} />
           <input type="text" value={parsed.caption || ''} onChange={e => updateField('caption', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Caption (optional)" />
+            placeholder={t.caption} />
         </div>
       )}
 
@@ -144,16 +173,16 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
         <div className="space-y-2">
           <input type="text" value={parsed.url || ''} onChange={e => updateField('url', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="File URL" />
+            placeholder={t.fileUrl} />
           <input type="text" value={parsed.filename || ''} onChange={e => updateField('filename', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Filename (e.g. guide.pdf)" />
+            placeholder={t.filename} />
           <input type="number" value={parsed.size_bytes || ''} onChange={e => updateField('size_bytes', parseInt(e.target.value) || 0)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="File size in bytes (optional)" />
+            placeholder={t.fileSize} />
           <input type="text" value={parsed.description || ''} onChange={e => updateField('description', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Description (optional)" />
+            placeholder={t.description} />
         </div>
       )}
 
@@ -170,11 +199,11 @@ export default function ContentBlockEditor({ blockType, content, onChange, onDel
             onChange={e => updateField('code', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 font-mono text-sm text-text focus:border-border-accent focus:outline-none"
             rows={8}
-            placeholder="Code snippet..."
+            placeholder={t.codeSnippet}
           />
           <input type="text" value={parsed.caption || ''} onChange={e => updateField('caption', e.target.value)}
             className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none"
-            placeholder="Caption (optional)" />
+            placeholder={t.caption} />
         </div>
       )}
     </div>

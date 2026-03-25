@@ -14,9 +14,24 @@ interface MediaLibraryProps {
   accept?: string;
   onSelect: (url: string) => void;
   onClose: () => void;
+  locale?: 'pt-br' | 'en';
 }
 
-export default function MediaLibrary({ accept = 'image/*,video/*', onSelect, onClose }: MediaLibraryProps) {
+const translations = {
+  en: {
+    title: 'Media Library', uploadNew: 'Upload new file',
+    loading: 'Loading...', noMedia: 'No media yet. Upload a file above.',
+    video: 'video',
+  },
+  'pt-br': {
+    title: 'Biblioteca de Midia', uploadNew: 'Enviar novo arquivo',
+    loading: 'Carregando...', noMedia: 'Nenhuma midia ainda. Envie um arquivo acima.',
+    video: 'video',
+  },
+};
+
+export default function MediaLibrary({ accept = 'image/*,video/*', onSelect, onClose, locale = 'pt-br' }: MediaLibraryProps) {
+  const t = translations[locale];
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -44,19 +59,19 @@ export default function MediaLibrary({ accept = 'image/*,video/*', onSelect, onC
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-bg-card rounded-xl border-2 border-border max-w-3xl w-full max-h-[80vh] flex flex-col shadow-lg">
         <div className="flex items-center justify-between p-4 border-b border-border-light">
-          <h3 className="font-pixel text-pixel-sm text-text">Media Library</h3>
+          <h3 className="font-pixel text-pixel-sm text-text">{t.title}</h3>
           <button onClick={onClose} className="text-text-light hover:text-text-mid text-lg">&times;</button>
         </div>
 
         <div className="p-4 border-b border-border-light">
-          <MediaUploader accept={accept} label="Upload new file" onUpload={() => { loadAssets(); }} />
+          <MediaUploader accept={accept} label={t.uploadNew} locale={locale} onUpload={() => { loadAssets(); }} />
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
-            <p className="text-center text-text-light">Loading...</p>
+            <p className="text-center text-text-light">{t.loading}</p>
           ) : filtered.length === 0 ? (
-            <p className="text-center text-text-light">No media yet. Upload a file above.</p>
+            <p className="text-center text-text-light">{t.noMedia}</p>
           ) : (
             <div className="grid grid-cols-3 gap-3">
               {filtered.map(asset => (
@@ -64,7 +79,7 @@ export default function MediaLibrary({ accept = 'image/*,video/*', onSelect, onC
                   {asset.content_type.startsWith('image/') ? (
                     <img src={asset.public_url} alt={asset.filename} className="w-full h-32 object-cover" />
                   ) : (
-                    <div className="w-full h-32 bg-bg-warm flex items-center justify-center text-2xl text-text-light">video</div>
+                    <div className="w-full h-32 bg-bg-warm flex items-center justify-center text-2xl text-text-light">{t.video}</div>
                   )}
                   <div className="p-1.5 text-xs text-text-light truncate">{asset.filename}</div>
                   <button

@@ -14,7 +14,25 @@ interface Phase { id: string; title: string; modules: Module[] }
 interface CourseData { id: string; title: string; slug: string; phases: Phase[] }
 interface Progress { total_modules: number; completed_modules: number; phases: { phase_id: string; total: number; completed: number }[] }
 
-export default function CourseLearnerView({ slug }: { slug: string }) {
+const translations = {
+  en: {
+    loading: 'Loading...', notFound: 'Course not found',
+    backToCourse: '\u2190 Back to course', complete: '% complete',
+    markComplete: 'Mark as Complete', completed: 'Completed',
+    selectModule: 'Select a module to begin.',
+    invalidBlock: 'Invalid block content',
+  },
+  'pt-br': {
+    loading: 'Carregando...', notFound: 'Curso nao encontrado',
+    backToCourse: '\u2190 Voltar ao curso', complete: '% concluido',
+    markComplete: 'Marcar como Concluido', completed: 'Concluido',
+    selectModule: 'Selecione um modulo para comecar.',
+    invalidBlock: 'Conteudo de bloco invalido',
+  },
+};
+
+export default function CourseLearnerView({ slug, locale = 'pt-br' }: { slug: string; locale?: 'pt-br' | 'en' }) {
+  const t = translations[locale];
   const [course, setCourse] = useState<CourseData | null>(null);
   const [progress, setProgress] = useState<Progress | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
@@ -85,7 +103,7 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
 
   const renderBlock = (block: Block) => {
     let parsed;
-    try { parsed = JSON.parse(block.content); } catch { return <p key={block.id} className="text-sm text-danger">Invalid block content</p>; }
+    try { parsed = JSON.parse(block.content); } catch { return <p key={block.id} className="text-sm text-danger">{t.invalidBlock}</p>; }
     switch (block.block_type) {
       case 'video':
         if (!trackedVideoIds.current.has(block.id)) {
@@ -105,6 +123,7 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
           explanation={parsed.explanation}
           passThreshold={parsed.pass_threshold}
           maxAttempts={parsed.max_attempts}
+          locale={locale}
           onAnswer={(selectedIndices, score) => {
             Analytics.track('course_quiz_submitted', {
               course_id: course!.id,
@@ -122,15 +141,15 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
       case 'image':
         return <ImageBlock key={block.id} url={parsed.url} alt={parsed.alt} caption={parsed.caption} />;
       case 'file':
-        return <FileBlock key={block.id} url={parsed.url} filename={parsed.filename} sizeBytes={parsed.size_bytes} description={parsed.description} />;
+        return <FileBlock key={block.id} url={parsed.url} filename={parsed.filename} sizeBytes={parsed.size_bytes} description={parsed.description} locale={locale} />;
       case 'code':
-        return <CodeBlock key={block.id} language={parsed.language} code={parsed.code} caption={parsed.caption} />;
+        return <CodeBlock key={block.id} language={parsed.language} code={parsed.code} caption={parsed.caption} locale={locale} />;
       default: return null;
     }
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">Loading...</div>;
-  if (!course) return <div className="flex min-h-screen items-center justify-center text-text-mid">Course not found</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">{t.loading}</div>;
+  if (!course) return <div className="flex min-h-screen items-center justify-center text-text-mid">{t.notFound}</div>;
 
   const percent = progress ? Math.round((progress.completed_modules / Math.max(progress.total_modules, 1)) * 100) : 0;
 
@@ -138,11 +157,11 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
     <div className="flex min-h-screen bg-bg">
       {/* Sidebar */}
       <aside className="w-72 shrink-0 overflow-y-auto border-r border-border bg-bg-warm p-4">
-        <a href={`/courses/${slug}`} className="mb-2 block text-xs text-text-light hover:text-text-mid">&larr; Back to course</a>
+        <a href={`/courses/${slug}`} className="mb-2 block text-xs text-text-light hover:text-text-mid">{t.backToCourse}</a>
         <h2 className="mb-1 font-pixel text-pixel-lg text-text">{course.title}</h2>
         <div className="mb-4 flex items-center gap-2">
           <ProgressRing percent={percent} size={36} strokeWidth={3} />
-          <span className="font-pixel text-pixel-xs text-text-mid">{percent}% complete</span>
+          <span className="font-pixel text-pixel-xs text-text-mid">{percent}{t.complete}</span>
         </div>
         {course.phases.map(phase => (
           <div key={phase.id} className="mb-4">
@@ -169,12 +188,12 @@ export default function CourseLearnerView({ slug }: { slug: string }) {
                 disabled={completedModules.has(activeModule.id)}
                 className="mt-8 rounded-md border-2 border-primary-dark bg-primary px-6 py-2 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-40 transition-colors"
               >
-                {completedModules.has(activeModule.id) ? 'Completed' : 'Mark as Complete'}
+                {completedModules.has(activeModule.id) ? t.completed : t.markComplete}
               </button>
             )}
           </div>
         ) : (
-          <p className="text-sm text-text-mid">Select a module to begin.</p>
+          <p className="text-sm text-text-mid">{t.selectModule}</p>
         )}
       </main>
     </div>

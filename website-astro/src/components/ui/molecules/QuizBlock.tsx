@@ -12,13 +12,30 @@ interface QuizBlockProps {
   attemptNumber?: number;
   onAnswer: (selectedIndices: number[], score: number) => void;
   disabled?: boolean;
+  locale?: 'pt-br' | 'en';
 }
+
+const translations = {
+  en: {
+    selectAll: 'Select all that apply', submit: 'Submit',
+    score: 'Score', passed: 'Passed!',
+    needToPass: (pct: number) => `Need ${pct}% to pass`,
+    attempt: (cur: number, max: number) => `Attempt ${cur} of ${max}. You can retry.`,
+  },
+  'pt-br': {
+    selectAll: 'Selecione todas que se aplicam', submit: 'Enviar',
+    score: 'Pontuacao', passed: 'Aprovado!',
+    needToPass: (pct: number) => `Necessario ${pct}% para aprovacao`,
+    attempt: (cur: number, max: number) => `Tentativa ${cur} de ${max}. Voce pode tentar novamente.`,
+  },
+};
 
 export default function QuizBlock({
   question, options, correctIndex, correctIndices, multiSelect,
   explanation, passThreshold, maxAttempts, attemptNumber = 0,
-  onAnswer, disabled,
+  onAnswer, disabled, locale = 'pt-br',
 }: QuizBlockProps) {
+  const t = translations[locale];
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
@@ -45,8 +62,6 @@ export default function QuizBlock({
   const handleSubmit = () => {
     if (selected.size === 0) return;
     setSubmitted(true);
-
-    // Score = (correct selections - wrong selections) / total correct answers, clamped to [0, 1]
     let correctCount = 0;
     let wrongCount = 0;
     for (const i of selected) {
@@ -66,7 +81,7 @@ export default function QuizBlock({
       <div className="mb-1 flex items-center justify-between">
         <p className="font-pixel text-pixel-sm text-text">{question}</p>
         {isMulti && (
-          <span className="font-pixel text-pixel-xs text-text-mid">Select all that apply</span>
+          <span className="font-pixel text-pixel-xs text-text-mid">{t.selectAll}</span>
         )}
       </div>
       <div className="space-y-2 mt-3">
@@ -82,7 +97,7 @@ export default function QuizBlock({
               'border-border-light text-text-mid hover:border-border'
             }`}
           >
-            <span className="mr-2">{isMulti ? (selected.has(i) ? '☑' : '☐') : (selected.has(i) ? '●' : '○')}</span>
+            <span className="mr-2">{isMulti ? (selected.has(i) ? '\u2611' : '\u2610') : (selected.has(i) ? '\u25CF' : '\u25CB')}</span>
             {opt}
           </button>
         ))}
@@ -93,20 +108,20 @@ export default function QuizBlock({
           disabled={selected.size === 0}
           className="mt-3 rounded-md border-2 border-primary-dark bg-primary px-4 py-1 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-40 transition-colors"
         >
-          Submit
+          {t.submit}
         </button>
       )}
       {submitted && (
         <div className="mt-3 space-y-2">
           {passThreshold !== undefined && score !== null && (
             <p className={`font-pixel text-pixel-xs ${passed ? 'text-primary' : 'text-danger'}`}>
-              Score: {Math.round(score * 100)}% {passed ? '— Passed!' : `— Need ${Math.round(passThreshold * 100)}% to pass`}
+              {t.score}: {Math.round(score * 100)}% {passed ? `\u2014 ${t.passed}` : `\u2014 ${t.needToPass(Math.round(passThreshold * 100))}`}
             </p>
           )}
           <p className="text-sm text-text-mid">{explanation}</p>
           {canRetry && (
             <p className="font-pixel text-pixel-xs text-text-mid">
-              Attempt {attemptNumber} of {maxAttempts}. You can retry.
+              {t.attempt(attemptNumber, maxAttempts!)}
             </p>
           )}
         </div>
