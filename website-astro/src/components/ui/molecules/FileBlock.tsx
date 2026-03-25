@@ -5,7 +5,13 @@ interface FileBlockProps {
   filename: string;
   sizeBytes?: number;
   description?: string;
+  locale?: 'pt-br' | 'en';
 }
+
+const translations = {
+  en: { download: 'Download' },
+  'pt-br': { download: 'Baixar' },
+};
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -13,7 +19,8 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function FileBlock({ url, filename, sizeBytes, description }: FileBlockProps) {
+export default function FileBlock({ url, filename, sizeBytes, description, locale = 'pt-br' }: FileBlockProps) {
+  const t = translations[locale];
   return (
     <a
       href={url}
@@ -30,7 +37,7 @@ export default function FileBlock({ url, filename, sizeBytes, description }: Fil
       {sizeBytes != null && sizeBytes > 0 && (
         <span className="text-xs text-text-mid whitespace-nowrap">{formatBytes(sizeBytes)}</span>
       )}
-      <span className="font-pixel text-pixel-xs text-primary">Download</span>
+      <span className="font-pixel text-pixel-xs text-primary">{t.download}</span>
     </a>
   );
 }

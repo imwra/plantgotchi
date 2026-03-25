@@ -1,10 +1,13 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import CourseLandingPage from "../../../components/ui/organisms/CourseLandingPage";
+import { getLocaleFromPath } from "../../../i18n";
 
+const locale = getLocaleFromPath(Astro.url.pathname);
 const { slug } = Astro.params;
+const title = locale === "pt-br" ? "Curso" : "Course";
 ---
 
-<BaseLayout title="Course">
-  <CourseLandingPage client:load slug={slug!} />
+<BaseLayout title={title}>
+  <CourseLandingPage client:load slug={slug!} locale={locale} />
 </BaseLayout>

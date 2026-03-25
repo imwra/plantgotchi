@@ -12,7 +12,23 @@ interface CatalogCourse {
 
 interface Tag { id: string; name: string; slug: string; }
 
-export default function CourseCatalog() {
+const translations = {
+  en: {
+    heading: 'Courses', subtitle: 'Learn plant care from expert growers',
+    newest: 'Newest', popular: 'Most Popular', priceLow: 'Price: Low to High', priceHigh: 'Price: High to Low',
+    loading: 'Loading courses...', noMatch: 'No courses match your filters.', noAvailable: 'No courses available yet.',
+    search: 'Search courses...',
+  },
+  'pt-br': {
+    heading: 'Cursos', subtitle: 'Aprenda cuidados com plantas de cultivadores experientes',
+    newest: 'Mais Recentes', popular: 'Mais Populares', priceLow: 'Preco: Menor para Maior', priceHigh: 'Preco: Maior para Menor',
+    loading: 'Carregando cursos...', noMatch: 'Nenhum curso corresponde aos filtros.', noAvailable: 'Nenhum curso disponivel ainda.',
+    search: 'Buscar cursos...',
+  },
+};
+
+export default function CourseCatalog({ locale = 'pt-br' }: { locale?: 'pt-br' | 'en' }) {
+  const t = translations[locale];
   const [courses, setCourses] = useState<CatalogCourse[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
@@ -40,11 +56,11 @@ export default function CourseCatalog() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-bg via-bg-warm to-bg p-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 font-pixel text-pixel-xl text-text">Courses</h1>
-        <p className="mb-6 text-sm text-text-mid">Learn plant care from expert growers</p>
+        <h1 className="mb-2 font-pixel text-pixel-xl text-text">{t.heading}</h1>
+        <p className="mb-6 text-sm text-text-mid">{t.subtitle}</p>
 
         <div className="space-y-4 mb-6">
-          <SearchBar value={query} onChange={setQuery} />
+          <SearchBar value={query} onChange={setQuery} placeholder={t.search} />
           {tags.length > 0 && (
             <TagFilter tags={tags} selected={selectedTags}
               onToggle={(slug) => setSelectedTags(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug])} />
@@ -52,22 +68,22 @@ export default function CourseCatalog() {
           <div className="flex justify-end">
             <select value={sort} onChange={(e) => setSort(e.target.value as typeof sort)}
               className="border border-border-light rounded-md px-2 py-1 text-sm bg-bg-warm text-text focus:border-border-accent focus:outline-none">
-              <option value="newest">Newest</option>
-              <option value="popular">Most Popular</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
+              <option value="newest">{t.newest}</option>
+              <option value="popular">{t.popular}</option>
+              <option value="price_asc">{t.priceLow}</option>
+              <option value="price_desc">{t.priceHigh}</option>
             </select>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-12 text-text-mid">Loading courses...</div>
+          <div className="flex items-center justify-center py-12 text-text-mid">{t.loading}</div>
         ) : courses.length === 0 ? (
-          <p className="text-sm text-text-light">{query || selectedTags.length ? 'No courses match your filters.' : 'No courses available yet.'}</p>
+          <p className="text-sm text-text-light">{query || selectedTags.length ? t.noMatch : t.noAvailable}</p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {courses.map(c => (
-              <CourseCard key={c.id} title={c.title} slug={c.slug} description={c.description} coverImageUrl={c.cover_image_url} creatorName={c.creator_name} priceCents={c.price_cents} currency={c.currency} enrollmentCount={c.enrollment_count} />
+              <CourseCard key={c.id} title={c.title} slug={c.slug} description={c.description} coverImageUrl={c.cover_image_url} creatorName={c.creator_name} priceCents={c.price_cents} currency={c.currency} enrollmentCount={c.enrollment_count} locale={locale} />
             ))}
           </div>
         )}

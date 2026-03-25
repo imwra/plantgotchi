@@ -2,11 +2,15 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import CreatorProfileForm from "../components/ui/organisms/CreatorProfileForm";
 import { getSession } from "../lib/auth";
+import { getLocaleFromPath } from "../i18n";
 
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect("/login");
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const title = locale === "pt-br" ? "Tornar-se Criador" : "Become a Creator";
 ---
 
-<BaseLayout title="Become a Creator">
-  <CreatorProfileForm client:load mode="create" />
+<BaseLayout title={title}>
+  <CreatorProfileForm client:load mode="create" locale={locale} />
 </BaseLayout>

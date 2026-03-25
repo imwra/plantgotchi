@@ -1,8 +1,12 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CourseCatalog from "../../components/ui/organisms/CourseCatalog";
+import { getLocaleFromPath } from "../../i18n";
+
+const locale = getLocaleFromPath(Astro.url.pathname);
+const title = locale === "pt-br" ? "Cursos" : "Courses";
 ---
 
-<BaseLayout title="Courses">
-  <CourseCatalog client:load />
+<BaseLayout title={title}>
+  <CourseCatalog client:load locale={locale} />
 </BaseLayout>

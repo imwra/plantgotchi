@@ -6,9 +6,31 @@ interface MediaUploaderProps {
   accept?: string;
   onUpload: (asset: { public_url: string; r2_key: string; filename: string; content_type: string; size_bytes: number }) => void;
   label?: string;
+  locale?: 'pt-br' | 'en';
 }
 
-export default function MediaUploader({ accept = 'image/*,video/*', onUpload, label = 'Upload file' }: MediaUploaderProps) {
+const translations = {
+  en: {
+    defaultLabel: 'Upload file',
+    tooLarge: 'File too large (max 50 MB)',
+    uploadFailed: 'Upload failed — unsupported file type or not signed in',
+    metaFailed: 'Failed to save upload metadata',
+    storageFailed: 'Upload to storage failed',
+    networkError: 'Network error during upload',
+  },
+  'pt-br': {
+    defaultLabel: 'Enviar arquivo',
+    tooLarge: 'Arquivo muito grande (maximo 50 MB)',
+    uploadFailed: 'Envio falhou — tipo de arquivo nao suportado ou nao autenticado',
+    metaFailed: 'Falha ao salvar metadados do envio',
+    storageFailed: 'Envio para o armazenamento falhou',
+    networkError: 'Erro de rede durante o envio',
+  },
+};
+
+export default function MediaUploader({ accept = 'image/*,video/*', onUpload, label, locale = 'pt-br' }: MediaUploaderProps) {
+  const t = translations[locale];
+  const displayLabel = label || t.defaultLabel;
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
@@ -18,7 +40,7 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
     setError(null);
 
     if (file.size > MAX_FILE_SIZE) {
-      setError('File too large (max 50 MB)');
+      setError(t.tooLarge);
       return;
     }
 
@@ -31,7 +53,7 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
       body: JSON.stringify({ filename: file.name, content_type: file.type }),
     });
     if (!res.ok) {
-      setError('Upload failed — unsupported file type or not signed in');
+      setError(t.uploadFailed);
       setUploading(false);
       return;
     }
@@ -49,19 +71,19 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
         if (metaRes.ok) {
           onUpload({ public_url, r2_key, filename: file.name, content_type: file.type, size_bytes: file.size });
         } else {
-          setError('Failed to save upload metadata');
+          setError(t.metaFailed);
         }
       } else {
-        setError('Upload to storage failed');
+        setError(t.storageFailed);
       }
       setUploading(false);
       setProgress(0);
     };
-    xhr.onerror = () => { setUploading(false); setProgress(0); setError('Network error during upload'); };
+    xhr.onerror = () => { setUploading(false); setProgress(0); setError(t.networkError); };
     xhr.open('PUT', upload_url);
     xhr.setRequestHeader('Content-Type', file.type);
     xhr.send(file);
-  }, [onUpload]);
+  }, [onUpload, t]);
 
   return (
     <div
@@ -79,7 +101,7 @@ export default function MediaUploader({ accept = 'image/*,video/*', onUpload, la
         </div>
       ) : (
         <label className="cursor-pointer">
-          <span className="text-sm text-soil/60">{label}</span>
+          <span className="text-sm text-soil/60">{displayLabel}</span>
           <input type="file" accept={accept} className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); }} />
         </label>
       )}

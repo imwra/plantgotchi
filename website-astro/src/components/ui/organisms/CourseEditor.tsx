@@ -8,7 +8,35 @@ interface Module { id: string; title: string; is_preview: number; blocks: Block[
 interface Phase { id: string; title: string; description: string | null; sort_order: number; modules: Module[] }
 interface CourseData { id: string; title: string; slug: string; description: string | null; price_cents: number; currency: string; status: string; cover_image_url: string | null; phases: Phase[] }
 
-export default function CourseEditor({ slug }: { slug?: string }) {
+const translations = {
+  en: {
+    loading: 'Loading...', backDashboard: '\u2190 Dashboard',
+    draft: 'Draft', published: 'Published', archived: 'Archived',
+    saving: 'Saving...', createCourse: 'Create Course', save: 'Save',
+    courseTitle: 'Course Title', courseDesc: 'Course description...',
+    priceCents: 'Price (cents)', changeCover: 'Change Cover', uploadCover: 'Upload Cover Image',
+    phases: 'Phases', add: '+ Add', module: '+ Module',
+    addText: '+ Text', addVideo: '+ Video', addQuiz: '+ Quiz',
+    addImage: '+ Image', addFile: '+ File', addCode: '+ Code',
+    selectModule: 'Select a module or create one to edit content.',
+    addPhase: 'Add a phase to start building your course.',
+  },
+  'pt-br': {
+    loading: 'Carregando...', backDashboard: '\u2190 Painel',
+    draft: 'Rascunho', published: 'Publicado', archived: 'Arquivado',
+    saving: 'Salvando...', createCourse: 'Criar Curso', save: 'Salvar',
+    courseTitle: 'Titulo do Curso', courseDesc: 'Descricao do curso...',
+    priceCents: 'Preco (centavos)', changeCover: 'Trocar Capa', uploadCover: 'Enviar Imagem de Capa',
+    phases: 'Fases', add: '+ Adicionar', module: '+ Modulo',
+    addText: '+ Texto', addVideo: '+ Video', addQuiz: '+ Quiz',
+    addImage: '+ Imagem', addFile: '+ Arquivo', addCode: '+ Codigo',
+    selectModule: 'Selecione um modulo ou crie um para editar conteudo.',
+    addPhase: 'Adicione uma fase para comecar a construir seu curso.',
+  },
+};
+
+export default function CourseEditor({ slug, locale = 'pt-br' }: { slug?: string; locale?: 'pt-br' | 'en' }) {
+  const t = translations[locale];
   const isNew = !slug;
   const [course, setCourse] = useState<CourseData | null>(null);
   const [title, setTitle] = useState('');
@@ -123,7 +151,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     setPhases(prev => prev.map(p => ({ ...p, modules: p.modules.map(m => ({ ...m, blocks: m.blocks.filter(b => b.id !== blockId) })) })));
   };
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">Loading...</div>;
+  if (loading) return <div className="flex min-h-screen items-center justify-center text-text-mid">{t.loading}</div>;
 
   const activePhase = phases.find(p => p.id === activePhaseId);
   const activeModule = phases.flatMap(p => p.modules).find(m => m.id === activeModuleId);
@@ -132,28 +160,28 @@ export default function CourseEditor({ slug }: { slug?: string }) {
     <div className="min-h-screen bg-gradient-to-b from-bg via-bg-warm to-bg p-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
-          <a href="/creator/dashboard" className="text-sm text-text-light hover:text-text-mid">&larr; Dashboard</a>
+          <a href="/creator/dashboard" className="text-sm text-text-light hover:text-text-mid">{t.backDashboard}</a>
           <div className="flex gap-2">
             {!isNew && (
               <select value={status} onChange={e => setStatus(e.target.value)} className="rounded-md border border-border-light bg-bg-warm px-2 py-1 text-sm text-text focus:border-border-accent focus:outline-none">
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
+                <option value="draft">{t.draft}</option>
+                <option value="published">{t.published}</option>
+                <option value="archived">{t.archived}</option>
               </select>
             )}
             <button onClick={saveCourse} disabled={saving} className="rounded-md border-2 border-primary-dark bg-primary px-4 py-1 font-pixel text-pixel-xs text-white hover:bg-primary-dark disabled:opacity-50 transition-colors">
-              {saving ? 'Saving...' : isNew ? 'Create Course' : 'Save'}
+              {saving ? t.saving : isNew ? t.createCourse : t.save}
             </button>
           </div>
         </div>
 
         {/* Course metadata */}
         <div className="mb-6 rounded-xl border border-border bg-bg-card p-4 space-y-3 shadow-sm">
-          <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 font-pixel text-pixel-sm text-text focus:border-border-accent focus:outline-none" placeholder="Course Title" />
-          <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" rows={3} placeholder="Course description..." />
+          <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 font-pixel text-pixel-sm text-text focus:border-border-accent focus:outline-none" placeholder={t.courseTitle} />
+          <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" rows={3} placeholder={t.courseDesc} />
           <div className="flex gap-4">
             <label className="block">
-              <span className="text-xs text-text-mid">Price (cents)</span>
+              <span className="text-xs text-text-mid">{t.priceCents}</span>
               <input type="number" value={priceCents} onChange={e => setPriceCents(Number(e.target.value))} className="block w-32 rounded-md border border-border-light bg-bg-warm p-2 text-sm text-text focus:border-border-accent focus:outline-none" min={0} />
             </label>
           </div>
@@ -162,7 +190,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
               {course?.cover_image_url && <img src={course.cover_image_url} alt="Cover" className="w-16 h-16 rounded object-cover" />}
               <button onClick={() => { setMediaTarget('cover'); setShowMediaLibrary(true); }}
                 className="rounded-md border border-border-light px-3 py-1.5 text-sm text-text-mid hover:bg-bg-warm transition-colors">
-                {course?.cover_image_url ? 'Change Cover' : 'Upload Cover Image'}
+                {course?.cover_image_url ? t.changeCover : t.uploadCover}
               </button>
             </div>
           )}
@@ -173,8 +201,8 @@ export default function CourseEditor({ slug }: { slug?: string }) {
             {/* Phases sidebar */}
             <div className="w-56 shrink-0 space-y-2">
               <div className="flex items-center justify-between">
-                <h3 className="font-pixel text-pixel-xs text-text-mid">Phases</h3>
-                <button onClick={addPhase} className="font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">+ Add</button>
+                <h3 className="font-pixel text-pixel-xs text-text-mid">{t.phases}</h3>
+                <button onClick={addPhase} className="font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">{t.add}</button>
               </div>
               {phases.map(phase => (
                 <div key={phase.id}>
@@ -188,7 +216,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
                           {mod.title}
                         </button>
                       ))}
-                      <button onClick={() => addModule(phase.id)} className="w-full px-2 py-1 text-left font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">+ Module</button>
+                      <button onClick={() => addModule(phase.id)} className="w-full px-2 py-1 text-left font-pixel text-pixel-xs text-primary hover:text-primary-dark transition-colors">{t.module}</button>
                     </div>
                   )}
                 </div>
@@ -201,21 +229,21 @@ export default function CourseEditor({ slug }: { slug?: string }) {
                 <div className="space-y-4">
                   <h3 className="font-pixel text-pixel-lg text-text">{activeModule.title}</h3>
                   {activeModule.blocks.sort((a, b) => a.sort_order - b.sort_order).map(block => (
-                    <ContentBlockEditor key={block.id} blockType={block.block_type} content={block.content} onChange={(c) => updateBlock(block.id, c)} onDelete={() => deleteBlock(block.id)} />
+                    <ContentBlockEditor key={block.id} blockType={block.block_type} content={block.content} onChange={(c) => updateBlock(block.id, c)} onDelete={() => deleteBlock(block.id)} locale={locale} />
                   ))}
                   <div className="flex gap-2 flex-wrap">
-                    <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Text</button>
-                    <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Video</button>
-                    <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Quiz</button>
-                    <button onClick={() => addBlock(activeModule.id, 'image')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Image</button>
-                    <button onClick={() => addBlock(activeModule.id, 'file')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ File</button>
-                    <button onClick={() => addBlock(activeModule.id, 'code')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">+ Code</button>
+                    <button onClick={() => addBlock(activeModule.id, 'text')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addText}</button>
+                    <button onClick={() => addBlock(activeModule.id, 'video')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addVideo}</button>
+                    <button onClick={() => addBlock(activeModule.id, 'quiz')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addQuiz}</button>
+                    <button onClick={() => addBlock(activeModule.id, 'image')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addImage}</button>
+                    <button onClick={() => addBlock(activeModule.id, 'file')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addFile}</button>
+                    <button onClick={() => addBlock(activeModule.id, 'code')} className="rounded-md border border-border-light px-3 py-1 font-pixel text-pixel-xs text-text-mid hover:border-border-accent hover:text-primary transition-colors">{t.addCode}</button>
                   </div>
                 </div>
               ) : activePhase ? (
-                <p className="text-sm text-text-light">Select a module or create one to edit content.</p>
+                <p className="text-sm text-text-light">{t.selectModule}</p>
               ) : (
-                <p className="text-sm text-text-light">Add a phase to start building your course.</p>
+                <p className="text-sm text-text-light">{t.addPhase}</p>
               )}
             </div>
           </div>
@@ -225,6 +253,7 @@ export default function CourseEditor({ slug }: { slug?: string }) {
       {showMediaLibrary && mediaTarget && (
         <MediaLibrary
           accept={mediaTarget === 'cover' ? 'image/*' : 'image/*,video/*'}
+          locale={locale}
           onClose={() => { setShowMediaLibrary(false); setMediaTarget(null); }}
           onSelect={async (url) => {
             if (mediaTarget === 'cover') {

@@ -2,13 +2,16 @@
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import CourseLearnerView from "../../../components/ui/organisms/CourseLearnerView";
 import { getSession } from "../../../lib/auth";
+import { getLocaleFromPath } from "../../../i18n";
 
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect("/login");
 
+const locale = getLocaleFromPath(Astro.url.pathname);
 const { slug } = Astro.params;
+const title = locale === "pt-br" ? "Aprender" : "Learn";
 ---
 
-<BaseLayout title="Learn">
-  <CourseLearnerView client:load slug={slug!} />
+<BaseLayout title={title}>
+  <CourseLearnerView client:load slug={slug!} locale={locale} />
 </BaseLayout>

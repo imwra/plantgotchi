@@ -2,13 +2,16 @@
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import CourseEditor from "../../../../components/ui/organisms/CourseEditor";
 import { getSession } from "../../../../lib/auth";
+import { getLocaleFromPath } from "../../../../i18n";
 
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect("/login");
 
+const locale = getLocaleFromPath(Astro.url.pathname);
 const { slug } = Astro.params;
+const title = locale === "pt-br" ? "Editar Curso" : "Edit Course";
 ---
 
-<BaseLayout title="Edit Course">
-  <CourseEditor client:load slug={slug!} />
+<BaseLayout title={title}>
+  <CourseEditor client:load slug={slug!} locale={locale} />
 </BaseLayout>
