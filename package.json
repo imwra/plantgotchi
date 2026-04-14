@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:repo-consistency": "node --test tests/repo/verify-repo-consistency.test.mjs",
+    "verify:repo-consistency": "node scripts/verify-repo-consistency.mjs"
+  }
+}
