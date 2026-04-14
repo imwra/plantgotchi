@@ -1,71 +1,81 @@
 # Plantgotchi
 
-Smart plant sensors with a Tamagotchi-inspired app experience. Stick it in soil, connect to WiFi, and watch your plants thrive.
+Plantgotchi is a multi-surface plant tracking project built around manual logging today, with sensor-connected workflows planned but not required for normal use in this repository.
 
-## Pages
+## Repository Status
 
-### Landing Page (`/`)
+- `website-astro` is the primary web app and current deployment target.
+- `website` is a smaller Next.js app kept in-repo as a secondary static web surface.
+- `ios-app` and `mac-app` are active native Apple targets with working local verification.
+- `android-app` is still incomplete and should be treated as work in progress.
+- Hardware, firmware, and manufacturing deliverables are not implemented in this repo yet.
 
-The marketing homepage featuring product lineup, pricing bundles, setup configurations, a digital garden dashboard preview, and an iOS app screens showcase.
+## Primary Web App
 
-| Desktop | Mobile |
-|---------|--------|
-| ![Landing Page](screenshots/home-page.png) | ![Landing Page Mobile](screenshots/home-page-mobile.png) |
+The main product surface lives in `website-astro/`. It contains the current Astro app, API routes, tests, and Storybook-driven component work.
 
-### Garden Dashboard (`/garden`)
+Run it locally:
 
-Interactive plant monitoring dashboard with segmented HP bars, moisture indicators, mini SVG trend charts, status badges, and a detail panel. Responsive layout with a mobile bottom-sheet overlay.
+```bash
+cd website-astro
+npm install
+npm run build
+npm test
+npm run dev
+```
 
-| Desktop | Mobile |
-|---------|--------|
-| ![Garden Dashboard](screenshots/garden-desktop.png) | ![Garden Dashboard Mobile](screenshots/garden-mobile.png) |
+Important environment variables are documented in `website-astro/.env.example`.
 
-### Admin Dashboard (`/admin`)
+## Secondary Web App
 
-Internal product launch tracker with 11 development phases, task management, cost estimation, and milestone tracking.
+The `website/` app is a smaller Next.js 16 static export project used for an alternate marketing/dashboard surface.
 
-| Desktop | Mobile |
-|---------|--------|
-| ![Admin Dashboard](screenshots/admin-page.png) | ![Admin Dashboard Mobile](screenshots/admin-page-mobile.png) |
-
-## Tech Stack
-
-- **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS v4
-- **Font:** Press Start 2P (retro pixel aesthetic)
-- **Deployment:** Static export ready
-
-## Getting Started
+Run its local verification:
 
 ```bash
 cd website
 npm install
+npm run build
+npm run lint
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the landing page, [http://localhost:3000/garden](http://localhost:3000/garden) for the garden dashboard, and [http://localhost:3000/admin](http://localhost:3000/admin) for the launch tracker.
+## Native Apple Apps
 
-## Mac App
+The shared Swift package and iOS code live in `ios-app/`. The native macOS shell lives in `mac-app/PlantgotchiMac.xcodeproj`.
 
-The native macOS shell lives in `mac-app/PlantgotchiMac.xcodeproj` and consumes shared models plus snapshot logic from `ios-app/Package.swift`.
-
-Run the shared Swift tests:
+Run the verified Apple commands:
 
 ```bash
 cd ios-app
 swift test
 ```
 
-Build or test the Mac app:
-
 ```bash
 xcodebuild -project mac-app/PlantgotchiMac.xcodeproj -scheme PlantgotchiMac -destination 'platform=macOS' build
 xcodebuild test -project mac-app/PlantgotchiMac.xcodeproj -scheme PlantgotchiMac -destination 'platform=macOS'
 ```
 
-Build or test the widget extension:
-
 ```bash
 xcodebuild -project mac-app/PlantgotchiMac.xcodeproj -scheme PlantgotchiWidgets -destination 'platform=macOS' build
-xcodebuild test -project mac-app/PlantgotchiMac.xcodeproj -scheme PlantgotchiWidgets -destination 'platform=macOS'
 ```
+
+## Android
+
+`android-app/` is in progress. The manifest and Gradle project exist, but the Android product is not feature-complete yet and should not be treated as parity with the Apple apps or the web app.
+
+## Ingestion
+
+The data ingestion package lives in `ingestion/`.
+
+Run its tests with:
+
+```bash
+cd ingestion
+npm install
+npm test
+```
+
+## Current Operating Model
+
+Current repo-supported usage centers on manual logging, garden views, and supporting product/admin flows. Sensor-connected behavior can be designed and scaffolded in code, but this repository does not depend on having a physical device connected in order to develop or verify the software surfaces.
