@@ -39,6 +39,29 @@ const translations = {
     all: 'All', auth: 'Auth', plants: 'Plants', lifecycle: 'Lifecycle',
     sensors: 'Sensors', dataSync: 'Data/Sync', metaLabel: 'Settings/Achievements', lmsLabel: 'Creators/Courses',
     prev: 'Previous', next: 'Next',
+    flowchartNodes: {
+      signup: 'Sign Up', signin: 'Sign In', apple_auth: 'Apple Auth', token: 'Token Mgmt', signout: 'Sign Out',
+      garden: 'Garden View', add_plant: 'Add Plant', strain_pick: 'Strain Picker', plant_detail: 'Plant Detail',
+      quick_actions: 'Quick Actions', recommendations: 'Recommendations', grow_log_hist: 'Grow Log History', strain_profiles: 'Strain Profiles',
+      germination: 'Germination', seedling: 'Seedling', vegetative: 'Vegetative', flowering: 'Flowering',
+      drying: 'Drying', curing: 'Curing', processing: 'Processing', complete: 'Complete',
+      phase_trans: 'Phase Transition', grow_session: 'Grow Session', grow_logging: 'Grow Logging', quick_log: 'Quick Log',
+      measurements: 'Measurements', harvest_flow: 'Harvest Flow', ble_scan: 'BLE Scan', sensor_pair: 'Sensor Pair', sensor_read: 'Sensor Read',
+      rule_engine: 'Rule Engine', threshold_res: 'Threshold Res.', transition_sug: 'Transition Sug.', achievements: 'Achievements',
+      local_db: 'Local DB', push_sync: 'Push Sync', pull_sync: 'Pull Sync', api_server: 'API Server',
+      ios_app: 'iOS App', macos_app: 'macOS App', android_app: 'Android App', web_app: 'Web App', settings: 'Settings',
+      become_creator: 'Become Creator', creator_profile: 'Creator Profile', creator_dash: 'Creator Dashboard',
+      create_course: 'Create Course', course_editor: 'Course Editor', add_phases: 'Add Phases', add_modules: 'Add Modules',
+      add_blocks: 'Add Blocks', publish_course: 'Publish Course', course_catalog: 'Course Catalog',
+      course_landing: 'Course Landing', enroll: 'Enroll', learner_view: 'Learner View', video_player: 'Video Player',
+      quiz_block: 'Quiz Block', progress_track: 'Progress Track', module_complete: 'Module Complete',
+      media_library: 'Media Library', image_block: 'Image Block', file_block: 'File Block', code_block: 'Code Block',
+      fts5_search: 'FTS5 Search', tag_filter: 'Tag Filter',
+    } as Record<string, string>,
+    flowchartSections: {
+      auth: 'Authentication', plants: 'Plants / Garden', lifecycle: 'Cannabis Lifecycle',
+      sensors: 'Sensors + Rules', data: 'Data + Platform', lms: 'Learning Management (Creators & Courses)',
+    } as Record<string, string>,
     tree: {
       sections: [
         {
@@ -212,6 +235,29 @@ const translations = {
     all: 'Todos', auth: 'Auth', plants: 'Plantas', lifecycle: 'Ciclo de Vida',
     sensors: 'Sensores', dataSync: 'Dados/Sync', metaLabel: 'Config/Conquistas', lmsLabel: 'Criadores/Cursos',
     prev: 'Anterior', next: 'Proximo',
+    flowchartNodes: {
+      signup: 'Cadastro', signin: 'Login', apple_auth: 'Apple Auth', token: 'Ger. Token', signout: 'Sair',
+      garden: 'Visao Jardim', add_plant: 'Add. Planta', strain_pick: 'Sel. Variedade', plant_detail: 'Detalhe Planta',
+      quick_actions: 'Acoes Rapidas', recommendations: 'Recomendacoes', grow_log_hist: 'Hist. Cultivo', strain_profiles: 'Perfis Variedade',
+      germination: 'Germinacao', seedling: 'Muda', vegetative: 'Vegetativo', flowering: 'Floracao',
+      drying: 'Secagem', curing: 'Cura', processing: 'Processamento', complete: 'Completo',
+      phase_trans: 'Trans. de Fase', grow_session: 'Sessao Cultivo', grow_logging: 'Registro Cultivo', quick_log: 'Log Rapido',
+      measurements: 'Medicoes', harvest_flow: 'Fluxo Colheita', ble_scan: 'Scan BLE', sensor_pair: 'Parear Sensor', sensor_read: 'Leitura Sensor',
+      rule_engine: 'Motor Regras', threshold_res: 'Res. Limiares', transition_sug: 'Sug. Transicao', achievements: 'Conquistas',
+      local_db: 'DB Local', push_sync: 'Sync Push', pull_sync: 'Sync Pull', api_server: 'Servidor API',
+      ios_app: 'App iOS', macos_app: 'App macOS', android_app: 'App Android', web_app: 'App Web', settings: 'Configuracoes',
+      become_creator: 'Ser Criador', creator_profile: 'Perfil Criador', creator_dash: 'Painel Criador',
+      create_course: 'Criar Curso', course_editor: 'Editor Curso', add_phases: 'Add. Fases', add_modules: 'Add. Modulos',
+      add_blocks: 'Add. Blocos', publish_course: 'Publicar Curso', course_catalog: 'Catalogo Cursos',
+      course_landing: 'Pagina Curso', enroll: 'Inscrever', learner_view: 'Visao Aluno', video_player: 'Player Video',
+      quiz_block: 'Bloco Quiz', progress_track: 'Acomp. Progresso', module_complete: 'Modulo Concluido',
+      media_library: 'Biblioteca Midia', image_block: 'Bloco Imagem', file_block: 'Bloco Arquivo', code_block: 'Bloco Codigo',
+      fts5_search: 'Busca FTS5', tag_filter: 'Filtro Tags',
+    } as Record<string, string>,
+    flowchartSections: {
+      auth: 'Autenticacao', plants: 'Plantas / Jardim', lifecycle: 'Ciclo de Vida Cannabis',
+      sensors: 'Sensores + Regras', data: 'Dados + Plataforma', lms: 'Gestao de Aprendizado (Criadores & Cursos)',
+    } as Record<string, string>,
     tree: {
       sections: [
         {
@@ -762,11 +808,12 @@ function FlowchartView({ t }: { t: typeof translations['en'] }) {
       const catColor = CAT_COLORS[sl.cat] || CAT_COLORS.plants;
       const lx = nodeX(sl.col);
       const ly = nodeY(sl.minRow) - 30;
+      const sectionLabel = t.flowchartSections[sl.cat] || sl.label;
 
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       rect.setAttribute('x', String(lx - 8));
       rect.setAttribute('y', String(ly - 14));
-      rect.setAttribute('width', String(sl.label.length * 8.5 + 16));
+      rect.setAttribute('width', String(sectionLabel.length * 8.5 + 16));
       rect.setAttribute('height', '22');
       rect.setAttribute('rx', '4');
       rect.setAttribute('fill', catColor.stroke);
@@ -780,7 +827,7 @@ function FlowchartView({ t }: { t: typeof translations['en'] }) {
       text.setAttribute('font-weight', '700');
       text.setAttribute('fill', catColor.stroke);
       text.setAttribute('opacity', '0.8');
-      text.textContent = sl.label;
+      text.textContent = sectionLabel;
       svg.appendChild(text);
     });
 
@@ -891,7 +938,7 @@ function FlowchartView({ t }: { t: typeof translations['en'] }) {
       text.setAttribute('font-weight', '600');
       text.setAttribute('fill', C.text);
       text.setAttribute('pointer-events', 'none');
-      text.textContent = node.label;
+      text.textContent = t.flowchartNodes[node.id] || node.label;
 
       g.appendChild(rect);
       g.appendChild(text);
@@ -921,7 +968,7 @@ function FlowchartView({ t }: { t: typeof translations['en'] }) {
 
     // Update minimap
     drawMinimap();
-  }, [filter, highlighted, getConnected, canvasW, canvasH]);
+  }, [filter, highlighted, getConnected, canvasW, canvasH, t]);
 
   // Update SVG transform
   useEffect(() => {
