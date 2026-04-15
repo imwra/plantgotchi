@@ -4,12 +4,51 @@ import { PixelButton } from '../atoms';
 
 const PLANT_EMOJIS = ['\uD83C\uDF3F', '\uD83C\uDF31', '\uD83E\uDEB4', '\uD83C\uDF35', '\uD83C\uDF3B', '\uD83C\uDF3A', '\uD83C\uDF38', '\uD83C\uDF40', '\uD83C\uDF3E', '\uD83C\uDF8B', '\uD83C\uDF8D', '\uD83C\uDF34'];
 
+const i18n = {
+  en: {
+    title: 'ADD PLANT',
+    name: 'NAME *',
+    species: 'SPECIES',
+    emoji: 'EMOJI *',
+    lightPref: 'LIGHT PREFERENCE',
+    lightLow: 'Low',
+    lightMedium: 'Medium',
+    lightHigh: 'High',
+    moistureMin: 'MOISTURE MIN %',
+    moistureMax: 'MOISTURE MAX %',
+    tempMin: 'TEMP MIN C',
+    tempMax: 'TEMP MAX C',
+    cancel: 'CANCEL',
+    create: 'CREATE',
+    errorFallback: 'Failed to create plant',
+  },
+  'pt-br': {
+    title: 'ADICIONAR PLANTA',
+    name: 'NOME *',
+    species: 'ESPECIE',
+    emoji: 'EMOJI *',
+    lightPref: 'PREFERENCIA DE LUZ',
+    lightLow: 'Baixa',
+    lightMedium: 'Media',
+    lightHigh: 'Alta',
+    moistureMin: 'UMIDADE MIN %',
+    moistureMax: 'UMIDADE MAX %',
+    tempMin: 'TEMP MIN C',
+    tempMax: 'TEMP MAX C',
+    cancel: 'CANCELAR',
+    create: 'CRIAR',
+    errorFallback: 'Falha ao criar planta',
+  },
+};
+
 export interface AddPlantModalProps {
   onClose: () => void;
   onCreated: () => void;
+  locale?: string;
 }
 
-export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps) {
+export default function AddPlantModal({ onClose, onCreated, locale = 'pt-br' }: AddPlantModalProps) {
+  const t = i18n[locale as keyof typeof i18n] || i18n['pt-br'];
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('');
   const [emoji, setEmoji] = useState('\uD83C\uDF3F');
@@ -46,7 +85,7 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to create plant');
+        throw new Error(data.error || t.errorFallback);
       }
 
       const newPlant = await res.json().catch(() => ({}));
@@ -70,21 +109,21 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="bg-bg-card rounded-2xl shadow-md p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="font-pixel text-pixel-lg text-primary-dark mb-4 text-center">ADD PLANT</h2>
+        <h2 className="font-pixel text-pixel-lg text-primary-dark mb-4 text-center">{t.title}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className={labelClasses}>NAME *</label>
+            <label className={labelClasses}>{t.name}</label>
             <input className={inputClasses} value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
 
           <div className="mb-3">
-            <label className={labelClasses}>SPECIES</label>
+            <label className={labelClasses}>{t.species}</label>
             <input className={inputClasses} value={species} onChange={(e) => setSpecies(e.target.value)} />
           </div>
 
           <div className="mb-3">
-            <label className={labelClasses}>EMOJI *</label>
+            <label className={labelClasses}>{t.emoji}</label>
             <div className="flex flex-wrap gap-2">
               {PLANT_EMOJIS.map((e) => (
                 <button
@@ -104,36 +143,36 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
           </div>
 
           <div className="mb-3">
-            <label className={labelClasses}>LIGHT PREFERENCE</label>
+            <label className={labelClasses}>{t.lightPref}</label>
             <select
               className={inputClasses}
               value={lightPreference}
               onChange={(e) => setLightPreference(e.target.value)}
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">{t.lightLow}</option>
+              <option value="medium">{t.lightMedium}</option>
+              <option value="high">{t.lightHigh}</option>
             </select>
           </div>
 
           <div className="mb-3 flex gap-2">
             <div className="flex-1">
-              <label className={labelClasses}>MOISTURE MIN %</label>
+              <label className={labelClasses}>{t.moistureMin}</label>
               <input className={inputClasses} type="number" min={0} max={100} value={moistureMin} onChange={(e) => setMoistureMin(+e.target.value)} />
             </div>
             <div className="flex-1">
-              <label className={labelClasses}>MOISTURE MAX %</label>
+              <label className={labelClasses}>{t.moistureMax}</label>
               <input className={inputClasses} type="number" min={0} max={100} value={moistureMax} onChange={(e) => setMoistureMax(+e.target.value)} />
             </div>
           </div>
 
           <div className="mb-4 flex gap-2">
             <div className="flex-1">
-              <label className={labelClasses}>TEMP MIN C</label>
+              <label className={labelClasses}>{t.tempMin}</label>
               <input className={inputClasses} type="number" min={-10} max={50} value={tempMin} onChange={(e) => setTempMin(+e.target.value)} />
             </div>
             <div className="flex-1">
-              <label className={labelClasses}>TEMP MAX C</label>
+              <label className={labelClasses}>{t.tempMax}</label>
               <input className={inputClasses} type="number" min={-10} max={50} value={tempMax} onChange={(e) => setTempMax(+e.target.value)} />
             </div>
           </div>
@@ -145,13 +184,13 @@ export default function AddPlantModal({ onClose, onCreated }: AddPlantModalProps
           )}
 
           <div className="flex gap-2">
-            <PixelButton label="CANCEL" variant="neutral" onClick={onClose} />
+            <PixelButton label={t.cancel} variant="neutral" onClick={onClose} />
             <button
               type="submit"
               disabled={loading}
               className="font-pixel text-pixel-sm flex-1 rounded-md py-2 px-1 cursor-pointer transition-all border bg-primary text-white border-primary-dark hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '...' : 'CREATE'}
+              {loading ? '...' : t.create}
             </button>
           </div>
         </form>
