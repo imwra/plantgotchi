@@ -473,7 +473,7 @@ export default function GardenDashboard({
 
       {/* Add Plant Modal */}
       {showAddModal && !demoMode && (
-        <AddPlantModal onClose={() => setShowAddModal(false)} onCreated={fetchPlants} />
+        <AddPlantModal onClose={() => setShowAddModal(false)} onCreated={fetchPlants} locale={locale} />
       )}
 
       {/* Footer */}
